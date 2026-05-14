@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,40 +16,19 @@ import { useAuth } from "@/lib/auth-store";
 import { importerApi } from "@/lib/api";
 import { TwoFactorCard } from "@/components/two-factor-card";
 
+type ProfileShape = {
+  id?: string;
+  firstname?: string;
+  lastname?: string;
+  phone?: string;
+  address?: string;
+  profile_name?: string;
+  totp_enabled?: boolean;
+};
+
 export default function AccountPage() {
   const { data, isLoading } = useImporterProfile();
-  const updateUser = useAuth((s) => s.updateUser);
-  const qc = useQueryClient();
-
-  const [form, setForm] = useState({
-    firstname: "",
-    lastname: "",
-    phone: "",
-    address: "",
-    profile_name: "",
-  });
-
-  useEffect(() => {
-    if (data && typeof data === "object") {
-      const d = data as Record<string, string>;
-      setForm({
-        firstname: d.firstname ?? "",
-        lastname: d.lastname ?? "",
-        phone: d.phone ?? "",
-        address: d.address ?? "",
-        profile_name: d.profile_name ?? "",
-      });
-    }
-  }, [data]);
-
-  const update = useMutation({
-    mutationFn: () => importerApi.updateProfile(form),
-    onSuccess: () => {
-      updateUser(form);
-      qc.invalidateQueries({ queryKey: queryKeys.importerProfile });
-      toast.success("Profile updated");
-    },
-  });
+  const profile = (data ?? {}) as ProfileShape;
 
   return (
     <>
@@ -76,31 +55,16 @@ export default function AccountPage() {
                   <Skeleton className="h-10 w-full" />
                 </div>
               ) : (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    update.mutate();
-                  }}
-                  className="space-y-4"
-                >
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <Field label="First name" id="firstname" value={form.firstname} onChange={(v) => setForm({ ...form, firstname: v })} />
-                    <Field label="Last name" id="lastname" value={form.lastname} onChange={(v) => setForm({ ...form, lastname: v })} />
-                  </div>
-                  <Field label="Phone" id="phone" type="tel" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-                  <Field label="Address" id="address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
-                  <Field label="Profile name" id="profile_name" value={form.profile_name} onChange={(v) => setForm({ ...form, profile_name: v })} />
-                  <Button type="submit" loading={update.isPending}>
-                    Save changes
-                  </Button>
-                </form>
+                // Key the form on the profile identity so it re-mounts with
+                // fresh state once the query resolves. Avoids setState-in-effect.
+                <ProfileForm key={profile.id ?? "loading"} initial={profile} />
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="security" className="mt-6 space-y-4">
-          <TwoFactorCard enabled={Boolean((data as { totp_enabled?: boolean })?.totp_enabled)} />
+          <TwoFactorCard enabled={Boolean(profile.totp_enabled)} />
           <Card>
             <CardContent className="space-y-4 p-6">
               <h3 className="font-semibold">Password</h3>
@@ -127,6 +91,48 @@ export default function AccountPage() {
         </TabsContent>
       </Tabs>
     </>
+  );
+}
+
+function ProfileForm({ initial }: { initial: ProfileShape }) {
+  const updateUser = useAuth((s) => s.updateUser);
+  const qc = useQueryClient();
+  const [form, setForm] = useState({
+    firstname: initial.firstname ?? "",
+    lastname: initial.lastname ?? "",
+    phone: initial.phone ?? "",
+    address: initial.address ?? "",
+    profile_name: initial.profile_name ?? "",
+  });
+
+  const update = useMutation({
+    mutationFn: () => importerApi.updateProfile(form),
+    onSuccess: () => {
+      updateUser(form);
+      qc.invalidateQueries({ queryKey: queryKeys.importerProfile });
+      toast.success("Profile updated");
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        update.mutate();
+      }}
+      className="space-y-4"
+    >
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="First name" id="firstname" value={form.firstname} onChange={(v) => setForm({ ...form, firstname: v })} />
+        <Field label="Last name" id="lastname" value={form.lastname} onChange={(v) => setForm({ ...form, lastname: v })} />
+      </div>
+      <Field label="Phone" id="phone" type="tel" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
+      <Field label="Address" id="address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
+      <Field label="Profile name" id="profile_name" value={form.profile_name} onChange={(v) => setForm({ ...form, profile_name: v })} />
+      <Button type="submit" loading={update.isPending}>
+        Save changes
+      </Button>
+    </form>
   );
 }
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-store";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { Spinner } from "@/components/ui/spinner";
 import type { Role } from "@/lib/types";
 
@@ -18,7 +19,7 @@ interface AuthGuardProps {
  * NOTE: This is a defense-in-depth layer. Real authorization happens
  * server-side via the bearer token attached by the API client.
  *
- * Waits for client mount + zustand persist hydration before deciding,
+ * Waits for client hydration + zustand persist hydration before deciding,
  * to avoid "Router action dispatched before initialization" in Next 16.
  */
 export function AuthGuard({ role, children }: AuthGuardProps) {
@@ -27,11 +28,7 @@ export function AuthGuard({ role, children }: AuthGuardProps) {
   const token = useAuth((s) => s.token);
   const currentRole = useAuth((s) => s.role);
   const isHydrated = useAuth((s) => s.isHydrated);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useHydrated();
 
   useEffect(() => {
     if (!mounted || !isHydrated) return;

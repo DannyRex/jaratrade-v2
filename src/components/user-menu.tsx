@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, Package, Heart, MapPin, Settings, LayoutDashboard, User } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/lib/auth-store";
 import { useLogout } from "@/lib/queries";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { initials } from "@/lib/format";
 
 export function UserMenu() {
@@ -23,10 +23,9 @@ export function UserMenu() {
   const user = useAuth((s) => s.user);
   const role = useAuth((s) => s.role);
   const logout = useLogout();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const hydrated = useHydrated();
 
-  if (!mounted) {
+  if (!hydrated) {
     return <div className="size-9 rounded-full bg-muted" aria-hidden />;
   }
 

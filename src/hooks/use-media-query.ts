@@ -1,18 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
-export function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+/**
+ * Subscribes to a media query. SSR-safe (always returns `false` on the server).
+ *
+ * Implemented via `useSyncExternalStore` so we don't trip React 19's
+ * `react-hooks/set-state-in-effect` rule — `matchMedia` is exactly the kind
+ * of external store this hook is designed for.
+ */
+export function useMediaQuery(query: string): boolean {
+  const subscribe = (onChange: () => void) => {
+    if (typeof window === "undefined") return () => {};
     const m = window.matchMedia(query);
-    setMatches(m.matches);
-    const onChange = (e: MediaQueryListEvent) => setMatches(e.matches);
     m.addEventListener("change", onChange);
     return () => m.removeEventListener("change", onChange);
-  }, [query]);
+  };
 
-  return matches;
+  const getSnapshot = () => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(query).matches;
+  };
+
+  const getServerSnapshot = () => false;
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
