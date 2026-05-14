@@ -6,7 +6,7 @@
  * from the public catalog, and handles upgrade -> Flutterwave inline -> verify.
  */
 import { useEffect, useState } from "react";
-import { Crown, Sparkles, ShieldCheck, Zap, X } from "lucide-react";
+import { Crown, Sparkles, ShieldCheck, Zap, X, CreditCard, AlertTriangle } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -209,6 +209,31 @@ export function SubscriptionPage({ role }: { role: Role }) {
                 ) : (
                   <p className="text-sm text-muted-foreground">No renewal scheduled.</p>
                 )}
+                {/* Stored card row — only show when there's one AND we're auto-renewing */}
+                {sub?.has_payment_token && sub.status === "active" ? (
+                  <p className="flex items-center gap-1.5 text-sm text-muted-foreground pt-1">
+                    <CreditCard className="size-4" aria-hidden />
+                    Auto-renew with{" "}
+                    <span className="font-medium text-foreground capitalize">
+                      {sub.card_brand ?? "card"}
+                    </span>{" "}
+                    {sub.card_last4 ? (
+                      <>
+                        ending in <span className="font-mono">{sub.card_last4}</span>
+                      </>
+                    ) : null}
+                  </p>
+                ) : null}
+                {/* Failure banner — surfaces silently-retried failures so the
+                    buyer knows to update their card before access lapses. */}
+                {sub && sub.renewal_failure_count > 0 && sub.status === "active" ? (
+                  <p className="flex items-start gap-1.5 text-sm text-warning pt-1">
+                    <AlertTriangle className="size-4 shrink-0 mt-0.5" aria-hidden />
+                    <span>
+                      Last renewal attempt failed ({sub.renewal_failure_count} of 3). We&apos;ll try again before {renewalDate ? formatDate(renewalDate) : "your renewal date"}.
+                    </span>
+                  </p>
+                ) : null}
               </div>
               {sub && sub.status === "active" ? (
                 <Button variant="outline" loading={cancel.isPending} onClick={() => cancel.mutate()}>

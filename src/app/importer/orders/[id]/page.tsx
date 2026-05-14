@@ -14,6 +14,8 @@ import { importerApi } from "@/lib/api";
 import { formatDate, formatMoney, shortId } from "@/lib/format";
 import type { Order } from "@/lib/types";
 import { ReviewPromptCard } from "@/components/review-prompt-card";
+import { RaiseDisputeDialog } from "@/components/raise-dispute-dialog";
+import { useImporterDisputes } from "@/lib/queries";
 
 export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -26,6 +28,10 @@ function OrderDetail({ id }: { id: string }) {
     queryFn: () => importerApi.getOrder(id) as Promise<Order>,
     enabled: Boolean(id),
   });
+  // Match existing dispute against this order so we can show "View dispute"
+  // instead of "Report issue" when one already exists.
+  const { data: disputes } = useImporterDisputes();
+  const existing = disputes?.rows.find((d) => d.order_id === id) ?? null;
 
   if (isError) {
     return (
@@ -61,7 +67,22 @@ function OrderDetail({ id }: { id: string }) {
       <PageHeader
         title={`Order ${shortId(data.order_id ?? data.id, 12)}`}
         description={`Placed ${formatDate(data.time_created)}`}
-        actions={<Badge variant="secondary">{data.status}</Badge>}
+        actions={
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary">{data.status}</Badge>
+            {/* Buyer can dispute only on shipped/delivered orders that aren't
+                already disputed. Refunded/cancelled orders skip this. */}
+            {existing ? (
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/importer/disputes/${encodeURIComponent(existing.id)}`}>
+                  View dispute
+                </Link>
+              </Button>
+            ) : data.status === "delivered" || data.status === "shipped" ? (
+              <RaiseDisputeDialog orderId={data.id} />
+            ) : null}
+          </div>
+        }
       />
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">

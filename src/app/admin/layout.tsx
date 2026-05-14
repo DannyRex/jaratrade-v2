@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AlertTriangle,
   Banknote,
   FolderTree,
   LayoutDashboard,
@@ -21,6 +22,7 @@ const nav: NavItem[] = [
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "KYC queue", href: "/admin/kyc", icon: UserCheck },
   { label: "Orders", href: "/admin/orders", icon: Package },
+  { label: "Disputes", href: "/admin/disputes", icon: AlertTriangle },
   { label: "Markets", href: "/admin/markets", icon: Store },
   { label: "Categories", href: "/admin/categories", icon: FolderTree },
   { label: "Banks", href: "/admin/banks", icon: Banknote },

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { StockBadge } from "@/components/stock-badge";
 import { useProduct } from "@/lib/queries";
 import { parseProductImages, parseProductProperties } from "@/lib/types";
 import { formatMoney, formatDate } from "@/lib/format";
@@ -83,7 +84,12 @@ function ProductDetail({ id }: { id: string }) {
   };
 
   const moq = data.min_order_quantity || 1;
-  const maxOrder = data.max_order_quantity > 0 ? data.max_order_quantity : 9999;
+  // If the seller has tracked stock, cap max order at the available units so
+  // the user can't accidentally exceed it. Falls back to the configured max.
+  const stockCap = typeof data.stock_quantity === "number" && data.stock_quantity > 0 ? data.stock_quantity : null;
+  const configuredMax = data.max_order_quantity > 0 ? data.max_order_quantity : 9999;
+  const maxOrder = stockCap !== null ? Math.min(stockCap, configuredMax) : configuredMax;
+  const outOfStock = typeof data.stock_quantity === "number" && data.stock_quantity <= 0;
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -154,6 +160,7 @@ function ProductDetail({ id }: { id: string }) {
                 {formatMoney(data.price, data.currency || "NGN")}
               </p>
               {data.has_tax ? <Badge variant="outline">Tax included</Badge> : null}
+              <StockBadge stock={data.stock_quantity} threshold={data.low_stock_threshold} />
             </div>
           </div>
 
@@ -209,8 +216,9 @@ function ProductDetail({ id }: { id: string }) {
                 <Plus className="size-4" />
               </Button>
             </div>
-            <Button size="lg" onClick={handleAddToCart} className="flex-1">
-              <ShoppingCart className="size-4" /> Add to cart · {formatMoney(Number(data.price) * quantity, data.currency || "NGN")}
+            <Button size="lg" onClick={handleAddToCart} className="flex-1" disabled={outOfStock}>
+              <ShoppingCart className="size-4" />
+              {outOfStock ? "Out of stock" : `Add to cart · ${formatMoney(Number(data.price) * quantity, data.currency || "NGN")}`}
             </Button>
             <Button size="lg" variant="outline" aria-label="Save to favourites">
               <Heart className="size-4" />

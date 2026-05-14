@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MapPin, Store as StoreIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { StockBadge } from "@/components/stock-badge";
 import { parseProductImages, type ProductSummary } from "@/lib/types";
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -56,6 +57,15 @@ export function ProductCard({ product, className, priority = false }: ProductCar
             </Badge>
           </div>
         ) : null}
+        {/* Only renders for low/out — keeps healthy cards visually quiet */}
+        <div className="absolute bottom-3 left-3">
+          <StockBadge
+            stock={product.stock_quantity}
+            threshold={product.low_stock_threshold}
+            compact
+            className="bg-background/95 backdrop-blur-sm shadow-sm"
+          />
+        </div>
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
         <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">

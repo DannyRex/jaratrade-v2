@@ -18,6 +18,8 @@ import type {
   ApiEnvelope,
   Bank,
   Category,
+  Dispute,
+  DisputeReason,
   ExporterPlan,
   HomeData,
   ImporterPlan,
@@ -331,6 +333,18 @@ export const importerApi = {
     request<SubscriptionDTO>("/imp/subscription/verify", { method: "POST", body: multipart({ tx_ref: txRef }) }),
   cancelSubscription: () =>
     request<SubscriptionDTO>("/imp/subscription/cancel", { method: "POST" }),
+
+  // Disputes (added v2.5)
+  raiseDispute: (
+    orderId: string,
+    payload: { reason: DisputeReason; description: string },
+  ) =>
+    request<Dispute>(`/imp/order/${orderId}/dispute`, {
+      method: "POST",
+      body: multipart(payload),
+    }),
+  listDisputes: () => request<PagedRows<Dispute>>("/imp/disputes"),
+  getDispute: (id: string) => request<Dispute>(`/imp/disputes/${id}`),
 };
 
 // -----------------------------------------------------------------------------
@@ -381,6 +395,18 @@ export const exporterApi = {
     request<SubscriptionDTO>("/exp/subscription/verify", { method: "POST", body: multipart({ tx_ref: txRef }) }),
   cancelSubscription: () =>
     request<SubscriptionDTO>("/exp/subscription/cancel", { method: "POST" }),
+
+  // Inventory (added v2.5)
+  confirmInventory: (
+    productId: string,
+    payload?: { stock_quantity?: number; low_stock_threshold?: number },
+  ) =>
+    request<ProductSummary>(`/exp/product/${productId}/confirm-inventory`, {
+      method: "POST",
+      body: multipart(payload ?? {}),
+    }),
+  confirmInventoryAll: () =>
+    request<{ confirmed: number }>("/exp/product/confirm-inventory-all", { method: "POST" }),
 };
 
 // -----------------------------------------------------------------------------
@@ -455,6 +481,22 @@ export const adminApi = {
   suspendUser: (id: string, reason?: string) =>
     request(`/adm/users/${id}/suspend`, { method: "POST", body: multipart({ reason: reason ?? "" }) }),
   reactivateUser: (id: string) => request(`/adm/users/${id}/reactivate`, { method: "POST" }),
+
+  // Disputes (added v2.5)
+  listDisputes: (params?: { status?: "open" | "in_review" | "resolved" | "rejected"; p?: number; len?: number }) =>
+    request<PagedRows<Dispute & { importer_email?: string | null; importer_name?: string | null }>>(
+      "/adm/disputes",
+      { query: params },
+    ),
+  acknowledgeDispute: (id: string) =>
+    request<Dispute>(`/adm/disputes/${id}/acknowledge`, { method: "POST" }),
+  resolveDispute: (
+    id: string,
+    payload: { resolution: "refund" | "replacement" | "dismissed"; refund_amount?: string; admin_notes?: string },
+  ) =>
+    request<Dispute>(`/adm/disputes/${id}/resolve`, { method: "POST", body: multipart(payload) }),
+  rejectDispute: (id: string, admin_notes?: string) =>
+    request<Dispute>(`/adm/disputes/${id}/reject`, { method: "POST", body: multipart({ admin_notes: admin_notes ?? "" }) }),
 };
 
 // -----------------------------------------------------------------------------
@@ -480,6 +522,13 @@ export interface SubscriptionDTO {
   tx_ref: string | null;
   cancelled_at: string | null;
   time_created: string;
+  /** Stored card metadata (added v2.5) — never the raw token, only the
+   * display bits needed for "Visa •4242" UX. */
+  card_last4: string | null;
+  card_brand: string | null;
+  has_payment_token: boolean;
+  renewal_failure_count: number;
+  last_renewal_attempt_at: string | null;
 }
 
 export interface SubscriptionState {

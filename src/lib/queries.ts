@@ -31,6 +31,12 @@ export const queryKeys = {
   adminCategories: ["admin", "categories"] as const,
   adminLogistics: ["admin", "logistics"] as const,
   adminExporterSubscriptions: ["admin", "subs", "exporter"] as const,
+  // v2.5
+  importerDisputes: ["importer", "disputes"] as const,
+  importerDispute: (id: string) => ["importer", "disputes", id] as const,
+  importerSubscription: ["importer", "subscription"] as const,
+  exporterSubscription: ["exporter", "subscription"] as const,
+  adminDisputes: (status?: string) => ["admin", "disputes", status ?? "all"] as const,
 };
 
 export const useHome = () =>
@@ -221,6 +227,55 @@ export const useAdminLogistics = () => {
   return useQuery({
     queryKey: queryKeys.adminLogistics,
     queryFn: adminApi.getLogistics,
+    enabled: isAuthed,
+  });
+};
+
+// ------------------------------- Disputes (v2.5) -----------------------------
+
+export const useImporterDisputes = () => {
+  const isAuthed = useAuth((s) => Boolean(s.token) && s.role === "importer");
+  return useQuery({
+    queryKey: queryKeys.importerDisputes,
+    queryFn: importerApi.listDisputes,
+    enabled: isAuthed,
+  });
+};
+
+export const useImporterDispute = (id: string | null | undefined) => {
+  const isAuthed = useAuth((s) => Boolean(s.token) && s.role === "importer");
+  return useQuery({
+    queryKey: queryKeys.importerDispute(id ?? ""),
+    queryFn: () => importerApi.getDispute(id!),
+    enabled: isAuthed && Boolean(id),
+  });
+};
+
+export const useAdminDisputes = (status?: "open" | "in_review" | "resolved" | "rejected") => {
+  const isAuthed = useAuth((s) => Boolean(s.token) && s.role === "admin");
+  return useQuery({
+    queryKey: queryKeys.adminDisputes(status),
+    queryFn: () => adminApi.listDisputes({ status }),
+    enabled: isAuthed,
+  });
+};
+
+// ------------------------------- Subscription (v2.5) -------------------------
+
+export const useImporterSubscription = () => {
+  const isAuthed = useAuth((s) => Boolean(s.token) && s.role === "importer");
+  return useQuery({
+    queryKey: queryKeys.importerSubscription,
+    queryFn: importerApi.getSubscription,
+    enabled: isAuthed,
+  });
+};
+
+export const useExporterSubscription = () => {
+  const isAuthed = useAuth((s) => Boolean(s.token) && s.role === "exporter");
+  return useQuery({
+    queryKey: queryKeys.exporterSubscription,
+    queryFn: exporterApi.getSubscription,
     enabled: isAuthed,
   });
 };

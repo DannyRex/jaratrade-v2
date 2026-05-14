@@ -170,6 +170,10 @@ export interface ProductSummary {
   /** Premium-tier sponsored placement flag from the backend (0 | 1). */
   promote?: number;
   status: number;
+  /** Inventory tracking (added v2.5) */
+  stock_quantity?: number;
+  low_stock_threshold?: number;
+  last_inventory_update_at?: string | null;
 }
 
 /** Detail shape (from /public/products/:id) */
@@ -200,6 +204,10 @@ export interface ProductDetail {
   market_name: string;
   market_location: string;
   market_id: string;
+  /** Inventory (added v2.5) */
+  stock_quantity?: number;
+  low_stock_threshold?: number;
+  last_inventory_update_at?: string | null;
 }
 
 export interface Store {
@@ -359,4 +367,33 @@ export function parseProductProperties(raw: string | undefined | null): Record<s
   } catch {
     return {};
   }
+}
+
+// =============================================================================
+// Disputes (added v2.5)
+// =============================================================================
+
+export type DisputeReason = "damaged" | "wrong_item" | "not_received" | "quality" | "other";
+export type DisputeStatus = "open" | "in_review" | "resolved" | "rejected";
+export type DisputeResolution = "refund" | "replacement" | "dismissed";
+
+export interface Dispute {
+  id: string;
+  order_id: string;
+  order_number?: string;
+  importer_id: string;
+  exporter_id: string;
+  reason: DisputeReason;
+  description: string;
+  status: DisputeStatus;
+  resolution: DisputeResolution | null;
+  refund_amount: string | null;
+  refund_currency: string | null;
+  refund_tx_ref: string | null;
+  replacement_order_id: string | null;
+  admin_notes: string | null;
+  reviewed_at: string | null;
+  resolved_at: string | null;
+  time_created: string;
+  time_updated: string;
 }
