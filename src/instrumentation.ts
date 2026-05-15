@@ -1,5 +1,5 @@
 /**
- * Next.js instrumentation hook — runs before the server boots.
+ * Next.js instrumentation hook - runs before the server boots.
  * https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
  *
  * We use it to load the appropriate Sentry config based on runtime.

@@ -27,11 +27,11 @@
   --popover: oklch(1 0 0);
   --popover-foreground: var(--foreground);
 
-  /* Brand primary — cobalt blue lifted from the logo glyph */
+  /* Brand primary - cobalt blue lifted from the logo glyph */
   --primary: oklch(0.4900 0.2186 264);
   --primary-foreground: oklch(0.9919 0 0);
 
-  /* Deep brand navy — used in hero gradient & dark sections */
+  /* Deep brand navy - used in hero gradient & dark sections */
   --brand-navy: oklch(0.2200 0.1100 264);
   --brand-cobalt: oklch(0.4900 0.2186 264);
   --brand-sky: oklch(0.7000 0.1593 245);
@@ -42,7 +42,7 @@
   --muted: oklch(0.9700 0.0148 250);
   --muted-foreground: oklch(0.5300 0.0382 257);
 
-  /* Accent — refined warm amber for sponsored / premium tags */
+  /* Accent - refined warm amber for sponsored / premium tags */
   --accent: oklch(0.7300 0.1730 55);
   --accent-foreground: oklch(0.1700 0.0498 264);
 
@@ -76,7 +76,7 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--primary);
 
-  /* Elevation tokens — used by Card, dialogs, header glass */
+  /* Elevation tokens - used by Card, dialogs, header glass */
   --shadow-soft: 0 1px 2px 0 oklch(0.22 0.11 264 / 0.04),
                  0 1px 1px 0 oklch(0.22 0.11 264 / 0.06);
   --shadow-card: 0 4px 16px -4px oklch(0.22 0.11 264 / 0.08),
@@ -87,7 +87,7 @@
 }
 
 .dark {
-  /* Deep navy base — premium, not pure black */
+  /* Deep navy base - premium, not pure black */
   --background: oklch(0.1500 0.0298 263);
   --foreground: oklch(0.9851 0 0);
 
@@ -227,7 +227,7 @@
     color: var(--foreground);
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
   }
-  /* Editorial display typography — used in headlines */
+  /* Editorial display typography - used in headlines */
   h1, h2, h3 {
     letter-spacing: -0.022em;
     font-feature-settings: "ss01" 1, "ss02" 1, "cv11" 1;
@@ -253,7 +253,7 @@
 }
 
 @layer utilities {
-  /* Brand gradient — cobalt → navy.  Used in hero, premium CTAs. */
+  /* Brand gradient - cobalt → navy.  Used in hero, premium CTAs. */
   .bg-brand-gradient {
     background: linear-gradient(
       135deg,
@@ -262,7 +262,7 @@
       oklch(0.22 0.11 264) 100%
     );
   }
-  /* Aurora — soft radial mesh used as hero backdrop */
+  /* Aurora - soft radial mesh used as hero backdrop */
   .bg-aurora {
     background:
       radial-gradient(60% 80% at 80% 0%, oklch(0.49 0.2186 264 / 0.18) 0%, transparent 70%),
@@ -275,7 +275,7 @@
       radial-gradient(circle, oklch(0.49 0.2186 264 / 0.08) 1px, transparent 1px);
     background-size: 24px 24px;
   }
-  /* Use sparingly — large gradient text for hero accents */
+  /* Use sparingly - large gradient text for hero accents */
   .text-gradient-brand {
     background: linear-gradient(
       135deg,
@@ -286,13 +286,13 @@
     background-clip: text;
     color: transparent;
   }
-  /* Glass surface — header + premium cards */
+  /* Glass surface - header + premium cards */
   .surface-glass {
     background: color-mix(in oklab, var(--background) 70%, transparent);
     backdrop-filter: saturate(180%) blur(12px);
     -webkit-backdrop-filter: saturate(180%) blur(12px);
   }
-  /* Smooth marquee — used in trust strips */
+  /* Smooth marquee - used in trust strips */
   @keyframes marquee {
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }

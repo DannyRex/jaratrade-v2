@@ -1,5 +1,5 @@
 /**
- * Final CTA — large gradient banner with paired role-specific actions.
+ * Final CTA - large gradient banner with paired role-specific actions.
  *
  * Visual:
  *  - Full-bleed `bg-brand-gradient` panel with a radial overlay for depth.

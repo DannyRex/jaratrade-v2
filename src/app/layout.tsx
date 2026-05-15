@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Manrope } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
-// Geist for body — clean, neutral, excellent at small sizes.
+// Geist for body - clean, neutral, excellent at small sizes.
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-// Manrope for display headlines — tighter, more editorial than Geist.
+// Manrope for display headlines - tighter, more editorial than Geist.
 // Loaded with explicit weights so we don't ship the whole family.
 const manrope = Manrope({
   variable: "--font-display",
@@ -29,12 +29,12 @@ const SITE_URL = "https://jaratrade.com";
 const SITE_NAME = "Jaratrade";
 const SITE_TAGLINE = "Source Nigeria. Sell to the world.";
 const SITE_DESCRIPTION =
-  "Jaratrade is the B2B marketplace connecting verified Nigerian exporters with UK importers. Source authentic FMCGs from Alaba, Aba, Onitsha, Mushin and Balogun — order, pay and ship with confidence.";
+  "Jaratrade is the B2B marketplace connecting verified Nigerian exporters with UK importers. Source authentic FMCGs from Alaba, Aba, Onitsha, Mushin and Balogun - order, pay and ship with confidence.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    default: `${SITE_NAME} - ${SITE_TAGLINE}`,
     template: `%s · ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -65,21 +65,21 @@ export const metadata: Metadata = {
     locale: "en_GB",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    title: `${SITE_NAME} - ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION,
     images: [
       {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
+        alt: `${SITE_NAME} - ${SITE_TAGLINE}`,
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    title: `${SITE_NAME} - ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION,
     images: ["/twitter.png"],
   },
@@ -105,7 +105,7 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 };
 
-// JSON-LD: Organization schema — gives Google rich-result-eligible info.
+// JSON-LD: Organization schema - gives Google rich-result-eligible info.
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",

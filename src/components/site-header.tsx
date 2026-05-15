@@ -1,14 +1,14 @@
 "use client";
 
 /**
- * Site header — premium glass-floating bar.
+ * Site header - premium glass-floating bar.
  *
  * Behaviour:
  *  - Transparent on top-of-page; once the user has scrolled past 8px we apply
  *    the glass surface + a hairline bottom border. Eliminates the heavy fixed
  *    bar feel while keeping a clear separation from content during scroll.
  *  - Search input expands inline on `md+`; collapses behind an icon on mobile.
- *  - Logo, primary nav, search, theme toggle, cart, user menu — exactly four
+ *  - Logo, primary nav, search, theme toggle, cart, user menu - exactly four
  *    discrete visual zones (left/center/right with the search as the spacer).
  */
 import Link from "next/link";

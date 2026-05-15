@@ -92,7 +92,7 @@ export default function ImporterDisputesPage() {
                   <Badge variant={STATUS_VARIANT[d.status]}>{d.status.replace("_", " ")}</Badge>
                 </TableCell>
                 <TableCell className="text-right tabular-nums text-sm">
-                  {d.refund_amount ? `${d.refund_amount} ${d.refund_currency}` : "—"}
+                  {d.refund_amount ? `${d.refund_amount} ${d.refund_currency}` : "-"}
                 </TableCell>
                 <TableCell className="text-right">
                   <Button asChild variant="ghost" size="sm">

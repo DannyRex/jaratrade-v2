@@ -159,7 +159,7 @@ export function SubscriptionPage({ role }: { role: Role }) {
           await loadFlutterwave();
         } catch {
           toast.error("Payment system unavailable", {
-            description: "Couldn't load Flutterwave — please refresh and try again.",
+            description: "Couldn't load Flutterwave - please refresh and try again.",
           });
           return;
         }
@@ -225,7 +225,7 @@ export function SubscriptionPage({ role }: { role: Role }) {
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">Current plan</p>
                 <div className="flex items-center gap-2">
                   <h2 className="text-2xl font-bold tracking-tight">
-                    {subQ.data?.current_plan?.title ?? "—"}
+                    {subQ.data?.current_plan?.title ?? "-"}
                   </h2>
                   {isPremiumActive ? (
                     <Badge variant="accent">
@@ -244,7 +244,7 @@ export function SubscriptionPage({ role }: { role: Role }) {
                 ) : (
                   <p className="text-sm text-muted-foreground">No renewal scheduled.</p>
                 )}
-                {/* Stored card row — only show when there's one AND we're auto-renewing */}
+                {/* Stored card row - only show when there's one AND we're auto-renewing */}
                 {sub?.has_payment_token && sub.status === "active" ? (
                   <p className="flex items-center gap-1.5 text-sm text-muted-foreground pt-1">
                     <CreditCard className="size-4" aria-hidden />
@@ -259,7 +259,7 @@ export function SubscriptionPage({ role }: { role: Role }) {
                     ) : null}
                   </p>
                 ) : null}
-                {/* Failure banner — surfaces silently-retried failures so the
+                {/* Failure banner - surfaces silently-retried failures so the
                     buyer knows to update their card before access lapses. */}
                 {sub && sub.renewal_failure_count > 0 && sub.status === "active" ? (
                   <p className="flex items-start gap-1.5 text-sm text-warning pt-1">

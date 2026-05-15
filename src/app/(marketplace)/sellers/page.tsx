@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * /sellers — Exporter discovery page.
+ * /sellers - Exporter discovery page.
  *
  * Live data feed of verified exporters (via the homeData API). Three sections
  * after the hero: what verification means, how curation works, and types of
- * sellers — each a short, sensory block. Closes with paired CTAs.
+ * sellers - each a short, sensory block. Closes with paired CTAs.
  */
 import Link from "next/link";
 import { ShieldCheck, Award, Factory, ShoppingBasket, Leaf, Sparkles } from "lucide-react";
@@ -19,7 +19,7 @@ const sellerTypes = [
     icon: Factory,
     title: "FMCG manufacturers",
     description:
-      "Packaged-goods producers — plantain chips, garri, palm oil, suya spice, snacks — with consistent supply and export-grade packaging.",
+      "Packaged-goods producers - plantain chips, garri, palm oil, suya spice, snacks - with consistent supply and export-grade packaging.",
   },
   {
     icon: ShoppingBasket,
@@ -31,7 +31,7 @@ const sellerTypes = [
     icon: Leaf,
     title: "Food producers",
     description:
-      "Yam farmers in Benue, grain mills in Kano, spice processors in Dawanau — supply chain straight from the source.",
+      "Yam farmers in Benue, grain mills in Kano, spice processors in Dawanau - supply chain straight from the source.",
   },
   {
     icon: Sparkles,
@@ -55,7 +55,7 @@ export default function SellersPage() {
             <span className="text-gradient-brand">ready to ship.</span>
           </>
         }
-        description="Every exporter on Jaratrade has been through our KYC checks — business registration, IDs, bank details, and inventory practices verified before they list a single SKU."
+        description="Every exporter on Jaratrade has been through our KYC checks - business registration, IDs, bank details, and inventory practices verified before they list a single SKU."
         ctaPrimary={{ label: "Browse the catalogue", href: "/products" }}
         ctaSecondary={{ label: "Become an exporter", href: "/auth/register/exporter" }}
       />
@@ -108,7 +108,7 @@ export default function SellersPage() {
               <p className="mt-4 max-w-xl text-muted-foreground">
                 Before any exporter goes live on Jaratrade, we check the
                 fundamentals. About 1 in 4 applications doesn&apos;t make it
-                through — which is exactly the point.
+                through - which is exactly the point.
               </p>
             </div>
             <ul className="grid gap-4 sm:grid-cols-2 lg:gap-5">
@@ -206,7 +206,7 @@ export default function SellersPage() {
       {/* Final CTA */}
       <section className="container mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8 lg:py-24">
         <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
-          Ready to source — or ready to sell?
+          Ready to source - or ready to sell?
         </h2>
         <p className="mt-4 text-muted-foreground">
           Browse 4,200+ catalogued products from 120+ verified exporters, or apply to list your own.

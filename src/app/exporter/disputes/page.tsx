@@ -3,7 +3,7 @@
 /**
  * Seller-side disputes view.
  *
- * Read-only — sellers don't resolve disputes (admin does), but they need
+ * Read-only - sellers don't resolve disputes (admin does), but they need
  * visibility into what's been filed against them so they can prepare a
  * response or flag issues with their listings. Mirrors the importer inbox
  * shape but uses /exp/disputes and shows the dispute reason from the
@@ -55,7 +55,7 @@ export default function ExporterDisputesPage() {
     <>
       <PageHeader
         title="Disputes"
-        description="Buyer complaints filed against your orders. Admin reviews and decides the outcome — you'll be emailed at each stage."
+        description="Buyer complaints filed against your orders. Admin reviews and decides the outcome - you'll be emailed at each stage."
       />
 
       <div role="tablist" aria-label="Filter by status" className="mb-6 inline-flex h-10 items-center rounded-md bg-muted p-1">
@@ -117,7 +117,7 @@ export default function ExporterDisputesPage() {
                   <Badge variant={STATUS_VARIANT[d.status]}>{d.status.replace("_", " ")}</Badge>
                 </TableCell>
                 <TableCell className="text-right tabular-nums text-sm">
-                  {d.refund_amount ? `${d.refund_amount} ${d.refund_currency}` : "—"}
+                  {d.refund_amount ? `${d.refund_amount} ${d.refund_currency}` : "-"}
                 </TableCell>
                 <TableCell className="text-right">
                   <Button asChild variant="ghost" size="sm">

@@ -106,7 +106,7 @@ export const useCart = create<CartState>()(
           const result = await importerApi.syncCart(items, true);
           if (result?.id) set({ remoteCartId: result.id });
         } catch {
-          // Silent — local cart is still authoritative for offline-first UX.
+          // Silent - local cart is still authoritative for offline-first UX.
         }
       },
     }),

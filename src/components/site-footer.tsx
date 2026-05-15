@@ -58,7 +58,7 @@ export function SiteFooter() {
             <Logo size="lg" />
             <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
               The trusted B2B marketplace connecting verified Nigerian exporters
-              with UK importers. Source, ship and scale — all in one place.
+              with UK importers. Source, ship and scale - all in one place.
             </p>
             <div className="flex flex-wrap gap-3 pt-2 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5">

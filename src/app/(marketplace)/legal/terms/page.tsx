@@ -1,8 +1,8 @@
 /**
- * /legal/terms — Terms of Service.
+ * /legal/terms - Terms of Service.
  *
  * Standard skeleton. Real legal text should be reviewed by counsel before
- * launch — placeholder here is plain-English and covers the major
+ * launch - placeholder here is plain-English and covers the major
  * marketplace bases.
  */
 import type { Metadata } from "next";
@@ -30,8 +30,8 @@ export default function TermsPage() {
           <p>
             Jaratrade Ltd (&ldquo;Jaratrade&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;) operates an online B2B
             marketplace at jaratrade.com that connects verified Nigerian exporters with
-            international importers. By using the marketplace — as a buyer, a seller, or
-            simply by visiting — you agree to these terms. If you don&apos;t agree, please don&apos;t
+            international importers. By using the marketplace - as a buyer, a seller, or
+            simply by visiting - you agree to these terms. If you don&apos;t agree, please don&apos;t
             use the service.
           </p>
 
@@ -57,7 +57,7 @@ export default function TermsPage() {
           <p>
             Jaratrade facilitates transactions between independent buyers and sellers. We are
             not a party to the underlying sale of goods. We verify sellers, process payments
-            via Flutterwave, and operate a dispute resolution layer — but the contract for
+            via Flutterwave, and operate a dispute resolution layer - but the contract for
             goods sits directly between the buyer and the seller listed on the order.
           </p>
           <h3>4.1 Listings</h3>
@@ -70,7 +70,7 @@ export default function TermsPage() {
           <p>
             When you place an order the buyer pays Jaratrade via Flutterwave. Funds are held
             in escrow and released to the seller once delivery is confirmed. We charge a
-            commission (2% on the free tier, 1.5% on Premium) — this is deducted before the
+            commission (2% on the free tier, 1.5% on Premium) - this is deducted before the
             seller&apos;s share is paid out.
           </p>
           <h3>4.3 Shipping</h3>
@@ -78,7 +78,7 @@ export default function TermsPage() {
             Shipping is either arranged by the seller (&ldquo;self-ship&rdquo;) or via a
             Jaratrade-vetted logistics partner. The buyer pays for shipping. Once goods are
             handed to the carrier, risk of loss transfers per the agreed Incoterm. The default
-            on Jaratrade-arranged shipping is DDP — door-to-door, duties paid.
+            on Jaratrade-arranged shipping is DDP - door-to-door, duties paid.
           </p>
 
           <h2>5. Disputes</h2>

@@ -1,17 +1,17 @@
 "use client";
 
 /**
- * Marketing hero — the front door.
+ * Marketing hero - the front door.
  *
  * Layout: editorial 6/6 split on lg+, single column on mobile.
  *   Left (lg:col-span-7)  : eyebrow chip, headline, subhead, two CTAs,
  *                            three trust pills, four stat counters.
- *   Right (lg:col-span-5) : visual stack — floating product chip cards
+ *   Right (lg:col-span-5) : visual stack - floating product chip cards
  *                            arranged over a brand gradient panel with a
  *                            radial glow. Hidden on mobile to keep the
  *                            primary message above the fold.
  *
- * Background: aurora mesh + subtle dot grid. Both pure CSS — no images, no
+ * Background: aurora mesh + subtle dot grid. Both pure CSS - no images, no
  * extra fetches.
  *
  * Motion: staggered rise-in fade for the left column children. Disabled by
@@ -29,7 +29,7 @@ const stats = [
   { label: "Avg. ship time", value: "9d" },
 ];
 
-// Sample products mirroring the seeded catalogue — photos sourced from
+// Sample products mirroring the seeded catalogue - photos sourced from
 // Unsplash (royalty-free, commercial use). Replace with photographer-shot
 // product imagery once we have it.
 const heroProducts = [
@@ -65,12 +65,12 @@ export function Hero() {
       className="relative isolate overflow-hidden bg-aurora"
       aria-labelledby="hero-headline"
     >
-      {/* Decorative grid — sits behind content */}
+      {/* Decorative grid - sits behind content */}
       <div className="bg-grid-soft absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" aria-hidden />
 
       <div className="container relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
-          {/* Left — message */}
+          {/* Left - message */}
           <div className="lg:col-span-7">
             <div className="animate-rise [animation-delay:0ms]">
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary backdrop-blur-sm">
@@ -92,7 +92,7 @@ export function Hero() {
 
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground animate-rise [animation-delay:160ms]">
               Jaratrade connects verified Nigerian exporters with UK importers.
-              Browse FMCGs from Alaba, Aba, Mushin, Dawanau and more — order,
+              Browse FMCGs from Alaba, Aba, Mushin, Dawanau and more - order,
               pay and ship with confidence.
             </p>
 
@@ -138,7 +138,7 @@ export function Hero() {
             </dl>
           </div>
 
-          {/* Right — visual stack (hidden on mobile to keep CTA above fold) */}
+          {/* Right - visual stack (hidden on mobile to keep CTA above fold) */}
           <div className="relative hidden lg:col-span-5 lg:block">
             <HeroVisual />
           </div>
@@ -151,7 +151,7 @@ export function Hero() {
 function HeroVisual() {
   return (
     <div className="relative aspect-square w-full max-w-md animate-rise [animation-delay:200ms]">
-      {/* Brand gradient panel — the canvas that floats the chips */}
+      {/* Brand gradient panel - the canvas that floats the chips */}
       <div className="absolute inset-0 rounded-[2rem] bg-brand-gradient shadow-[var(--shadow-pop)]" aria-hidden />
       {/* Top-right radial highlight */}
       <div

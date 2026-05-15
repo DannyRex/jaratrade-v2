@@ -240,7 +240,7 @@ export const publicApi = {
 // -----------------------------------------------------------------------------
 
 /**
- * Login response — either a full LoginPayload (token + user fields) OR a 2FA
+ * Login response - either a full LoginPayload (token + user fields) OR a 2FA
  * challenge ({requires_2fa: true, email}). The frontend branches on this.
  */
 export type LoginResponse = LoginPayload | { requires_2fa: true; email: string };
@@ -409,7 +409,7 @@ export const exporterApi = {
   confirmInventoryAll: () =>
     request<{ confirmed: number }>("/exp/product/confirm-inventory-all", { method: "POST" }),
 
-  // Disputes — read-only view of disputes filed against this seller (added v2.5.1)
+  // Disputes - read-only view of disputes filed against this seller (added v2.5.1)
   listDisputes: (params?: { status?: "open" | "in_review" | "resolved" | "rejected" }) =>
     request<PagedRows<Dispute>>("/exp/disputes", { query: params }),
   getDispute: (id: string) => request<Dispute>(`/exp/disputes/${id}`),
@@ -528,7 +528,7 @@ export interface SubscriptionDTO {
   tx_ref: string | null;
   cancelled_at: string | null;
   time_created: string;
-  /** Stored card metadata (added v2.5) — never the raw token, only the
+  /** Stored card metadata (added v2.5) - never the raw token, only the
    * display bits needed for "Visa •4242" UX. */
   card_last4: string | null;
   card_brand: string | null;

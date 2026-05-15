@@ -3,7 +3,7 @@
 /**
  * Buyer-facing dispute detail.
  *
- * Read-only — once filed, the buyer can only watch progress until admin
+ * Read-only - once filed, the buyer can only watch progress until admin
  * resolves or rejects. Future iteration: add a "comment / append evidence"
  * thread, which is why we render description as a stand-alone block.
  */

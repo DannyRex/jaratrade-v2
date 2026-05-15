@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Prose — long-form text wrapper with tuned typography.
+ * Prose - long-form text wrapper with tuned typography.
  *
  * Replaces @tailwindcss/typography for the few content pages we have so we
  * don't have to ship the prose plugin. Spacing, weights, and link colors

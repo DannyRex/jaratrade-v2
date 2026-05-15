@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Trust marquee — infinite scroll of trust signals.
+ * Trust marquee - infinite scroll of trust signals.
  *
  * Static labels (markets, partners, payment networks) cycle horizontally so
  * the eye keeps moving and the band reads as "many things going on" without

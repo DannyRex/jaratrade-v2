@@ -1,5 +1,5 @@
 /**
- * /legal/privacy — Privacy policy.
+ * /legal/privacy - Privacy policy.
  * Plain-English summary of what we collect and what we do with it.
  * Aligned with UK GDPR / Nigerian NDPR principles.
  */
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
         <Prose>
           <h2>1. The short version</h2>
           <p>
-            We collect the minimum we need to run the marketplace — your contact details,
+            We collect the minimum we need to run the marketplace - your contact details,
             business documents for KYC, transaction records, and basic usage analytics. We
             don&apos;t sell your data, ever. We retain records only for as long as we have to.
           </p>
@@ -48,13 +48,13 @@ export default function PrivacyPage() {
           </ul>
           <h3>3.2 Transaction data</h3>
           <ul>
-            <li>Orders, listings, payments (processed by Flutterwave — we hold transaction metadata, not full card numbers)</li>
+            <li>Orders, listings, payments (processed by Flutterwave - we hold transaction metadata, not full card numbers)</li>
             <li>Communications between buyers, sellers, and Jaratrade support</li>
             <li>Dispute records and admin notes</li>
           </ul>
           <h3>3.3 Usage data</h3>
           <ul>
-            <li>Pages you visit, products you search and view (cookies — see our <a href="/legal/cookies">cookie policy</a>)</li>
+            <li>Pages you visit, products you search and view (cookies - see our <a href="/legal/cookies">cookie policy</a>)</li>
             <li>Device, browser, IP address (truncated for analytics)</li>
             <li>How you navigated to the site (referrer)</li>
           </ul>
@@ -63,19 +63,19 @@ export default function PrivacyPage() {
           <ul>
             <li>To run your account and process orders (contractual necessity)</li>
             <li>To verify exporter identity and prevent fraud (legitimate interest + legal obligation)</li>
-            <li>To send transactional emails (order confirmations, dispute updates) — these aren&apos;t marketing and you can&apos;t unsubscribe</li>
+            <li>To send transactional emails (order confirmations, dispute updates) - these aren&apos;t marketing and you can&apos;t unsubscribe</li>
             <li>To improve the product (legitimate interest, aggregated analytics only)</li>
             <li>To send marketing emails when you&apos;ve opted in (you can unsubscribe at any time)</li>
           </ul>
 
           <h2>5. Who we share it with</h2>
-          <p>We share specific data with specific third parties — only as needed to run the service:</p>
+          <p>We share specific data with specific third parties - only as needed to run the service:</p>
           <ul>
-            <li><strong>Flutterwave</strong> — payment processing, escrow, refunds</li>
-            <li><strong>Cloudinary</strong> — product image hosting</li>
-            <li><strong>Resend</strong> — transactional email delivery</li>
-            <li><strong>Logistics partners</strong> — when you choose a partner at checkout, we share the shipping address and contact details</li>
-            <li><strong>Authorities</strong> — when required by law (court order, sanctions screening)</li>
+            <li><strong>Flutterwave</strong> - payment processing, escrow, refunds</li>
+            <li><strong>Cloudinary</strong> - product image hosting</li>
+            <li><strong>Resend</strong> - transactional email delivery</li>
+            <li><strong>Logistics partners</strong> - when you choose a partner at checkout, we share the shipping address and contact details</li>
+            <li><strong>Authorities</strong> - when required by law (court order, sanctions screening)</li>
           </ul>
           <p>We don&apos;t sell, rent, or trade your data to advertisers.</p>
 

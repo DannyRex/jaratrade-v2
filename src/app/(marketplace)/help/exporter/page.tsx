@@ -1,5 +1,5 @@
 /**
- * /help/exporter — How to sell on Jaratrade.
+ * /help/exporter - How to sell on Jaratrade.
  *
  * Practical onboarding guide. Six sections:
  *  1. 4-step start (numbered cards)
@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Sell on Jaratrade · Exporter resources",
   description:
-    "How to sell to UK importers on Jaratrade. KYC, listing, fulfilment, payouts — all the steps and what to expect.",
+    "How to sell to UK importers on Jaratrade. KYC, listing, fulfilment, payouts - all the steps and what to expect.",
 };
 
 const steps = [
@@ -53,7 +53,7 @@ const steps = [
     icon: Banknote,
     title: "Get paid",
     detail:
-      "Funds are held in escrow until the buyer confirms receipt — then your share lands in your Nigerian bank account within 48 hours.",
+      "Funds are held in escrow until the buyer confirms receipt - then your share lands in your Nigerian bank account within 48 hours.",
   },
 ];
 
@@ -91,7 +91,7 @@ const faqs = [
   },
   {
     q: "Can I bulk-upload products?",
-    a: "Yes — we have a CSV importer for sellers with 50+ SKUs. Email sellers@jaratrade.com for the template.",
+    a: "Yes - we have a CSV importer for sellers with 50+ SKUs. Email sellers@jaratrade.com for the template.",
   },
   {
     q: "Can I sell from multiple markets?",
@@ -161,16 +161,16 @@ export default function ExporterHelpPage() {
                 What we look for
               </h2>
               <p className="mt-4 max-w-xl text-muted-foreground">
-                We&apos;re picky about who we let in — that&apos;s how we keep
+                We&apos;re picky about who we let in - that&apos;s how we keep
                 buyer trust. A strong application has these things in place.
               </p>
             </div>
             <ul className="space-y-3">
               {[
-                "A registered business (sole prop or limited liability — both accepted)",
+                "A registered business (sole prop or limited liability - both accepted)",
                 "A bank account in the business name",
                 "A working address you can prove",
-                "A product range that&apos;s export-ready — consistent stock, decent photos, fair pricing",
+                "A product range that&apos;s export-ready - consistent stock, decent photos, fair pricing",
               ].map((c) => (
                 <li
                   key={c}

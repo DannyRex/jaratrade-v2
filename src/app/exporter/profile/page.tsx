@@ -39,7 +39,7 @@ export default function ExporterProfilePage() {
         </Card>
       ) : (
         // Key the editor on data identity so it re-mounts with fresh state
-        // once the profile loads — avoids setState-in-effect.
+        // once the profile loads - avoids setState-in-effect.
         <ProfileEditor key={data.id ?? "loading"} initial={data} />
       )}
     </>

@@ -3,7 +3,7 @@
 /**
  * Seller-facing dispute detail.
  *
- * Read-only — sellers see the complaint text, current status, and any admin
+ * Read-only - sellers see the complaint text, current status, and any admin
  * notes once the case is closed. Future iteration: allow the seller to
  * attach a counter-statement before admin adjudication.
  */

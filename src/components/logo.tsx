@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
  */
 interface LogoProps {
   variant?: "full" | "mark";
-  /** Visual tone — `default` = brand-blue on transparent (use on light bg),
+  /** Visual tone - `default` = brand-blue on transparent (use on light bg),
    *  `inverted` = white wordmark for dark/branded surfaces (CTAs, dark hero). */
   tone?: "default" | "inverted";
   /** Tailwind size of the mark only; wordmark scales relative to it. */

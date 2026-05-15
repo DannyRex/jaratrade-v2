@@ -1,5 +1,5 @@
 /**
- * How it works — numbered three-step process card.
+ * How it works - numbered three-step process card.
  *
  * Each step is presented as a card with a large brand-tinted numeral, a
  * concise title, and a one-paragraph description. The numerals use the
@@ -45,7 +45,7 @@ export function HowItWorks() {
           From discovery to delivery in three steps
         </h2>
         <p className="mt-4 text-base text-muted-foreground sm:text-lg">
-          Whether you&apos;re sourcing one carton or a full container — the path
+          Whether you&apos;re sourcing one carton or a full container - the path
           to your shipment is the same.
         </p>
       </div>

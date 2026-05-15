@@ -1,8 +1,8 @@
 /**
- * /contact — Get in touch.
+ * /contact - Get in touch.
  *
  * Three clearly-named contact lanes with email + SLA, two office addresses,
- * a brief founder note. Designed for "trust signal first, form second" —
+ * a brief founder note. Designed for "trust signal first, form second" -
  * we surface direct emails before asking for any input.
  */
 import type { Metadata } from "next";
@@ -150,7 +150,7 @@ export default function ContactPage() {
           <p className="mt-4 font-display text-xl font-medium leading-relaxed tracking-tight text-foreground/90 sm:text-2xl">
             &ldquo;Jaratrade is a small team building something that didn&apos;t exist
             when we needed it ourselves. If you&apos;ve got feedback, an idea, or
-            a complaint — write to me directly. I read everything.&rdquo;
+            a complaint - write to me directly. I read everything.&rdquo;
           </p>
           <p className="mt-6 text-sm">
             <a href="mailto:daniel@jaratrade.com" className="font-semibold text-primary underline-offset-4 hover:underline">
@@ -167,7 +167,7 @@ export default function ContactPage() {
           Ready to start?
         </h2>
         <p className="mt-4 text-muted-foreground">
-          Create an account in two minutes — or just browse the catalogue.
+          Create an account in two minutes - or just browse the catalogue.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="rounded-full px-6 shadow-[var(--shadow-brand)]">

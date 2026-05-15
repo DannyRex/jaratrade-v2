@@ -1,5 +1,5 @@
 /**
- * /markets — Nigerian wholesale markets directory.
+ * /markets - Nigerian wholesale markets directory.
  *
  * Static content page. Each market is presented as a card with a colored
  * marker, location, specialties, and a "browse products from this market"
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Nigerian wholesale markets",
   description:
-    "Every major Nigerian wholesale market — Alaba, Aba, Onitsha, Mushin, Balogun, Dawanau, Kano Kurmi, Zaki Biam — onboarded into one catalogue.",
+    "Every major Nigerian wholesale market - Alaba, Aba, Onitsha, Mushin, Balogun, Dawanau, Kano Kurmi, Zaki Biam - onboarded into one catalogue.",
 };
 
 interface Market {
@@ -35,7 +35,7 @@ const markets: Market[] = [
     state: "Lagos",
     specialty: "Electronics & FMCG",
     description:
-      "West Africa's largest electronics market — and increasingly the FMCG distribution hub for Lagos. Strong export-grade packaging on snacks, packaged drinks, and household goods.",
+      "West Africa's largest electronics market - and increasingly the FMCG distribution hub for Lagos. Strong export-grade packaging on snacks, packaged drinks, and household goods.",
     tags: ["Snacks", "Beverages", "Household goods"],
     hue: "from-blue-500/20 to-cyan-500/10",
   },
@@ -45,7 +45,7 @@ const markets: Market[] = [
     state: "Abia",
     specialty: "Textiles & leather",
     description:
-      "The textile and leather capital of Nigeria. Garments, shoes, school uniforms — manufactured locally and priced for export. Several Jaratrade exporters operate from here.",
+      "The textile and leather capital of Nigeria. Garments, shoes, school uniforms - manufactured locally and priced for export. Several Jaratrade exporters operate from here.",
     tags: ["Garments", "Leather", "Shoes"],
     hue: "from-amber-500/20 to-orange-500/10",
   },
@@ -95,7 +95,7 @@ const markets: Market[] = [
     state: "Kano",
     specialty: "Leather & crafts",
     description:
-      "One of Africa's oldest markets — 500+ years old. Leather goods, traditional crafts, dyed fabrics. Best for hand-finished leather and artisanal craft.",
+      "One of Africa's oldest markets - 500+ years old. Leather goods, traditional crafts, dyed fabrics. Best for hand-finished leather and artisanal craft.",
     tags: ["Leather", "Crafts", "Dyed fabrics"],
     hue: "from-yellow-500/20 to-amber-500/10",
   },
@@ -128,7 +128,7 @@ export default function MarketsPage() {
       {/* Intro paragraph */}
       <section className="container mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
         <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Nigerian wholesale markets are some of the largest in West Africa —
+          Nigerian wholesale markets are some of the largest in West Africa -
           but most of them have lived offline. We&apos;ve spent two years onboarding
           sellers from each one so you can browse listings the same way you&apos;d
           browse a supermarket aisle. Each market specialises in different goods.
@@ -191,7 +191,7 @@ export default function MarketsPage() {
           Source from any market. Or all of them.
         </h2>
         <p className="mt-4 text-muted-foreground">
-          Browse 4,200+ catalogued products from across Nigeria — or apply to
+          Browse 4,200+ catalogued products from across Nigeria - or apply to
           add your market stall.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">

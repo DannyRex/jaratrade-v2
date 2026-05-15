@@ -1,5 +1,5 @@
 /**
- * /trust — Trust & Safety as a marketing page.
+ * /trust - Trust & Safety as a marketing page.
  *
  * Sections:
  *  1. KYC standards (with the verification checklist)
@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Trust & safety",
   description:
-    "How Jaratrade protects buyers and sellers — KYC verification, Flutterwave-secured escrow, a 7-day dispute window with human review on every claim.",
+    "How Jaratrade protects buyers and sellers - KYC verification, Flutterwave-secured escrow, a 7-day dispute window with human review on every claim.",
 };
 
 const disputeStages = [
@@ -139,7 +139,7 @@ export default function TrustPage() {
               </h2>
               <p className="mt-4 max-w-xl text-muted-foreground">
                 Every transaction runs through Flutterwave. Buyer funds are held in
-                escrow from payment until you confirm receipt — only then do we
+                escrow from payment until you confirm receipt - only then do we
                 release to the seller. If the order goes wrong, we can refund
                 without involving the seller&apos;s bank.
               </p>

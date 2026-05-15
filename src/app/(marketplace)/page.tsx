@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Marketing homepage — v3 craft pass.
+ * Marketing homepage - v3 craft pass.
  *
  * Section flow (top → bottom):
  *  1. Hero            (editorial split, gradient mesh, floating product chips, stats)
@@ -12,7 +12,7 @@
  *  6. HowItWorks      (3-step narrative)
  *  7. FinalCTA        (gradient banner, paired role actions)
  *
- * Each section composes a SectionHeading where it makes sense — section
+ * Each section composes a SectionHeading where it makes sense - section
  * titles are mid-bold + grouped with their description and a "view all"
  * affordance.
  */
@@ -81,7 +81,7 @@ export default function HomePage() {
         <SectionHeading
           eyebrow="Verified exporters"
           title="Trusted Nigerian businesses"
-          description="Every account is KYC-verified — IDs, business registration, and bank details are checked before activation."
+          description="Every account is KYC-verified - IDs, business registration, and bank details are checked before activation."
           href="/sellers"
           ctaLabel="See all exporters"
         />

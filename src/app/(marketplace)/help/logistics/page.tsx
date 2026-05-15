@@ -1,5 +1,5 @@
 /**
- * /help/logistics — How shipping works.
+ * /help/logistics - How shipping works.
  *
  * Sections:
  *   1. Two paths (self-ship vs Jaratrade partners)
@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Shipping & logistics · How it works",
   description:
-    "Two ways to ship on Jaratrade — your own freight or a Jaratrade-vetted partner. Quotes at checkout, customs handled, full tracking.",
+    "Two ways to ship on Jaratrade - your own freight or a Jaratrade-vetted partner. Quotes at checkout, customs handled, full tracking.",
 };
 
 const partnerDuties = [
@@ -39,7 +39,7 @@ const partnerDuties = [
     icon: FileCheck2,
     title: "Quotes at checkout",
     detail:
-      "Live quotes from each partner before the buyer pays. No \"we'll get back to you\" — they see the price and decide.",
+      "Live quotes from each partner before the buyer pays. No \"we'll get back to you\" - they see the price and decide.",
   },
   {
     icon: Navigation,
@@ -78,7 +78,7 @@ const incoterms = [
     code: "DDP",
     label: "Delivered Duty Paid",
     description:
-      "Door-to-door. You pay for everything. Jaratrade partners default to this — the buyer's quoted price is the final price.",
+      "Door-to-door. You pay for everything. Jaratrade partners default to this - the buyer's quoted price is the final price.",
   },
 ];
 
@@ -89,7 +89,7 @@ const faqs = [
   },
   {
     q: "What if my goods are seized at customs?",
-    a: "Your partner files the appeal. Buyer funds stay in escrow until the dispute resolves — at which point we refund or release as the outcome dictates.",
+    a: "Your partner files the appeal. Buyer funds stay in escrow until the dispute resolves - at which point we refund or release as the outcome dictates.",
   },
   {
     q: "Can I see partner ratings?",
@@ -196,7 +196,7 @@ export default function LogisticsHelpPage() {
             Who pays for what, and when
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Most Jaratrade flows are DDP — UK buyers prefer a single price, and our partners are set up to deliver that.
+            Most Jaratrade flows are DDP - UK buyers prefer a single price, and our partners are set up to deliver that.
           </p>
         </div>
         <ol className="space-y-3">
@@ -245,7 +245,7 @@ export default function LogisticsHelpPage() {
           Get a shipping quote
         </h2>
         <p className="mt-4 text-muted-foreground">
-          Start an order — partner quotes appear at checkout. No commitment until you tap pay.
+          Start an order - partner quotes appear at checkout. No commitment until you tap pay.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="rounded-full px-6 shadow-[var(--shadow-brand)]">

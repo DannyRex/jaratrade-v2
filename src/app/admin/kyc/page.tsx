@@ -87,19 +87,19 @@ export default function KycQueuePage() {
                 <dl className="grid grid-cols-2 gap-2 rounded-md bg-muted/40 p-3 text-xs">
                   <div>
                     <dt className="text-muted-foreground">Country</dt>
-                    <dd className="font-medium">{user.business_country || user.country || "—"}</dd>
+                    <dd className="font-medium">{user.business_country || user.country || "-"}</dd>
                   </div>
                   <div>
                     <dt className="text-muted-foreground">Business reg</dt>
-                    <dd className="font-medium font-mono">{user.business_reg_number || "—"}</dd>
+                    <dd className="font-medium font-mono">{user.business_reg_number || "-"}</dd>
                   </div>
                   <div>
                     <dt className="text-muted-foreground">Phone</dt>
-                    <dd className="font-medium">{user.phone || "—"}</dd>
+                    <dd className="font-medium">{user.phone || "-"}</dd>
                   </div>
                   <div>
                     <dt className="text-muted-foreground">Profile</dt>
-                    <dd className="font-medium">{user.profile_name || "—"}</dd>
+                    <dd className="font-medium">{user.profile_name || "-"}</dd>
                   </div>
                 </dl>
 

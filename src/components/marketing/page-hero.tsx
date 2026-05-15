@@ -1,5 +1,5 @@
 /**
- * PageHero — reusable top-of-page hero for marketing & content pages.
+ * PageHero - reusable top-of-page hero for marketing & content pages.
  *
  * Establishes a consistent rhythm across /sellers, /markets, /help/*,
  * /contact, /trust and the legal pages: aurora backdrop + dot grid,

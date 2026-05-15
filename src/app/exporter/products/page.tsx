@@ -62,7 +62,7 @@ export default function ExporterProductsPage() {
       // explanation: an upstream error inside `request()` was being swallowed
       // because the `disabled={items.length === 0}` guard combined with a
       // hydration race made the click silently no-op on the very first paint.
-      // The mutationFn is intact — we just need onError to surface anything
+      // The mutationFn is intact - we just need onError to surface anything
       // weird, and a deliberate awaited call so any rejection bubbles up.
       const res = await exporterApi.confirmInventoryAll();
       return res;

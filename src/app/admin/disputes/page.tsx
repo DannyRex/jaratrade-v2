@@ -10,7 +10,7 @@
  *  3. Reject      -> closes the dispute without a resolution
  *
  * Status filter tabs scope the view; default tab is "open" since that's
- * the queue ops cares about. Counts are derived from the loaded page only —
+ * the queue ops cares about. Counts are derived from the loaded page only -
  * that's fine for v1; if volumes grow we'll fetch counts separately.
  */
 import { useState } from "react";
@@ -77,7 +77,7 @@ export default function AdminDisputesPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.adminDisputes("open") });
       qc.invalidateQueries({ queryKey: queryKeys.adminDisputes("in_review") });
-      toast.success("Dispute acknowledged — buyer notified.");
+      toast.success("Dispute acknowledged - buyer notified.");
     },
     onError: (err) => toast.error("Couldn't acknowledge", { description: String(err) }),
   });
@@ -86,10 +86,10 @@ export default function AdminDisputesPage() {
     <>
       <PageHeader
         title="Disputes"
-        description="Resolve buyer disputes — refunds run through Flutterwave; replacements flag the seller."
+        description="Resolve buyer disputes - refunds run through Flutterwave; replacements flag the seller."
       />
 
-      {/* Status filter — plain buttons instead of Radix Tabs because the
+      {/* Status filter - plain buttons instead of Radix Tabs because the
           dispute cards render outside this component as a query-driven list,
           and Radix Tabs swallows clicks when there's no matching
           TabsContent registered. A button group keeps the click->state path
@@ -311,7 +311,7 @@ function RejectDialog({ target, onClose }: { target: Dispute | null; onClose: ()
     mutationFn: () => adminApi.rejectDispute(target!.id, reason),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin", "disputes"] });
-      toast.success("Dispute rejected — buyer notified");
+      toast.success("Dispute rejected - buyer notified");
       onClose();
       setReason("");
     },

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Stock badge — shown on product cards + the detail page.
+ * Stock badge - shown on product cards + the detail page.
  *
  * Decision tree:
  *  - `undefined`  → no badge (backend hasn't surfaced stock; v2.4 and earlier)
@@ -9,7 +9,7 @@
  *  - 1..threshold → "Only N left" (warning)
  *  - > threshold  → "In stock" (success), suppressed in `compact` mode
  *
- * `compact` is for cards where vertical real estate is tight — we only show the
+ * `compact` is for cards where vertical real estate is tight - we only show the
  * badge when it carries a buy-now-urgency signal (low or out).
  */
 import { Badge } from "@/components/ui/badge";
@@ -48,7 +48,7 @@ export function StockBadge({ stock, threshold = 10, compact = false, className }
   );
 }
 
-/** Inline label form (no badge chrome) — for table cells or tight rows. */
+/** Inline label form (no badge chrome) - for table cells or tight rows. */
 export function StockLabel({ stock, threshold = 10 }: StockBadgeProps) {
   if (stock === undefined || stock === null) return <span className="text-muted-foreground">--</span>;
   const lowAt = threshold ?? 10;

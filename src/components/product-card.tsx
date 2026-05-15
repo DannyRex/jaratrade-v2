@@ -1,18 +1,18 @@
 "use client";
 
 /**
- * ProductCard — marketplace listing card.
+ * ProductCard - marketplace listing card.
  *
  * Visual rules (v3 craft pass):
  *  - Aspect-3/4 image with a soft brand-tinted gradient overlay (only at the
  *    very bottom) so price + name on the image are always legible if we ever
- *    overlay them. Currently we don't — the price sits below the image — but
+ *    overlay them. Currently we don't - the price sits below the image - but
  *    the gradient adds depth and signals premium curation.
  *  - Hover: card lifts (-translate-y-1) + brand glow shadow. Image zooms
  *    subtly (scale-105) inside its overflow-hidden frame.
  *  - Badges live in the corners so they don't compete with the product photo
  *    centerpiece.
- *  - Stock badge (low/out) is the strongest signal — sits bottom-left with
+ *  - Stock badge (low/out) is the strongest signal - sits bottom-left with
  *    a backdrop-blur pill to remain readable on busy photos.
  */
 import Image from "next/image";
@@ -43,7 +43,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
         className,
       )}
     >
-      {/* Whole-card link — sits beneath badges so the badges remain visually layered on top */}
+      {/* Whole-card link - sits beneath badges so the badges remain visually layered on top */}
       <Link
         href={`/products/${encodeURIComponent(product.id)}`}
         className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -67,7 +67,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
             No image
           </div>
         )}
-        {/* Bottom edge fade — adds dimension + reserves space for any future overlay text */}
+        {/* Bottom edge fade - adds dimension + reserves space for any future overlay text */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
         {/* Top-left: category */}

@@ -6,7 +6,7 @@ import { useSyncExternalStore } from "react";
  * Subscribes to a media query. SSR-safe (always returns `false` on the server).
  *
  * Implemented via `useSyncExternalStore` so we don't trip React 19's
- * `react-hooks/set-state-in-effect` rule — `matchMedia` is exactly the kind
+ * `react-hooks/set-state-in-effect` rule - `matchMedia` is exactly the kind
  * of external store this hook is designed for.
  */
 export function useMediaQuery(query: string): boolean {

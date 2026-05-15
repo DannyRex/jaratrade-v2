@@ -16,6 +16,6 @@ export function useHydrated(): boolean {
   return useSyncExternalStore(
     noopSubscribe,
     () => true,   // client snapshot
-    () => false,  // server snapshot — keeps SSR markup stable
+    () => false,  // server snapshot - keeps SSR markup stable
   );
 }
