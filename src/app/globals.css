@@ -4,37 +4,47 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* =================================================================
-   JARATRADE BRAND TOKENS
+   JARATRADE DESIGN TOKENS  ·  v3.0
    ----------------------------------------------------------------
-   Primary    : modern indigo-blue (refined from legacy #247df6)
-   Accent     : warm orange  (legacy #f59025) - used for highlights,
-                 promo badges, "premium" indicators
-   Surfaces   : slate neutrals (clean B2B feel)
+   Anchored on the brand glyph blue:
+     · brand-cobalt   #1d4ed8  (logo gradient mid)
+     · brand-navy     #0b1a3f  (logo gradient deep)
+     · brand-sky      #60a5fa  (logo gradient highlight)
+     · accent-amber   #fb923c  (warm contrast for sponsored / premium)
+   ----------------------------------------------------------------
+   Color choices use OKLCH so light and dark mode share the same hue
+   chroma and the visual feel stays consistent across both themes.
    ================================================================= */
 
 :root {
-  --background: oklch(0.9911 0 0);
-  --foreground: oklch(0.2046 0 0);
+  /* Surfaces */
+  --background: oklch(0.9919 0.0023 247);  /* almost-white with hint of cool */
+  --foreground: oklch(0.1700 0.0298 263);  /* near-navy, never pure black */
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2046 0 0);
+  --card-foreground: var(--foreground);
 
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2046 0 0);
+  --popover-foreground: var(--foreground);
 
-  /* Brand primary - refined blue */
-  --primary: oklch(0.5407 0.2233 261);
-  --primary-foreground: oklch(1 0 0);
+  /* Brand primary — cobalt blue lifted from the logo glyph */
+  --primary: oklch(0.4900 0.2186 264);
+  --primary-foreground: oklch(0.9919 0 0);
 
-  --secondary: oklch(0.961 0.0151 254);
-  --secondary-foreground: oklch(0.205 0.0498 264);
+  /* Deep brand navy — used in hero gradient & dark sections */
+  --brand-navy: oklch(0.2200 0.1100 264);
+  --brand-cobalt: oklch(0.4900 0.2186 264);
+  --brand-sky: oklch(0.7000 0.1593 245);
 
-  --muted: oklch(0.961 0.0151 254);
-  --muted-foreground: oklch(0.5446 0.0382 257);
+  --secondary: oklch(0.9700 0.0148 250);
+  --secondary-foreground: oklch(0.2200 0.0498 264);
 
-  /* Brand accent - warm orange (premium/promo) */
-  --accent: oklch(0.7106 0.166 47);
-  --accent-foreground: oklch(0.1448 0.0498 264);
+  --muted: oklch(0.9700 0.0148 250);
+  --muted-foreground: oklch(0.5300 0.0382 257);
+
+  /* Accent — refined warm amber for sponsored / premium tags */
+  --accent: oklch(0.7300 0.1730 55);
+  --accent-foreground: oklch(0.1700 0.0498 264);
 
   --destructive: oklch(0.6368 0.2078 25);
   --destructive-foreground: oklch(1 0 0);
@@ -45,48 +55,62 @@
   --warning: oklch(0.7691 0.1543 70);
   --warning-foreground: oklch(0.2046 0.0498 264);
 
-  --border: oklch(0.928 0.0058 264);
-  --input: oklch(0.928 0.0058 264);
-  --ring: oklch(0.5407 0.2233 261);
+  --border: oklch(0.9200 0.0058 264);
+  --input: oklch(0.9200 0.0058 264);
+  --ring: oklch(0.4900 0.2186 264);
 
-  --chart-1: oklch(0.5407 0.2233 261);
-  --chart-2: oklch(0.7106 0.166 47);
-  --chart-3: oklch(0.6862 0.1568 145);
-  --chart-4: oklch(0.7691 0.1543 70);
+  --chart-1: var(--brand-cobalt);
+  --chart-2: var(--accent);
+  --chart-3: var(--success);
+  --chart-4: var(--brand-sky);
   --chart-5: oklch(0.5928 0.2199 318);
 
-  --radius: 0.625rem;
+  --radius: 0.75rem;
 
   --sidebar: oklch(0.9851 0 0);
-  --sidebar-foreground: oklch(0.2046 0 0);
-  --sidebar-primary: oklch(0.5407 0.2233 261);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.961 0.0151 254);
-  --sidebar-accent-foreground: oklch(0.2046 0.0498 264);
-  --sidebar-border: oklch(0.928 0.0058 264);
-  --sidebar-ring: oklch(0.5407 0.2233 261);
+  --sidebar-accent: oklch(0.9700 0.0148 250);
+  --sidebar-accent-foreground: oklch(0.2200 0.0498 264);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--primary);
+
+  /* Elevation tokens — used by Card, dialogs, header glass */
+  --shadow-soft: 0 1px 2px 0 oklch(0.22 0.11 264 / 0.04),
+                 0 1px 1px 0 oklch(0.22 0.11 264 / 0.06);
+  --shadow-card: 0 4px 16px -4px oklch(0.22 0.11 264 / 0.08),
+                 0 2px 4px -1px oklch(0.22 0.11 264 / 0.06);
+  --shadow-pop:  0 24px 48px -16px oklch(0.22 0.11 264 / 0.18),
+                 0 12px 24px -8px oklch(0.22 0.11 264 / 0.10);
+  --shadow-brand-glow: 0 8px 32px -8px oklch(0.49 0.2186 264 / 0.32);
 }
 
 .dark {
-  --background: oklch(0.1448 0.0098 264);
+  /* Deep navy base — premium, not pure black */
+  --background: oklch(0.1500 0.0298 263);
   --foreground: oklch(0.9851 0 0);
 
-  --card: oklch(0.205 0.0151 264);
+  --card: oklch(0.2000 0.0298 263);
   --card-foreground: oklch(0.9851 0 0);
 
-  --popover: oklch(0.205 0.0151 264);
+  --popover: oklch(0.2000 0.0298 263);
   --popover-foreground: oklch(0.9851 0 0);
 
-  --primary: oklch(0.6231 0.1879 261);
-  --primary-foreground: oklch(0.1448 0.0498 264);
+  --primary: oklch(0.6700 0.1879 261);
+  --primary-foreground: oklch(0.1500 0.0498 264);
 
-  --secondary: oklch(0.269 0.0151 264);
+  --brand-navy: oklch(0.1100 0.0698 264);
+  --brand-cobalt: oklch(0.6700 0.1879 261);
+  --brand-sky: oklch(0.7500 0.1593 245);
+
+  --secondary: oklch(0.2700 0.0298 263);
   --secondary-foreground: oklch(0.9851 0 0);
 
-  --muted: oklch(0.269 0.0151 264);
+  --muted: oklch(0.2700 0.0298 263);
   --muted-foreground: oklch(0.7155 0.0382 257);
 
-  --accent: oklch(0.7691 0.1543 47);
+  --accent: oklch(0.7691 0.1543 55);
   --accent-foreground: oklch(0.1448 0.0498 264);
 
   --destructive: oklch(0.5928 0.2078 25);
@@ -98,22 +122,30 @@
   --warning: oklch(0.7106 0.1543 70);
   --warning-foreground: oklch(0.1448 0.0498 264);
 
-  --border: oklch(0.269 0.0151 264);
-  --input: oklch(0.269 0.0151 264);
-  --ring: oklch(0.6231 0.1879 261);
+  --border: oklch(0.2700 0.0298 263);
+  --input: oklch(0.2700 0.0298 263);
+  --ring: var(--primary);
 
-  --sidebar: oklch(0.205 0.0151 264);
+  --sidebar: oklch(0.2000 0.0298 263);
   --sidebar-foreground: oklch(0.9851 0 0);
-  --sidebar-primary: oklch(0.6231 0.1879 261);
+  --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: oklch(0.1448 0.0498 264);
-  --sidebar-accent: oklch(0.269 0.0151 264);
+  --sidebar-accent: oklch(0.2700 0.0298 263);
   --sidebar-accent-foreground: oklch(0.9851 0 0);
-  --sidebar-border: oklch(0.269 0.0151 264);
-  --sidebar-ring: oklch(0.6231 0.1879 261);
+  --sidebar-border: oklch(0.2700 0.0298 263);
+  --sidebar-ring: var(--primary);
+
+  --shadow-soft: 0 1px 2px 0 oklch(0 0 0 / 0.40);
+  --shadow-card: 0 4px 16px -4px oklch(0 0 0 / 0.45),
+                 0 2px 4px -1px oklch(0 0 0 / 0.30);
+  --shadow-pop:  0 24px 48px -16px oklch(0 0 0 / 0.60),
+                 0 12px 24px -8px oklch(0 0 0 / 0.35);
+  --shadow-brand-glow: 0 8px 32px -8px oklch(0.67 0.1879 261 / 0.45);
 }
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
   --color-background: var(--background);
@@ -127,6 +159,10 @@
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-cobalt: var(--brand-cobalt);
+  --color-brand-sky: var(--brand-sky);
 
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -165,10 +201,16 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 12px);
+
+  --shadow-soft: var(--shadow-soft);
+  --shadow-card: var(--shadow-card);
+  --shadow-pop: var(--shadow-pop);
+  --shadow-brand: var(--shadow-brand-glow);
 }
 
 @layer base {
@@ -183,14 +225,22 @@
   body {
     background: var(--background);
     color: var(--foreground);
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+  /* Editorial display typography — used in headlines */
+  h1, h2, h3 {
+    letter-spacing: -0.022em;
+    font-feature-settings: "ss01" 1, "ss02" 1, "cv11" 1;
+  }
+  h1 {
+    line-height: 1.05;
   }
   *:focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
   ::selection {
-    background: color-mix(in oklab, var(--primary) 25%, transparent);
+    background: color-mix(in oklab, var(--primary) 30%, transparent);
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -203,16 +253,72 @@
 }
 
 @layer utilities {
+  /* Brand gradient — cobalt → navy.  Used in hero, premium CTAs. */
+  .bg-brand-gradient {
+    background: linear-gradient(
+      135deg,
+      oklch(0.49 0.2186 264) 0%,
+      oklch(0.32 0.1786 264) 60%,
+      oklch(0.22 0.11 264) 100%
+    );
+  }
+  /* Aurora — soft radial mesh used as hero backdrop */
+  .bg-aurora {
+    background:
+      radial-gradient(60% 80% at 80% 0%, oklch(0.49 0.2186 264 / 0.18) 0%, transparent 70%),
+      radial-gradient(50% 60% at 0% 100%, oklch(0.73 0.1730 55 / 0.10) 0%, transparent 70%),
+      radial-gradient(60% 80% at 50% 50%, oklch(0.70 0.1593 245 / 0.06) 0%, transparent 70%);
+  }
+  /* Subtle dot grid overlay */
+  .bg-grid-soft {
+    background-image:
+      radial-gradient(circle, oklch(0.49 0.2186 264 / 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  /* Use sparingly — large gradient text for hero accents */
+  .text-gradient-brand {
+    background: linear-gradient(
+      135deg,
+      oklch(0.49 0.2186 264) 0%,
+      oklch(0.70 0.1593 245) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* Glass surface — header + premium cards */
+  .surface-glass {
+    background: color-mix(in oklab, var(--background) 70%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+  }
+  /* Smooth marquee — used in trust strips */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 32s linear infinite;
+  }
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50%      { transform: translateY(-8px) rotate(0.2deg); }
+  }
+  .animate-float {
+    animation: float-slow 6s ease-in-out infinite;
+  }
+  /* Stagger fade-in for hero & grids */
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-rise {
+    animation: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: var(--muted-foreground) transparent;
   }
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: var(--muted-foreground);
-    border-radius: 3px;
-  }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--muted-foreground); border-radius: 3px; }
 }

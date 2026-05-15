@@ -1,36 +1,72 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+/**
+ * Jaratrade brand lockup.
+ *
+ * Two presentations:
+ *  - `full`  : mark + wordmark, used in headers + footers
+ *  - `mark`  : mark only, used in compact bars and the mobile sheet
+ *
+ * The mark is a tightly-cropped PNG (250×308) of the brand glyph; we serve it
+ * via next/image so it gets responsive sizing + an explicit aspect ratio (no
+ * CLS). Wordmark uses a tighter tracking + the brand serif-ish feel from
+ * Geist's `font-feature-settings: ss01` ligatures.
+ */
 interface LogoProps {
   variant?: "full" | "mark";
+  /** Visual tone — `default` = brand-blue on transparent (use on light bg),
+   *  `inverted` = white wordmark for dark/branded surfaces (CTAs, dark hero). */
+  tone?: "default" | "inverted";
+  /** Tailwind size of the mark only; wordmark scales relative to it. */
+  size?: "sm" | "md" | "lg";
   className?: string;
   href?: string | null;
 }
 
-export function Logo({ variant = "full", className, href = "/" }: LogoProps) {
+const SIZE_MAP = {
+  sm: { mark: "h-7", word: "text-base" },
+  md: { mark: "h-9", word: "text-lg" },
+  lg: { mark: "h-12", word: "text-2xl" },
+} as const;
+
+export function Logo({
+  variant = "full",
+  tone = "default",
+  size = "md",
+  className,
+  href = "/",
+}: LogoProps) {
+  const dims = SIZE_MAP[size];
   const content = (
-    <span className={cn("inline-flex items-center gap-2 font-semibold tracking-tight", className)}>
-      <span
-        aria-hidden
-        className="grid size-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-primary to-[oklch(0.45_0.22_280)] text-primary-foreground shadow-sm"
-      >
-        <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
-          <path
-            d="M5 7C5 5.34315 6.34315 4 8 4H16C17.6569 4 19 5.34315 19 7V14C19 17.866 15.866 21 12 21V21C8.13401 21 5 17.866 5 14V7Z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
-          <path d="M9 8L12 11L15 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </span>
-      {variant === "full" ? <span className="text-lg">Jaratrade</span> : null}
+    <span
+      className={cn(
+        "inline-flex items-center gap-2.5 font-bold tracking-tight",
+        tone === "inverted" ? "text-white" : "text-foreground",
+        className,
+      )}
+    >
+      <Image
+        src="/brand/logo.png"
+        alt=""
+        width={250}
+        height={308}
+        priority
+        className={cn(dims.mark, "w-auto select-none")}
+        aria-hidden="true"
+      />
+      {variant === "full" ? (
+        <span className={cn(dims.word, "leading-none [font-feature-settings:'ss01']")}>
+          Jaratrade
+        </span>
+      ) : null}
     </span>
   );
 
   if (!href) return content;
   return (
-    <Link href={href} aria-label="Jaratrade home">
+    <Link href={href} aria-label="Jaratrade home" className="inline-flex">
       {content}
     </Link>
   );
