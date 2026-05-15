@@ -31,8 +31,8 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -89,15 +89,31 @@ export default function AdminDisputesPage() {
         description="Resolve buyer disputes — refunds run through Flutterwave; replacements flag the seller."
       />
 
-      <Tabs value={status} onValueChange={(v) => setStatus(v as DisputeStatus)} className="mb-6">
-        <TabsList>
-          {STATUSES.map((s) => (
-            <TabsTrigger key={s.value} value={s.value}>
-              {s.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+      {/* Status filter — plain buttons instead of Radix Tabs because the
+          dispute cards render outside this component as a query-driven list,
+          and Radix Tabs swallows clicks when there's no matching
+          TabsContent registered. A button group keeps the click->state path
+          dead simple. */}
+      <div role="tablist" aria-label="Dispute status" className="mb-6 inline-flex h-10 items-center rounded-md bg-muted p-1">
+        {STATUSES.map((s) => (
+          <button
+            key={s.value}
+            type="button"
+            role="tab"
+            aria-selected={status === s.value}
+            onClick={() => setStatus(s.value)}
+            className={cn(
+              "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-colors",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              status === s.value
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
 
       {isLoading ? (
         <div className="space-y-3">
@@ -125,7 +141,17 @@ export default function AdminDisputesPage() {
                       </span>
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Filed by {d.importer_name ?? d.importer_email ?? "buyer"} on {formatDate(d.time_created)}
+                      Filed by{" "}
+                      <span className="font-medium text-foreground">
+                        {d.importer_name ?? "buyer"}
+                      </span>
+                      {d.importer_email ? (
+                        <>
+                          {" "}
+                          (<a href={`mailto:${d.importer_email}`} className="hover:underline">{d.importer_email}</a>)
+                        </>
+                      ) : null}{" "}
+                      on {formatDate(d.time_created)}
                     </p>
                   </div>
                   <Badge variant={STATUS_VARIANT[d.status]}>{d.status.replace("_", " ")}</Badge>

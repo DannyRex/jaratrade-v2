@@ -5,7 +5,7 @@
  * Renders the user's current plan + auto-renew status, lists available plans
  * from the public catalog, and handles upgrade -> Flutterwave inline -> verify.
  */
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Crown, Sparkles, ShieldCheck, Zap, X, CreditCard, AlertTriangle } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -113,9 +113,12 @@ export function SubscriptionPage({ role }: { role: Role }) {
     ? (importerPlans.data?.rows ?? []).map(importerPlanToUI)
     : (exporterPlans.data?.rows ?? []).map(exporterPlanToUI);
 
-  const [scriptReady, setScriptReady] = useState(false);
+  // Pre-warm the Flutterwave script on mount so clicks land on a ready
+  // checkout. The upgrade handler also awaits this if it raced ahead.
   useEffect(() => {
-    loadFlutterwave().then(() => setScriptReady(true)).catch(() => setScriptReady(false));
+    loadFlutterwave().catch(() => {
+      /* failure surfaces lazily in the click handler */
+    });
   }, []);
 
   const verify = useMutation({
@@ -128,13 +131,26 @@ export function SubscriptionPage({ role }: { role: Role }) {
 
   const upgrade = useMutation({
     mutationFn: (planId: string) => api.upgradeSubscription(planId),
-    onSuccess: (data: SubscriptionUpgradeResponse) => {
+    onSuccess: async (data: SubscriptionUpgradeResponse) => {
       if (!("requires_payment" in data) || data.requires_payment === false) {
         qc.invalidateQueries({ queryKey: [role, "subscription"] });
         toast.success(`Switched to ${(data as { plan_title: string }).plan_title}`);
         return;
       }
-      if (!scriptReady || !window.FlutterwaveCheckout) {
+      // If the user clicked Upgrade before the Flutterwave script finished
+      // loading, await the loader here instead of bailing out. (QA observed
+      // first-click failures when the upgrade request beat the script.)
+      if (!window.FlutterwaveCheckout) {
+        try {
+          await loadFlutterwave();
+        } catch {
+          toast.error("Payment system unavailable", {
+            description: "Couldn't load Flutterwave — please refresh and try again.",
+          });
+          return;
+        }
+      }
+      if (!window.FlutterwaveCheckout) {
         toast.error("Payment system unavailable", { description: "Please refresh and try again." });
         return;
       }
