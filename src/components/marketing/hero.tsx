@@ -29,25 +29,31 @@ const stats = [
   { label: "Avg. ship time", value: "9d" },
 ];
 
+// Sample products mirroring the seeded catalogue — photos sourced from
+// Unsplash (royalty-free, commercial use). Replace with photographer-shot
+// product imagery once we have it.
 const heroProducts = [
   {
     name: "Plantain Chips",
     market: "Alaba Intl. Market",
-    img: "https://res.cloudinary.com/do4nw8sul/image/upload/v1727867535/products/hfnmkkfkompwubsoqxdf.jpg",
+    price: "₦18,000",
+    img: "/brand/products/plantain-chips.jpg",
     rotate: "-rotate-3",
     delay: "0s",
   },
   {
-    name: "Premium Garri",
+    name: "Premium Garri (50kg)",
     market: "Mushin Market",
-    img: "https://res.cloudinary.com/do4nw8sul/image/upload/v1727867535/products/hfnmkkfkompwubsoqxdf.jpg",
+    price: "₦35,000",
+    img: "/brand/products/premium-garri.jpg",
     rotate: "rotate-2",
     delay: "0.4s",
   },
   {
     name: "Suya Spice Mix",
     market: "Onitsha Main",
-    img: "https://res.cloudinary.com/do4nw8sul/image/upload/v1727867535/products/hfnmkkfkompwubsoqxdf.jpg",
+    price: "₦8,500",
+    img: "/brand/products/suya-spice.jpg",
     rotate: "-rotate-2",
     delay: "0.8s",
   },
@@ -205,6 +211,7 @@ function HeroVisual() {
 function ProductChip({
   name,
   market,
+  price,
   img,
   rotate,
   delay,
@@ -212,32 +219,36 @@ function ProductChip({
 }: {
   name: string;
   market: string;
+  price: string;
   img: string;
   rotate: string;
   delay: string;
   index: number;
 }) {
+  // Each chip is positioned absolutely so the visual stack reads as casual
+  // overlapping cards rather than a neat row.
   const positions = [
-    "left-4 top-6",
-    "right-6 top-1/3",
-    "left-10 bottom-12",
+    "left-2 top-8 sm:left-4 sm:top-10",
+    "right-2 top-1/3 sm:-right-2",
+    "left-12 bottom-14 sm:left-16",
   ];
   return (
     <figure
-      className={`absolute ${positions[index]} ${rotate} flex w-44 animate-float items-center gap-3 rounded-2xl border border-white/30 bg-white/95 p-2.5 shadow-[var(--shadow-pop)] backdrop-blur dark:bg-card/95`}
+      className={`absolute ${positions[index]} ${rotate} flex w-48 animate-float items-center gap-3 rounded-2xl border border-white/30 bg-white/95 p-2.5 shadow-[var(--shadow-pop)] backdrop-blur dark:bg-card/95`}
       style={{ animationDelay: delay }}
     >
       <Image
         src={img}
         alt=""
-        width={40}
-        height={40}
-        className="size-10 shrink-0 rounded-lg object-cover"
-        unoptimized
+        width={56}
+        height={56}
+        sizes="56px"
+        className="size-12 shrink-0 rounded-lg object-cover"
       />
-      <figcaption className="min-w-0">
+      <figcaption className="min-w-0 flex-1">
         <p className="truncate text-xs font-semibold leading-tight text-foreground">{name}</p>
         <p className="truncate text-[10px] text-muted-foreground">{market}</p>
+        <p className="mt-0.5 text-xs font-bold tabular-nums text-primary">{price}</p>
       </figcaption>
     </figure>
   );
