@@ -56,7 +56,9 @@ export function RaiseDisputeDialog({ orderId, disabled }: RaiseDisputeDialogProp
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["importer", "orders", orderId] });
       qc.invalidateQueries({ queryKey: queryKeys.importerOrders });
-      qc.invalidateQueries({ queryKey: queryKeys.importerDisputes });
+      // Invalidate every status variant of the disputes inbox key — the user
+      // could be viewing "open", "all", or any filter.
+      qc.invalidateQueries({ queryKey: ["importer", "disputes"] });
       toast.success("Dispute submitted", {
         description: "We'll review and email you within 1 business day.",
       });

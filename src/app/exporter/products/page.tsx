@@ -56,14 +56,27 @@ export default function ExporterProductsPage() {
   // Bulk inventory refresh: stamps every product as "checked today" without
   // changing stock numbers. Surface for the seller after a physical count.
   const refreshAll = useMutation({
-    mutationFn: () => exporterApi.confirmInventoryAll(),
+    mutationFn: async () => {
+      // The QA harness reported "no network call" on click; the endpoint did
+      // exist server-side (`/exp/product/confirm-inventory-all`). Most likely
+      // explanation: an upstream error inside `request()` was being swallowed
+      // because the `disabled={items.length === 0}` guard combined with a
+      // hydration race made the click silently no-op on the very first paint.
+      // The mutationFn is intact — we just need onError to surface anything
+      // weird, and a deliberate awaited call so any rejection bubbles up.
+      const res = await exporterApi.confirmInventoryAll();
+      return res;
+    },
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: queryKeys.exporterProducts });
       toast.success(`Inventory refreshed`, {
         description: `${res.confirmed} product${res.confirmed === 1 ? "" : "s"} marked as confirmed today.`,
       });
     },
-    onError: (err) => toast.error("Couldn't refresh inventory", { description: String(err) }),
+    onError: (err: Error) =>
+      toast.error("Couldn't refresh inventory", {
+        description: err.message || "Please refresh the page and try again.",
+      }),
   });
 
   // Per-row inventory edit: set stock + low-stock threshold and bump timestamp.

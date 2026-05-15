@@ -343,7 +343,8 @@ export const importerApi = {
       method: "POST",
       body: multipart(payload),
     }),
-  listDisputes: () => request<PagedRows<Dispute>>("/imp/disputes"),
+  listDisputes: (params?: { status?: "open" | "in_review" | "resolved" | "rejected" }) =>
+    request<PagedRows<Dispute>>("/imp/disputes", { query: params }),
   getDispute: (id: string) => request<Dispute>(`/imp/disputes/${id}`),
 };
 
@@ -407,6 +408,11 @@ export const exporterApi = {
     }),
   confirmInventoryAll: () =>
     request<{ confirmed: number }>("/exp/product/confirm-inventory-all", { method: "POST" }),
+
+  // Disputes — read-only view of disputes filed against this seller (added v2.5.1)
+  listDisputes: (params?: { status?: "open" | "in_review" | "resolved" | "rejected" }) =>
+    request<PagedRows<Dispute>>("/exp/disputes", { query: params }),
+  getDispute: (id: string) => request<Dispute>(`/exp/disputes/${id}`),
 };
 
 // -----------------------------------------------------------------------------

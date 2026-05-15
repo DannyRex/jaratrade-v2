@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AlertTriangle,
   HelpCircle,
   LayoutDashboard,
   Package,
@@ -18,6 +19,7 @@ const nav: NavItem[] = [
   { label: "Products", href: "/exporter/products", icon: Package },
   { label: "Stores", href: "/exporter/stores", icon: Store },
   { label: "Orders", href: "/exporter/orders", icon: Truck },
+  { label: "Disputes", href: "/exporter/disputes", icon: AlertTriangle },
   { label: "Subscription", href: "/exporter/subscription", icon: Sparkles },
   { label: "Profile", href: "/exporter/profile", icon: User },
   { label: "Settings", href: "/exporter/settings", icon: Settings },

@@ -127,10 +127,24 @@ export function SubscriptionPage({ role }: { role: Role }) {
       qc.invalidateQueries({ queryKey: [role, "subscription"] });
       toast.success("Subscription activated");
     },
+    onError: (err: Error) => {
+      toast.error("Payment verification failed", {
+        description: err.message || "Contact support if you were charged.",
+      });
+    },
   });
 
   const upgrade = useMutation({
     mutationFn: (planId: string) => api.upgradeSubscription(planId),
+    // QA reported a silent-failure scenario where clicking Upgrade fired no
+    // visible feedback. Without an onError, a 401/500/network error from
+    // upgradeSubscription disappears into mutation state and the user sees
+    // nothing. Surface every failure as a toast.
+    onError: (err: Error) => {
+      toast.error("Couldn't start checkout", {
+        description: err.message || "Please refresh and try again.",
+      });
+    },
     onSuccess: async (data: SubscriptionUpgradeResponse) => {
       if (!("requires_payment" in data) || data.requires_payment === false) {
         qc.invalidateQueries({ queryKey: [role, "subscription"] });
@@ -180,6 +194,11 @@ export function SubscriptionPage({ role }: { role: Role }) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: [role, "subscription"] });
       toast.success("Auto-renewal cancelled");
+    },
+    onError: (err: Error) => {
+      toast.error("Couldn't cancel auto-renewal", {
+        description: err.message || "Please try again.",
+      });
     },
   });
 
