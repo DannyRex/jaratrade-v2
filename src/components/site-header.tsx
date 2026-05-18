@@ -112,7 +112,10 @@ export function SiteHeader() {
           </SheetContent>
         </Sheet>
 
-        <Logo size="md" />
+        {/* Logo: wordmark hidden on the smallest viewports so the right-side
+            control cluster has room. Re-appears at sm+ where there's space. */}
+        <Logo variant="mark" size="md" className="sm:hidden" />
+        <Logo variant="full" size="md" className="hidden sm:inline-flex" />
 
         <nav aria-label="Primary" className="ml-2 hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
@@ -145,17 +148,19 @@ export function SiteHeader() {
           </div>
         </form>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Search"
-          className="ml-auto md:hidden"
-          onClick={() => setMobileSearchOpen((v) => !v)}
-        >
-          {mobileSearchOpen ? <X className="size-5" /> : <Search className="size-5" />}
-        </Button>
-
-        <div className="flex items-center gap-1 md:ml-2">
+        {/* Right-side action cluster - search (mobile only), theme, cart,
+            user. `ml-auto` here so the whole group hugs the right edge on
+            mobile (where the search form is hidden). */}
+        <div className="ml-auto flex items-center gap-0.5 md:ml-2 md:gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Search"
+            className="md:hidden"
+            onClick={() => setMobileSearchOpen((v) => !v)}
+          >
+            {mobileSearchOpen ? <X className="size-5" /> : <Search className="size-5" />}
+          </Button>
           <ThemeToggle />
           <CartButton />
           <UserMenu />
