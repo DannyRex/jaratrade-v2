@@ -1,56 +1,46 @@
 /**
  * /contact - Get in touch.
  *
- * Three clearly-named contact lanes with email + SLA, two office addresses,
- * a brief founder note. Designed for "trust signal first, form second" -
- * we surface direct emails before asking for any input.
+ * Single-lane contact surface: one email (admin@), clear response
+ * expectations, and a final CTA back to the marketplace. We deliberately
+ * keep the surface narrow at launch and expand only when we have dedicated
+ * inboxes + an ops team to answer them.
  */
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Mail, Building, Clock, ArrowRight } from "lucide-react";
+import { Mail, Clock, ArrowRight, ShieldCheck, MessageSquare, AlertTriangle } from "lucide-react";
 import { PageHero } from "@/components/marketing/page-hero";
 import { Button } from "@/components/ui/button";
+
+const CONTACT_EMAIL = "admin@jaratrade.com";
 
 export const metadata: Metadata = {
   title: "Contact us",
   description:
-    "Three ways to reach Jaratrade: general inquiries, exporter support, importer support. Offices in Lagos and London.",
+    "Get in touch with the Jaratrade team. One email, one promise: we read every message and respond within one business day.",
 };
 
-const lanes = [
+const topics = [
   {
+    icon: MessageSquare,
     badge: "General",
-    email: "hello@jaratrade.com",
-    sla: "Typically same-day, weekdays",
-    description:
-      "Press, partnerships, anything that doesn't fit a support lane. Founders read this inbox.",
+    title: "Questions about Jaratrade",
+    detail:
+      "Press, partnerships, product questions, anything that doesn't fit a support lane. We read every message.",
   },
   {
-    badge: "For sellers",
-    email: "sellers@jaratrade.com",
-    sla: "4 business hours",
-    description:
-      "Verification questions, listing help, payouts, disputes from your end. Critical issues escalate immediately.",
+    icon: ShieldCheck,
+    badge: "Verification &amp; KYC",
+    title: "Applying as an exporter or importer",
+    detail:
+      "Issues with your application, document uploads, or KYC review. Include your registered email so we can find your case quickly.",
   },
   {
-    badge: "For buyers",
-    email: "buyers@jaratrade.com",
-    sla: "4 business hours",
-    description:
-      "Order issues, shipping questions, dispute filings, account access. Importer support reads this lane.",
-  },
-];
-
-const offices = [
-  {
-    city: "Lagos",
-    address: "7B Adeola Hopewell Street, Victoria Island",
-    hours: "Mon–Fri · 8am–7pm WAT · Sat 10am–4pm",
-  },
-  {
-    city: "London",
-    address: "167–169 Great Portland Street, W1W 5PF",
-    hours: "Mon–Fri · 9am–6pm GMT",
+    icon: AlertTriangle,
+    badge: "Orders &amp; disputes",
+    title: "Something went wrong with an order",
+    detail:
+      "Stuck payments, missing shipments, dispute escalations. Most order issues are handled inside the importer or exporter dashboard - email us if you're blocked.",
   },
 ];
 
@@ -68,101 +58,83 @@ export default function ContactPage() {
         description="Whether you're shipping containers from Onitsha or sourcing your first carton of garri, we want to hear from you."
       />
 
-      {/* Lanes */}
-      <section className="container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-        <div className="grid gap-5 md:grid-cols-3 lg:gap-6">
-          {lanes.map((lane) => (
-            <article
-              key={lane.badge}
-              className="group flex flex-col rounded-2xl border border-border/70 bg-card p-7 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-[var(--shadow-brand)]"
+      {/* Primary contact card */}
+      <section className="container mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+        <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-card p-8 shadow-[var(--shadow-brand)] sm:p-10">
+          <div
+            className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full blur-3xl opacity-50"
+            style={{ background: "radial-gradient(circle, oklch(0.49 0.2186 264 / 0.45), transparent 70%)" }}
+            aria-hidden
+          />
+          <div className="relative">
+            <div className="mb-5 grid size-12 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+              <Mail className="size-6" aria-hidden />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+              The fastest way to reach us
+            </p>
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="mt-3 inline-block font-display text-3xl font-bold tracking-tight text-foreground transition-colors hover:text-primary sm:text-4xl"
             >
-              <span className="self-start rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-primary">
-                {lane.badge}
-              </span>
-              <div className="mt-5 flex items-start gap-3">
-                <Mail className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
-                <a
-                  href={`mailto:${lane.email}`}
-                  className="font-display text-lg font-bold tracking-tight text-foreground transition-colors hover:text-primary"
-                >
-                  {lane.email}
-                </a>
-              </div>
-              <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Clock className="size-3.5" aria-hidden /> {lane.sla}
-              </p>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                {lane.description}
-              </p>
-            </article>
-          ))}
+              {CONTACT_EMAIL}
+            </a>
+            <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1.5 text-xs font-semibold text-success">
+              <Clock className="size-3.5" aria-hidden />
+              We respond within 1 business day
+            </p>
+            <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+              Whatever brings you to this page - a question about your account,
+              a stuck order, a partnership idea, or just feedback - this inbox
+              is the right place. Include as much context as you can and a real
+              human will reply.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Offices */}
+      {/* Common topics */}
       <section className="border-y border-border/60 bg-muted/30">
         <div className="container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <div className="mb-12 max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-              Where we are
+              What we hear about
             </p>
             <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
-              Lagos &amp; London
+              Common reasons to write in
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Two offices, one team. Visits by appointment.
+              We&apos;ve grouped the questions that come up most so you can frame yours
+              the same way. It helps us route faster.
             </p>
           </div>
-          <div className="grid gap-5 md:grid-cols-2 lg:gap-7">
-            {offices.map((o) => (
+          <div className="grid gap-5 md:grid-cols-3 lg:gap-6">
+            {topics.map((topic) => (
               <article
-                key={o.city}
-                className="overflow-hidden rounded-2xl border border-border/70 bg-card"
+                key={topic.title}
+                className="group flex flex-col rounded-2xl border border-border/70 bg-card p-7 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-[var(--shadow-brand)]"
               >
-                {/* Decorative tinted "map" panel */}
-                <div className="relative h-40 overflow-hidden bg-brand-gradient">
-                  <div className="absolute inset-0 bg-grid-soft opacity-20" aria-hidden />
-                  <div className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-primary shadow-sm">
-                    <Building className="size-3.5" aria-hidden />
-                    {o.city}
-                  </div>
+                <div className="mb-4 grid size-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+                  <topic.icon className="size-5" aria-hidden />
                 </div>
-                <div className="p-6">
-                  <p className="font-display text-lg font-semibold tracking-tight">
-                    {o.address}
-                  </p>
-                  <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <Clock className="size-3.5" aria-hidden /> {o.hours}
-                  </p>
-                </div>
+                <span
+                  className="self-start rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-primary"
+                  dangerouslySetInnerHTML={{ __html: topic.badge }}
+                />
+                <h3 className="mt-3 font-display text-lg font-semibold tracking-tight">
+                  {topic.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {topic.detail}
+                </p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Founder note */}
-      <section className="container mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-        <div className="overflow-hidden rounded-2xl border border-border/70 bg-card p-7 sm:p-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
-            A note from the founder
-          </p>
-          <p className="mt-4 font-display text-xl font-medium leading-relaxed tracking-tight text-foreground/90 sm:text-2xl">
-            &ldquo;Jaratrade is a small team building something that didn&apos;t exist
-            when we needed it ourselves. If you&apos;ve got feedback, an idea, or
-            a complaint - write to me directly. I read everything.&rdquo;
-          </p>
-          <p className="mt-6 text-sm">
-            <a href="mailto:daniel@jaratrade.com" className="font-semibold text-primary underline-offset-4 hover:underline">
-              daniel@jaratrade.com
-            </a>{" "}
-            <span className="text-muted-foreground">· Daniel, founder</span>
-          </p>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="container mx-auto max-w-3xl px-4 pb-20 text-center sm:px-6 lg:px-8 lg:pb-24">
+      {/* Final CTA */}
+      <section className="container mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8 lg:py-24">
         <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
           Ready to start?
         </h2>

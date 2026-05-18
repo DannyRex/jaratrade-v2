@@ -105,7 +105,7 @@ export default function PrivacyPage() {
           </ul>
           <p>
             To exercise any of these, email{" "}
-            <a href="mailto:privacy@jaratrade.com">privacy@jaratrade.com</a>. We&apos;ll
+            <a href="mailto:admin@jaratrade.com">admin@jaratrade.com</a>. We&apos;ll
             respond within 30 days.
           </p>
 
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
           <h2>11. Contact</h2>
           <p>
             Questions or concerns? Email our Data Protection lead at{" "}
-            <a href="mailto:privacy@jaratrade.com">privacy@jaratrade.com</a>. You also have
+            <a href="mailto:admin@jaratrade.com">admin@jaratrade.com</a>. You also have
             the right to complain to the UK ICO (ico.org.uk) or the Nigeria NDPB
             (ndpb.gov.ng).
           </p>

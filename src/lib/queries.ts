@@ -9,6 +9,7 @@ import type { Role, UserProfile } from "./types";
 
 export const queryKeys = {
   home: ["home"] as const,
+  metrics: ["metrics"] as const,
   products: (filters?: object) => ["products", filters ?? {}] as const,
   product: (id: string) => ["product", id] as const,
   categories: ["categories"] as const,
@@ -43,6 +44,14 @@ export const queryKeys = {
 
 export const useHome = () =>
   useQuery({ queryKey: queryKeys.home, queryFn: publicApi.home, staleTime: 5 * 60 * 1000 });
+
+export const useMetrics = () =>
+  useQuery({
+    queryKey: queryKeys.metrics,
+    queryFn: publicApi.metrics,
+    // Counts move slowly; refetching every five minutes is plenty.
+    staleTime: 5 * 60 * 1000,
+  });
 
 export const useProducts = (filters?: Parameters<typeof publicApi.products>[0]) =>
   useQuery({

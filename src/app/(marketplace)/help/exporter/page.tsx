@@ -91,7 +91,7 @@ const faqs = [
   },
   {
     q: "Can I bulk-upload products?",
-    a: "Yes - we have a CSV importer for sellers with 50+ SKUs. Email sellers@jaratrade.com for the template.",
+    a: "Yes - we have a CSV importer for sellers with 50+ SKUs. Email admin@jaratrade.com for the template.",
   },
   {
     q: "Can I sell from multiple markets?",

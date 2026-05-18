@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Globe2, MapPin } from "lucide-react";
+import { Globe2, Mail } from "lucide-react";
 import { Logo } from "./logo";
 
 const sections = [
@@ -64,9 +64,12 @@ export function SiteFooter() {
               <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5">
                 <Globe2 className="size-3.5" aria-hidden /> en-GB
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5">
-                <MapPin className="size-3.5" aria-hidden /> Lagos &amp; London
-              </span>
+              <a
+                href="mailto:admin@jaratrade.com"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/60 px-3 py-1.5 transition-colors hover:border-primary/40 hover:text-foreground"
+              >
+                <Mail className="size-3.5" aria-hidden /> admin@jaratrade.com
+              </a>
             </div>
           </div>
 
@@ -105,8 +108,6 @@ export function SiteFooter() {
             <Link href="/legal/cookies" className="transition-colors hover:text-foreground">
               Cookies
             </Link>
-            <span aria-hidden className="text-muted-foreground/40">·</span>
-            <span>Made in Lagos &amp; London</span>
           </div>
         </div>
       </div>

@@ -209,7 +209,7 @@ export default function SellersPage() {
           Ready to source - or ready to sell?
         </h2>
         <p className="mt-4 text-muted-foreground">
-          Browse 4,200+ catalogued products from 120+ verified exporters, or apply to list your own.
+          Browse catalogued products from verified Nigerian exporters, or apply to list your own.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild size="lg" className="rounded-full px-6 shadow-[var(--shadow-brand)]">

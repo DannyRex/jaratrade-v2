@@ -122,15 +122,15 @@ export default function MarketsPage() {
             <span className="text-gradient-brand">in one catalogue.</span>
           </>
         }
-        description="Twelve markets. Hundreds of stalls. Thousands of products. Jaratrade brings them online so UK buyers can source from each one without ever needing a buying trip."
+        description="The wholesale markets that move Nigeria. Jaratrade brings them online so UK buyers can source from each one without ever needing a buying trip."
       />
 
       {/* Intro paragraph */}
       <section className="container mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
         <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
           Nigerian wholesale markets are some of the largest in West Africa -
-          but most of them have lived offline. We&apos;ve spent two years onboarding
-          sellers from each one so you can browse listings the same way you&apos;d
+          but most of them have lived offline. We onboard verified sellers from
+          each one so you can browse listings the same way you&apos;d
           browse a supermarket aisle. Each market specialises in different goods.
           Here&apos;s where to look for what.
         </p>
@@ -191,7 +191,7 @@ export default function MarketsPage() {
           Source from any market. Or all of them.
         </h2>
         <p className="mt-4 text-muted-foreground">
-          Browse 4,200+ catalogued products from across Nigeria - or apply to
+          Browse catalogued products from across Nigeria - or apply to
           add your market stall.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">

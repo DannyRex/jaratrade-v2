@@ -48,7 +48,7 @@ export default function TermsPage() {
           <p>
             You&apos;re responsible for keeping your password safe and for everything that
             happens under your account. Notify us at{" "}
-            <a href="mailto:security@jaratrade.com">security@jaratrade.com</a> as soon as you
+            <a href="mailto:admin@jaratrade.com">admin@jaratrade.com</a> as soon as you
             suspect unauthorised use. We may suspend or close accounts that violate these
             terms, fail KYC, or pose a risk to other users.
           </p>
@@ -147,8 +147,8 @@ export default function TermsPage() {
           <h2>13. Contact</h2>
           <p>
             Questions? Email{" "}
-            <a href="mailto:legal@jaratrade.com">legal@jaratrade.com</a> or write to us at one
-            of our offices (see the <a href="/contact">contact page</a>).
+            <a href="mailto:admin@jaratrade.com">admin@jaratrade.com</a> or
+            reach us via the <a href="/contact">contact page</a>.
           </p>
         </Prose>
       </section>

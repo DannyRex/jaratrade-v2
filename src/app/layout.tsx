@@ -113,10 +113,7 @@ const organizationSchema = {
   url: SITE_URL,
   logo: `${SITE_URL}/brand/logo-square.png`,
   description: SITE_DESCRIPTION,
-  foundingLocation: [
-    { "@type": "Place", name: "Lagos, Nigeria" },
-    { "@type": "Place", name: "London, United Kingdom" },
-  ],
+  email: "admin@jaratrade.com",
   sameAs: [],
 };
 

@@ -213,8 +213,17 @@ export function multipart(payload: Record<string, unknown>): FormData {
 // Public reference data (no auth required)
 // -----------------------------------------------------------------------------
 
+/** Live marketing metrics. Surfaces on the homepage hero + body copy. */
+export interface PublicMetrics {
+  verified_exporters: number;
+  active_skus: number;
+  markets: number;
+  categories: number;
+}
+
 export const publicApi = {
   home: () => request<HomeData>("/public"),
+  metrics: () => request<PublicMetrics>("/public/metrics"),
   products: (params?: { category?: string; p?: number; len?: number; sort_by?: string; exporter?: string; store?: string }) =>
     request<PagedData<ProductSummary>>("/public/products", { query: params }),
   product: (id: string) => request<ProductDetail>(`/public/products/${id}`),

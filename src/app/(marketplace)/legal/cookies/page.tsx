@@ -82,7 +82,7 @@ export default function CookiePolicyPage() {
           <h2>Contact</h2>
           <p>
             Questions about cookies? Email{" "}
-            <a href="mailto:privacy@jaratrade.com">privacy@jaratrade.com</a>.
+            <a href="mailto:admin@jaratrade.com">admin@jaratrade.com</a>.
           </p>
         </Prose>
       </section>

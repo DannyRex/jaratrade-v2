@@ -5,29 +5,33 @@
  *
  * Layout: editorial 6/6 split on lg+, single column on mobile.
  *   Left (lg:col-span-7)  : eyebrow chip, headline, subhead, two CTAs,
- *                            three trust pills, four stat counters.
+ *                            three trust pills, four live stat counters.
  *   Right (lg:col-span-5) : visual stack - floating product chip cards
  *                            arranged over a brand gradient panel with a
  *                            radial glow. Hidden on mobile to keep the
  *                            primary message above the fold.
  *
- * Background: aurora mesh + subtle dot grid. Both pure CSS - no images, no
- * extra fetches.
- *
- * Motion: staggered rise-in fade for the left column children. Disabled by
- * the global `prefers-reduced-motion` rule.
+ * Stats: pulled live from /public/metrics. Skeleton renders until the
+ * count arrives so we never display invented figures.
  */
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Truck, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMetrics } from "@/lib/queries";
 
-const stats = [
-  { label: "Verified exporters", value: "120+" },
-  { label: "Active SKUs", value: "4,200" },
-  { label: "Markets covered", value: "12" },
-  { label: "Avg. ship time", value: "9d" },
+const STAT_LABELS = [
+  { key: "verified_exporters" as const, label: "Verified exporters" },
+  { key: "active_skus" as const, label: "Active SKUs" },
+  { key: "markets" as const, label: "Markets" },
+  { key: "categories" as const, label: "Categories" },
 ];
+
+function formatStat(n: number | undefined): string {
+  if (n === undefined) return "--";
+  if (n >= 1000) return new Intl.NumberFormat("en-GB").format(n);
+  return String(n);
+}
 
 // Sample products mirroring the seeded catalogue - photos sourced from
 // Unsplash (royalty-free, commercial use). Replace with photographer-shot
@@ -124,18 +128,7 @@ export function Hero() {
               </li>
             </ul>
 
-            <dl className="mt-12 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4 animate-rise [animation-delay:400ms]">
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    {s.label}
-                  </dt>
-                  <dd className="mt-1 font-display text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">
-                    {s.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            <LiveStats />
           </div>
 
           {/* Right - visual stack (hidden on mobile to keep CTA above fold) */}
@@ -145,6 +138,31 @@ export function Hero() {
         </div>
       </div>
     </section>
+  );
+}
+
+function LiveStats() {
+  const { data, isLoading } = useMetrics();
+  return (
+    <dl className="mt-12 grid grid-cols-2 gap-x-8 gap-y-6 sm:grid-cols-4 animate-rise [animation-delay:400ms]">
+      {STAT_LABELS.map((s) => {
+        const value = data?.[s.key];
+        return (
+          <div key={s.key}>
+            <dt className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              {s.label}
+            </dt>
+            <dd className="mt-1 font-display text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">
+              {isLoading ? (
+                <span className="inline-block h-7 w-12 animate-pulse rounded bg-muted align-middle" aria-hidden />
+              ) : (
+                formatStat(value)
+              )}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
   );
 }
 
@@ -185,23 +203,28 @@ function HeroVisual() {
         />
       </div>
 
-      {/* Stat ribbon at bottom */}
-      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 rounded-2xl border border-border/70 bg-card px-5 py-4 shadow-[var(--shadow-pop)] backdrop-blur">
-        <div className="flex items-center gap-4">
-          <div className="flex -space-x-2">
-            {["#2563eb", "#fb923c", "#10b981"].map((c, i) => (
-              <span
-                key={i}
-                className="size-7 rounded-full border-2 border-card"
-                style={{ background: c }}
-                aria-hidden
-              />
-            ))}
-          </div>
-          <div>
-            <p className="text-xs font-medium text-muted-foreground">Live this hour</p>
-            <p className="text-sm font-bold tabular-nums">42 orders shipped</p>
-          </div>
+      {/* Trust ribbon at bottom - real signal, not fake "live" counter */}
+      <LiveTrustRibbon />
+    </div>
+  );
+}
+
+function LiveTrustRibbon() {
+  const { data } = useMetrics();
+  const exporters = data?.verified_exporters;
+  return (
+    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 rounded-2xl border border-border/70 bg-card px-5 py-4 shadow-[var(--shadow-pop)] backdrop-blur">
+      <div className="flex items-center gap-3">
+        <ShieldCheck className="size-6 text-success" aria-hidden />
+        <div>
+          <p className="text-xs font-medium text-muted-foreground">KYC-verified sellers</p>
+          <p className="text-sm font-bold tabular-nums">
+            {exporters === undefined ? (
+              <span className="inline-block h-4 w-8 animate-pulse rounded bg-muted align-middle" aria-hidden />
+            ) : (
+              `${formatStat(exporters)} active`
+            )}
+          </p>
         </div>
       </div>
     </div>

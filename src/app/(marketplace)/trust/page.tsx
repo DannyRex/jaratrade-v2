@@ -256,8 +256,8 @@ export default function TrustPage() {
             </h2>
             <p className="mt-4 max-w-xl text-muted-foreground">
               Suspect something&apos;s off? Email{" "}
-              <a href="mailto:security@jaratrade.com" className="font-medium text-primary underline-offset-4 hover:underline">
-                security@jaratrade.com
+              <a href="mailto:admin@jaratrade.com" className="font-medium text-primary underline-offset-4 hover:underline">
+                admin@jaratrade.com
               </a>
               . We act on every report within 24 hours and never share the
               reporter&apos;s identity with the subject of the report.
