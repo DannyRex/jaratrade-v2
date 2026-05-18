@@ -76,14 +76,16 @@ export function SiteHeader() {
               <Menu className="size-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80 sm:w-96">
-            <SheetHeader>
-              <SheetTitle>
-                <Logo size="md" />
+          <SheetContent side="left" className="w-[88vw] max-w-sm overflow-y-auto p-0 sm:max-w-sm">
+            <SheetHeader className="border-b border-border/60 p-6 pr-16">
+              <SheetTitle asChild>
+                <div>
+                  <Logo size="md" />
+                </div>
               </SheetTitle>
               <SheetDescription className="sr-only">Site navigation</SheetDescription>
             </SheetHeader>
-            <nav aria-label="Primary" className="mt-8 flex flex-col gap-0.5">
+            <nav aria-label="Primary" className="flex flex-col gap-0.5 px-3 py-4">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -94,13 +96,18 @@ export function SiteHeader() {
                 </Link>
               ))}
             </nav>
-            <div className="mt-8 space-y-3 border-t pt-6">
-              <Button asChild className="w-full" size="lg">
-                <Link href="/auth/login">Sign in</Link>
-              </Button>
-              <Button asChild className="w-full" variant="outline" size="lg">
-                <Link href="/auth/register/importer">Create account</Link>
-              </Button>
+            <div className="mt-auto border-t border-border/60 p-6">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                Get started
+              </p>
+              <div className="space-y-2.5">
+                <Button asChild className="w-full rounded-full" size="lg">
+                  <Link href="/auth/login/importer">Sign in</Link>
+                </Button>
+                <Button asChild className="w-full rounded-full" variant="outline" size="lg">
+                  <Link href="/auth/register/importer">Create account</Link>
+                </Button>
+              </div>
             </div>
           </SheetContent>
         </Sheet>
