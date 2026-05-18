@@ -64,7 +64,7 @@ export default function TrustPage() {
         title={
           <>
             Trade with{" "}
-            <span className="text-gradient-brand">confidence.</span>
+            <span className="text-primary">confidence.</span>
           </>
         }
         description="Every order on Jaratrade is backed by KYC verification, funds held in escrow, and a 7-day dispute window. We review every claim."

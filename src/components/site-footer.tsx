@@ -42,16 +42,6 @@ const sections = [
 export function SiteFooter() {
   return (
     <footer className="relative mt-24 overflow-hidden border-t border-border/60 bg-muted/30">
-      {/* Soft brand-tinted backdrop */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, oklch(0.49 0.2186 264 / 0.40), transparent)",
-        }}
-        aria-hidden
-      />
-
       <div className="container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="space-y-4 md:col-span-4">

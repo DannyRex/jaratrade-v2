@@ -37,7 +37,7 @@ const markets: Market[] = [
     description:
       "West Africa's largest electronics market - and increasingly the FMCG distribution hub for Lagos. Strong export-grade packaging on snacks, packaged drinks, and household goods.",
     tags: ["Snacks", "Beverages", "Household goods"],
-    hue: "from-blue-500/20 to-cyan-500/10",
+    hue: "bg-blue-500/15",
   },
   {
     name: "Aba Main Market",
@@ -47,7 +47,7 @@ const markets: Market[] = [
     description:
       "The textile and leather capital of Nigeria. Garments, shoes, school uniforms - manufactured locally and priced for export. Several Jaratrade exporters operate from here.",
     tags: ["Garments", "Leather", "Shoes"],
-    hue: "from-amber-500/20 to-orange-500/10",
+    hue: "bg-amber-500/15",
   },
   {
     name: "Onitsha Main Market",
@@ -57,7 +57,7 @@ const markets: Market[] = [
     description:
       "The most concentrated food and FMCG market in the East. Anything that moves by truck across Nigeria passes through Onitsha. Strong on dried foods, palm oil, and packaged staples.",
     tags: ["Dried foods", "Palm oil", "Staples"],
-    hue: "from-emerald-500/20 to-green-500/10",
+    hue: "bg-emerald-500/15",
   },
   {
     name: "Mushin Market",
@@ -67,7 +67,7 @@ const markets: Market[] = [
     description:
       "The grain and food market for Lagos. Yam flour, garri, beans, rice, dried fish, dried meats. UK importers source restocks here when their Onitsha supplier is short.",
     tags: ["Grains", "Garri", "Dried fish"],
-    hue: "from-violet-500/20 to-purple-500/10",
+    hue: "bg-violet-500/15",
   },
   {
     name: "Balogun Market",
@@ -77,7 +77,7 @@ const markets: Market[] = [
     description:
       "Textiles, fabrics, ankara, lace. The go-to for UK-based African fashion brands and tailors. Bulk fabric sold in 5-yard, 10-yard and 50-yard rolls.",
     tags: ["Ankara", "Lace", "Bulk fabric"],
-    hue: "from-pink-500/20 to-fuchsia-500/10",
+    hue: "bg-pink-500/15",
   },
   {
     name: "Dawanau International Market",
@@ -87,7 +87,7 @@ const markets: Market[] = [
     description:
       "The largest grain and spice market in West Africa. Sesame, sorghum, hibiscus (zobo), groundnuts, dried chillies, ginger, fonio. Most exports to North America come through here.",
     tags: ["Sesame", "Hibiscus", "Ginger"],
-    hue: "from-rose-500/20 to-red-500/10",
+    hue: "bg-rose-500/15",
   },
   {
     name: "Kano Kurmi Market",
@@ -97,7 +97,7 @@ const markets: Market[] = [
     description:
       "One of Africa's oldest markets - 500+ years old. Leather goods, traditional crafts, dyed fabrics. Best for hand-finished leather and artisanal craft.",
     tags: ["Leather", "Crafts", "Dyed fabrics"],
-    hue: "from-yellow-500/20 to-amber-500/10",
+    hue: "bg-yellow-500/15",
   },
   {
     name: "Zaki Biam Yam Market",
@@ -107,7 +107,7 @@ const markets: Market[] = [
     description:
       "The yam capital of Nigeria. Tubers in sizes from \"tray\" to \"container\". Best shipping window is October to February when fresh harvest is in.",
     tags: ["Yams", "Tubers", "Seasonal"],
-    hue: "from-teal-500/20 to-cyan-500/10",
+    hue: "bg-teal-500/15",
   },
 ];
 
@@ -119,7 +119,7 @@ export default function MarketsPage() {
         title={
           <>
             Every major Nigerian market,{" "}
-            <span className="text-gradient-brand">in one catalogue.</span>
+            <span className="text-primary">in one catalogue.</span>
           </>
         }
         description="The wholesale markets that move Nigeria. Jaratrade brings them online so UK buyers can source from each one without ever needing a buying trip."
@@ -145,7 +145,7 @@ export default function MarketsPage() {
               className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-card transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-[var(--shadow-brand)]"
             >
               {/* Tinted "map" area at top */}
-              <div className={`relative h-32 overflow-hidden bg-gradient-to-br ${m.hue}`}>
+              <div className={`relative h-32 overflow-hidden ${m.hue}`}>
                 <div className="absolute inset-0 bg-grid-soft opacity-50" aria-hidden />
                 <div className="absolute bottom-3 right-3 grid size-10 place-items-center rounded-full bg-background/90 text-primary shadow-sm">
                   <MapPin className="size-5" aria-hidden />

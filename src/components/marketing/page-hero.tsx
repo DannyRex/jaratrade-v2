@@ -33,14 +33,10 @@ export function PageHero({
   return (
     <section
       className={cn(
-        "relative isolate overflow-hidden bg-aurora",
+        "relative isolate overflow-hidden bg-muted/30 border-b border-border/60",
         className,
       )}
     >
-      <div
-        className="bg-grid-soft absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_75%)]"
-        aria-hidden
-      />
       <div
         className={cn(
           "container relative mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24",

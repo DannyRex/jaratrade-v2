@@ -127,7 +127,7 @@ export function ProfileProgress({ role }: { role: Role }) {
           className="mt-5 h-2 overflow-hidden rounded-full bg-muted"
         >
           <div
-            className="h-full rounded-full bg-gradient-to-r from-primary to-brand-sky transition-[width] duration-500"
+            className="h-full rounded-full bg-primary transition-[width] duration-500"
             style={{ width: `${pct}%` }}
           />
         </div>

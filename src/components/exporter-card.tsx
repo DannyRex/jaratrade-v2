@@ -24,7 +24,7 @@ export function ExporterCard({ exporter }: { exporter: ExporterSummary }) {
       </Link>
       <CardContent className="flex items-center gap-4 p-5">
         <Avatar className="size-14 ring-2 ring-primary/10">
-          <AvatarFallback className="bg-gradient-to-br from-primary/20 to-brand-sky/15 text-base font-bold text-primary">
+          <AvatarFallback className="bg-primary/10 text-base font-bold text-primary">
             {initials(name)}
           </AvatarFallback>
         </Avatar>

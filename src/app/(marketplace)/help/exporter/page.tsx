@@ -107,7 +107,7 @@ export default function ExporterHelpPage() {
         title={
           <>
             Sell to the UK,{" "}
-            <span className="text-gradient-brand">from your market stall.</span>
+            <span className="text-primary">from your market stall.</span>
           </>
         }
         description="Jaratrade brings UK buyers to you. Apply once, list your catalogue, and we'll handle the matching, payments, and dispute layer."

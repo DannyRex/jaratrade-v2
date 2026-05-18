@@ -52,7 +52,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
         <span className="sr-only">View {product.product_name}</span>
       </Link>
 
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-muted to-secondary/40">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
         {cover ? (
           <Image
             src={cover}
@@ -68,7 +68,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
           </div>
         )}
         {/* Bottom edge fade - adds dimension + reserves space for any future overlay text */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        
 
         {/* Top-left: category */}
         <div className="absolute left-3 top-3 z-[1]">
@@ -141,7 +141,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
 export function ProductCardSkeleton() {
   return (
     <div className="flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card">
-      <div className="aspect-[4/3] w-full bg-gradient-to-br from-muted to-secondary/40 animate-pulse" />
+      <div className="aspect-[4/3] w-full bg-muted animate-pulse" />
       <div className="space-y-3 p-4 sm:p-5">
         <div className="space-y-2">
           <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />

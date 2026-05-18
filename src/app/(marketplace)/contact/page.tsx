@@ -52,7 +52,7 @@ export default function ContactPage() {
         title={
           <>
             Talk to us.{" "}
-            <span className="text-gradient-brand">We&apos;re listening.</span>
+            <span className="text-primary">We&apos;re listening.</span>
           </>
         }
         description="Whether you're shipping containers from Onitsha or sourcing your first carton of garri, we want to hear from you."
@@ -61,11 +61,6 @@ export default function ContactPage() {
       {/* Primary contact card */}
       <section className="container mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-card p-8 shadow-[var(--shadow-brand)] sm:p-10">
-          <div
-            className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full blur-3xl opacity-50"
-            style={{ background: "radial-gradient(circle, oklch(0.49 0.2186 264 / 0.45), transparent 70%)" }}
-            aria-hidden
-          />
           <div className="relative">
             <div className="mb-5 grid size-12 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
               <Mail className="size-6" aria-hidden />

@@ -134,11 +134,6 @@ export function ExporterSubscriptionExtras() {
       {/* Pay-back panel - quick maths to make Premium feel obvious */}
       <section className="container mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
         <div className="relative isolate overflow-hidden rounded-3xl border border-primary/20 bg-card p-6 shadow-[var(--shadow-soft)] sm:p-8">
-          <div
-            className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full blur-3xl opacity-50"
-            style={{ background: "radial-gradient(circle, oklch(0.49 0.2186 264 / 0.35), transparent 70%)" }}
-            aria-hidden
-          />
           <div className="relative grid gap-5 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-7">
             <div className="grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/15">
               <Zap className="size-6" aria-hidden />

@@ -35,7 +35,7 @@ export default function ServicesPage() {
         title={
           <>
             Free to start.{" "}
-            <span className="text-gradient-brand">Pay when you sell.</span>
+            <span className="text-primary">Pay when you sell.</span>
           </>
         }
         description="One plan keeps you live, listed and verified. Premium adds reach when you're ready to scale."

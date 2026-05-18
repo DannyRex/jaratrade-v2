@@ -78,7 +78,7 @@ export function HowItWorks() {
 
             {/* Bottom border accent on hover */}
             <span
-              className="absolute inset-x-7 bottom-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-primary to-brand-sky transition-transform duration-300 group-hover:scale-x-100"
+              className="absolute inset-x-7 bottom-0 h-0.5 origin-left scale-x-0 bg-primary transition-transform duration-300 group-hover:scale-x-100"
               aria-hidden
             />
           </li>

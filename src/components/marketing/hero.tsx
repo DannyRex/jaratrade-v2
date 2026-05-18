@@ -66,11 +66,9 @@ const heroProducts = [
 export function Hero() {
   return (
     <section
-      className="relative isolate overflow-hidden bg-aurora"
+      className="relative isolate overflow-hidden bg-muted/30 border-b border-border/60"
       aria-labelledby="hero-headline"
     >
-      {/* Decorative grid - sits behind content */}
-      <div className="bg-grid-soft absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" aria-hidden />
 
       <div className="container relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
         <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
@@ -91,7 +89,7 @@ export function Hero() {
               className="mt-6 max-w-3xl font-display text-[clamp(2.25rem,5.4vw,4.5rem)] font-bold leading-[1.02] tracking-tight animate-rise [animation-delay:80ms]"
             >
               Source Nigeria.{" "}
-              <span className="text-gradient-brand sm:whitespace-nowrap">Sell to the world.</span>
+              <span className="text-primary sm:whitespace-nowrap">Sell to the world.</span>
             </h1>
 
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground animate-rise [animation-delay:160ms]">
@@ -169,20 +167,8 @@ function LiveStats() {
 function HeroVisual() {
   return (
     <div className="relative aspect-square w-full max-w-md animate-rise [animation-delay:200ms]">
-      {/* Brand gradient panel - the canvas that floats the chips */}
-      <div className="absolute inset-0 rounded-[2rem] bg-brand-gradient shadow-[var(--shadow-pop)]" aria-hidden />
-      {/* Top-right radial highlight */}
-      <div
-        className="absolute -right-4 -top-4 size-48 rounded-full blur-3xl opacity-60"
-        style={{ background: "radial-gradient(circle, oklch(0.70 0.1593 245 / 0.55), transparent 70%)" }}
-        aria-hidden
-      />
-      {/* Bottom-left warm accent */}
-      <div
-        className="absolute -bottom-6 -left-6 size-40 rounded-full blur-3xl opacity-50"
-        style={{ background: "radial-gradient(circle, oklch(0.73 0.1730 55 / 0.45), transparent 70%)" }}
-        aria-hidden
-      />
+      {/* Solid brand canvas (was a brand gradient panel — flattened for v3.4 */}
+      <div className="absolute inset-0 rounded-[2rem] bg-primary shadow-[var(--shadow-pop)]" aria-hidden />
 
       {/* Floating product chips */}
       {heroProducts.map((p, i) => (

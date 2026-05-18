@@ -1,11 +1,9 @@
 /**
- * Final CTA - large gradient banner with paired role-specific actions.
+ * Final CTA - solid brand panel with paired role-specific actions.
  *
- * Visual:
- *  - Full-bleed `bg-brand-gradient` panel with a radial overlay for depth.
- *  - Two primary actions (importer + exporter) on light buttons so they pop
- *    against the deep blue surface.
- *  - Faint logo glyph in the background for brand pattern.
+ * v3.4: gradients removed. Single solid brand-cobalt panel; the visual
+ * lift comes from the contrast against the page background plus the
+ * faint logo glyph at lower-right and the shadow-pop elevation.
  */
 import Image from "next/image";
 import Link from "next/link";
@@ -15,20 +13,9 @@ import { Button } from "@/components/ui/button";
 export function FinalCTA() {
   return (
     <section className="container mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
-      <div className="relative isolate overflow-hidden rounded-3xl bg-brand-gradient p-10 text-white shadow-[var(--shadow-pop)] sm:p-14 lg:p-16">
-        {/* Decorative layers */}
-        <div
-          className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full blur-3xl opacity-50"
-          style={{ background: "radial-gradient(circle, oklch(0.70 0.1593 245 / 0.55), transparent 70%)" }}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -left-32 -bottom-32 size-[28rem] rounded-full blur-3xl opacity-40"
-          style={{ background: "radial-gradient(circle, oklch(0.73 0.1730 55 / 0.45), transparent 70%)" }}
-          aria-hidden
-        />
+      <div className="relative isolate overflow-hidden rounded-3xl bg-primary p-10 text-white shadow-[var(--shadow-pop)] sm:p-14 lg:p-16">
         {/* Faint logo glyph */}
-        <div className="pointer-events-none absolute -bottom-12 -right-12 opacity-[0.06]" aria-hidden>
+        <div className="pointer-events-none absolute -bottom-12 -right-12 opacity-[0.08]" aria-hidden>
           <Image src="/brand/logo.png" alt="" width={420} height={517} className="h-72 w-auto sm:h-96" />
         </div>
 
@@ -61,7 +48,7 @@ export function FinalCTA() {
               asChild
               size="lg"
               variant="outline"
-              className="h-12 rounded-full border-white/30 bg-white/10 px-6 text-base text-white backdrop-blur hover:bg-white/20"
+              className="h-12 rounded-full border-white/30 bg-white/10 px-6 text-base text-white hover:bg-white/20"
             >
               <Link href="/auth/register/exporter">
                 I want to export <ArrowRight className="size-4" />

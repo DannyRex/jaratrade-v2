@@ -52,7 +52,7 @@ export default function SellersPage() {
         title={
           <>
             Verified Nigerian businesses,{" "}
-            <span className="text-gradient-brand">ready to ship.</span>
+            <span className="text-primary">ready to ship.</span>
           </>
         }
         description="Every exporter on Jaratrade has been through our KYC checks - business registration, IDs, bank details, and inventory practices verified before they list a single SKU."

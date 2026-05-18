@@ -109,7 +109,7 @@ export default function LogisticsHelpPage() {
         title={
           <>
             Two ways to ship.{" "}
-            <span className="text-gradient-brand">Both work.</span>
+            <span className="text-primary">Both work.</span>
           </>
         }
         description="You can use your own freight company or hand the leg to a Jaratrade-vetted partner. Whatever fits your operation."
