@@ -498,6 +498,18 @@ export const adminApi = {
       { method: "PUT", body: multipart({ percent }) },
     ),
 
+  // Subaccount management (v3.5 — Flutterwave integration)
+  reprovisionSubaccount: (userId: string) =>
+    request<AdminUser>(`/adm/users/${userId}/reprovision-subaccount`, { method: "POST" }),
+
+  // Payouts (v3.5 — manual seller disbursement)
+  listPayouts: (params?: { status?: "pending" | "sent" | "completed" | "failed"; p?: number; len?: number }) =>
+    request<PagedRows<PayoutRow>>("/adm/payouts", { query: params }),
+  eligiblePayouts: () =>
+    request<PagedRows<EligiblePayout>>("/adm/payouts/eligible"),
+  sendPayout: (orderId: string) =>
+    request<PayoutRow>(`/adm/payouts/${orderId}/send`, { method: "POST" }),
+
   // Logs (logistics-partner-facing - no auth needed in production but token-gated here)
   logsViewOrders: (filters?: { from?: string; to?: string; status?: string }) =>
     request<unknown>("/logs/orders", { query: filters }),
@@ -617,5 +629,39 @@ export interface AdminUser {
   business_name: string | null;
   business_country: string | null;
   business_reg_number: string | null;
+  flw_subaccount_id?: string | null;
   time_created: string;
+}
+
+// v3.5 — Flutterwave payout types
+export interface PayoutRow {
+  id: string;
+  order_id: string;
+  order_number: string | null;
+  seller_id: string;
+  seller_name?: string | null;
+  amount: string;
+  currency: string;
+  reference: string;
+  status: "pending" | "sent" | "completed" | "failed";
+  failure_reason: string | null;
+  initiated_by: string | null;
+  time_created: string;
+  time_updated: string;
+}
+
+export interface EligiblePayout {
+  order_id: string;
+  order_number: string;
+  delivered_at: string;
+  gross_total: string;
+  commission_rate_percent: number;
+  seller_share: string;
+  currency: string;
+  seller_id: string;
+  seller_name: string | null;
+  seller_bank: string | null;
+  seller_account_number: string | null;
+  flw_subaccount_id: string | null;
+  bank_code: string | null;
 }
