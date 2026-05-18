@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/data-table";
+import { ProfileProgress } from "@/components/profile-progress";
 import { useImporterOrders } from "@/lib/queries";
 import { formatDate, formatMoney, shortId } from "@/lib/format";
 import type { Order } from "@/lib/types";
@@ -36,6 +37,8 @@ export default function ImporterOrdersPage() {
           </Button>
         }
       />
+
+      <ProfileProgress role="importer" />
 
       {isError ? (
         <EmptyState

@@ -217,6 +217,11 @@
   * {
     border-color: var(--border);
   }
+  html, body {
+    /* Prevent stray content from causing horizontal scroll on mobile.
+       `clip` is preferred over `hidden` so position: sticky still works. */
+    overflow-x: clip;
+  }
   html {
     color-scheme: light dark;
     -webkit-font-smoothing: antialiased;

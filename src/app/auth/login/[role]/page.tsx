@@ -109,9 +109,11 @@ function LoginForm({ role }: { role: Role }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight sm:text-[2rem]">
+          Welcome back
+        </h1>
         <p className="text-sm text-muted-foreground">
           Log in as {meta.label.toLowerCase()} to continue.
         </p>
@@ -119,7 +121,7 @@ function LoginForm({ role }: { role: Role }) {
 
       <RoleTabs active={role} hrefBuilder={(r) => `/auth/login/${r}`} />
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -130,6 +132,7 @@ function LoginForm({ role }: { role: Role }) {
             placeholder="you@company.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="h-11"
           />
         </div>
 
@@ -139,7 +142,7 @@ function LoginForm({ role }: { role: Role }) {
             {role !== "admin" ? (
               <Link
                 href={`/auth/forgot-password?role=${role}`}
-                className="text-xs font-medium text-primary hover:underline"
+                className="text-xs font-semibold text-primary hover:underline"
               >
                 Forgot password?
               </Link>
@@ -154,13 +157,13 @@ function LoginForm({ role }: { role: Role }) {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pr-10"
+              className="h-11 pr-10"
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
             >
               {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
             </button>
@@ -173,7 +176,12 @@ function LoginForm({ role }: { role: Role }) {
           </Alert>
         ) : null}
 
-        <Button type="submit" className="w-full" size="lg" loading={login.isPending}>
+        <Button
+          type="submit"
+          className="h-11 w-full rounded-full text-base font-semibold shadow-[var(--shadow-brand)]"
+          size="lg"
+          loading={login.isPending}
+        >
           Log in
         </Button>
       </form>
@@ -181,7 +189,7 @@ function LoginForm({ role }: { role: Role }) {
       {role !== "admin" ? (
         <p className="text-center text-sm text-muted-foreground">
           New to Jaratrade?{" "}
-          <Link href={`/auth/register/${role}`} className="font-medium text-primary hover:underline">
+          <Link href={`/auth/register/${role}`} className="font-semibold text-primary hover:underline">
             Create an account
           </Link>
         </p>

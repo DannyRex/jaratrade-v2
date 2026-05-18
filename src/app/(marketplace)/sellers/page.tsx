@@ -145,7 +145,7 @@ export default function SellersPage() {
             How we curate
           </p>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
-            Verification is the floor. Featured status is earned.
+            Every seller is checked. The best ones rise to the top.
           </h2>
           <p className="mt-4 text-muted-foreground">
             The exporters you see at the top of the marketplace have done the work to get there.

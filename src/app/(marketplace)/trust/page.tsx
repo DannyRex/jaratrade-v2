@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Trust & safety",
   description:
-    "How Jaratrade protects buyers and sellers - KYC verification, Flutterwave-secured escrow, a 7-day dispute window with human review on every claim.",
+    "How Jaratrade protects buyers and sellers - KYC verification, Flutterwave-secured escrow, a 7-day dispute window. We review every claim.",
 };
 
 const disputeStages = [
@@ -52,7 +52,7 @@ const disputeStages = [
 
 const slas = [
   { window: "Within 1 hour", action: "Automated receipt of your report" },
-  { window: "Within 4 business hours", action: "Initial human review" },
+  { window: "Within 4 business hours", action: "Initial review" },
   { window: "Within 48 hours", action: "Resolution path communicated" },
 ];
 
@@ -67,7 +67,7 @@ export default function TrustPage() {
             <span className="text-gradient-brand">confidence.</span>
           </>
         }
-        description="Every order on Jaratrade is backed by KYC verification, funds held in escrow, and a 7-day dispute window with a human review on every claim."
+        description="Every order on Jaratrade is backed by KYC verification, funds held in escrow, and a 7-day dispute window. We review every claim."
       />
 
       {/* KYC standards */}
@@ -114,17 +114,21 @@ export default function TrustPage() {
         <div className="container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:items-center lg:gap-16">
             <div className="relative">
-              <div className="aspect-[5/4] overflow-hidden rounded-3xl bg-brand-gradient p-8 shadow-[var(--shadow-pop)]">
-                <div className="absolute inset-0 bg-grid-soft opacity-20" aria-hidden />
-                <div className="relative flex h-full flex-col justify-between text-white">
-                  <Lock className="size-10 opacity-90" aria-hidden />
+              <div className="aspect-[5/4] overflow-hidden rounded-3xl border border-border/70 bg-card p-8 shadow-[var(--shadow-pop)]">
+                <div className="relative flex h-full flex-col justify-between">
+                  <Lock className="size-9 text-primary/70" aria-hidden />
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] opacity-80">
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
                       Powered by
                     </p>
-                    <p className="mt-1 font-display text-3xl font-bold">Flutterwave</p>
-                    <p className="mt-2 text-sm opacity-85">
-                      UK-regulated · PCI DSS Level 1
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/brand/partners/flutterwave.svg"
+                      alt="Flutterwave"
+                      className="mt-3 h-10 w-auto sm:h-12"
+                    />
+                    <p className="mt-4 text-sm text-muted-foreground">
+                      PCI DSS Level 1 · Licensed in the UK, US &amp; across Africa
                     </p>
                   </div>
                 </div>
@@ -168,7 +172,7 @@ export default function TrustPage() {
             Dispute resolution
           </p>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
-            7 days to raise it. Humans review every case.
+            7 days to raise it. We review every case.
           </h2>
           <p className="mt-4 text-muted-foreground">
             You can resolve disputes from the importer dashboard. We email the

@@ -12,7 +12,7 @@ const steps = [
     icon: ShoppingBag,
     title: "Browse & order",
     description:
-      "Search 4,000+ catalogued products from verified Nigerian exporters. Filter by market, category, and price.",
+      "Search catalogued products from verified Nigerian exporters. Filter by market, category, and price.",
   },
   {
     icon: CreditCard,

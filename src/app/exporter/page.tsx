@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageHeader } from "@/components/ui/page-header";
+import { ProfileProgress } from "@/components/profile-progress";
 import { useExporterProfile, useExporterProducts } from "@/lib/queries";
 import { useAuth } from "@/lib/auth-store";
 import { formatMoney } from "@/lib/format";
@@ -39,6 +40,8 @@ export default function ExporterDashboard() {
           </Button>
         }
       />
+
+      <ProfileProgress role="exporter" />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard

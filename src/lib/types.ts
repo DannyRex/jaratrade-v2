@@ -148,6 +148,8 @@ export interface ExporterSummary {
   business_address: string;
   business_reg_number: string;
   order_count: number;
+  is_verified?: boolean;
+  kyc_status?: "pending" | "approved" | "rejected";
 }
 
 /** Listing-card shape (from /public/products) */

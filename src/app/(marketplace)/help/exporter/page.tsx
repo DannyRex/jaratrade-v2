@@ -216,10 +216,11 @@ export default function ExporterHelpPage() {
               Pricing
             </p>
             <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
-              Transparent. No surprises.
+              You only pay when you sell
             </h2>
             <p className="mt-3 text-muted-foreground">
-              No listing fees. No setup fees. No monthly minimums on the free tier.
+              List for free. Pay a small commission per transaction - no listing
+              fees, no setup fees, no monthly minimums.
             </p>
           </div>
           <div className="grid gap-5 md:grid-cols-2">

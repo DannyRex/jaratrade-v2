@@ -101,11 +101,12 @@ export default function ContactPage() {
               What we hear about
             </p>
             <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
-              Common reasons to write in
+              What people email us about
             </h2>
             <p className="mt-3 text-muted-foreground">
-              We&apos;ve grouped the questions that come up most so you can frame yours
-              the same way. It helps us route faster.
+              The three topics below cover most of what hits our inbox. Pick the
+              one that fits your question and we&apos;ll get back to you on the
+              same business day.
             </p>
           </div>
           <div className="grid gap-5 md:grid-cols-3 lg:gap-6">

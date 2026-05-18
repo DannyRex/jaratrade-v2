@@ -103,7 +103,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2.5 p-4 sm:p-5">
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
         <div className="space-y-1">
           <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-foreground">
             {product.product_name}
@@ -111,23 +111,27 @@ export function ProductCard({ product, className, priority = false }: ProductCar
           <p className="line-clamp-1 text-xs text-muted-foreground">by {sellerLabel}</p>
         </div>
 
-        <div className="mt-auto flex items-end justify-between gap-2 pt-2">
-          <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">
-              From
-            </p>
-            <p className="text-lg font-bold tracking-tight tabular-nums">
-              {formatMoney(product.price, product.currency || "NGN")}
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-1 text-[11px] text-muted-foreground">
-            <span className="inline-flex items-center gap-1">
-              <StoreIcon className="size-3" aria-hidden /> {product.store}
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="size-3" aria-hidden /> {product.market_name}
-            </span>
-          </div>
+        {/* Price row */}
+        <div className="mt-auto flex items-baseline gap-1.5">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">
+            From
+          </p>
+          <p className="text-lg font-bold tracking-tight tabular-nums">
+            {formatMoney(product.price, product.currency || "NGN")}
+          </p>
+        </div>
+
+        {/* Provenance row - one line, truncates with ellipses if it overflows */}
+        <div className="flex items-center gap-3 border-t border-border/50 pt-2.5 text-[11px] text-muted-foreground">
+          <span className="inline-flex min-w-0 items-center gap-1">
+            <StoreIcon className="size-3 shrink-0" aria-hidden />
+            <span className="truncate">{product.store}</span>
+          </span>
+          <span className="text-muted-foreground/40" aria-hidden>·</span>
+          <span className="inline-flex min-w-0 items-center gap-1">
+            <MapPin className="size-3 shrink-0" aria-hidden />
+            <span className="truncate">{product.market_name}</span>
+          </span>
         </div>
       </div>
     </article>

@@ -91,7 +91,7 @@ export function Hero() {
               className="mt-6 max-w-3xl font-display text-[clamp(2.25rem,5.4vw,4.5rem)] font-bold leading-[1.02] tracking-tight animate-rise [animation-delay:80ms]"
             >
               Source Nigeria.{" "}
-              <span className="text-gradient-brand whitespace-nowrap">Sell to the world.</span>
+              <span className="text-gradient-brand sm:whitespace-nowrap">Sell to the world.</span>
             </h1>
 
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground animate-rise [animation-delay:160ms]">
