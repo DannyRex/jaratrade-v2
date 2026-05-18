@@ -475,13 +475,28 @@ export const adminApi = {
   updateDeliveryStatus: (orderId: string, payload: { status: string }) =>
     request(`/adm/logistics/${orderId}`, { method: "PATCH", body: multipart(payload) }),
 
-  // Settings
+  // Settings — commission account (reference record)
   getCommissionAccount: () =>
     request<{ bank_name?: string; account_name?: string; account_number?: string }>(
       "/settings/commision_account",
     ),
   updateCommissionAccount: (payload: Record<string, unknown>) =>
     request("/settings/commision_account", { method: "PUT", body: multipart(payload) }),
+
+  // Settings — commission rate (the % FLW splits to the platform on every order)
+  getCommissionRate: () =>
+    request<{
+      percent: number;
+      decimal_rate: number;
+      default: number;
+      min: number;
+      max: number;
+    }>("/settings/commission_rate"),
+  updateCommissionRate: (percent: number) =>
+    request<{ percent: number; decimal_rate: number }>(
+      "/settings/commission_rate",
+      { method: "PUT", body: multipart({ percent }) },
+    ),
 
   // Logs (logistics-partner-facing - no auth needed in production but token-gated here)
   logsViewOrders: (filters?: { from?: string; to?: string; status?: string }) =>
