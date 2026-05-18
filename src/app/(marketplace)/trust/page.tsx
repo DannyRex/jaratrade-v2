@@ -111,26 +111,31 @@ export default function TrustPage() {
 
       {/* Secured payments */}
       <section className="border-y border-border/60 bg-muted/30">
-        <div className="container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-          <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:items-center lg:gap-16">
-            <div className="relative">
-              <div className="aspect-[5/4] overflow-hidden rounded-3xl border border-border/70 bg-card p-8 shadow-[var(--shadow-pop)]">
-                <div className="relative flex h-full flex-col justify-between">
-                  <Lock className="size-9 text-primary/70" aria-hidden />
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                      Powered by
-                    </p>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="/brand/partners/flutterwave.svg"
-                      alt="Flutterwave"
-                      className="mt-3 h-10 w-auto sm:h-12"
-                    />
-                    <p className="mt-4 text-sm text-muted-foreground">
-                      PCI DSS Level 1 · Licensed in the UK, US &amp; across Africa
-                    </p>
+        <div className="container mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+          <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr] lg:items-stretch lg:gap-14">
+            {/* Flutterwave card — no aspect ratio, natural height. On lg+ a
+                min-height makes the card look intentional next to the wider
+                text column. */}
+            <div className="flex">
+              <div className="flex w-full flex-col gap-6 rounded-3xl border border-border/70 bg-card p-6 shadow-[var(--shadow-pop)] sm:p-8 lg:min-h-[320px] lg:justify-between">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+                    <Lock className="size-5" aria-hidden />
                   </div>
+                  <span className="self-center text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    Powered by
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/brand/partners/flutterwave.svg"
+                    alt="Flutterwave"
+                    className="block h-8 w-auto max-w-full sm:h-10"
+                  />
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    PCI DSS Level 1 certified. Licensed payments across Nigeria, the UK and US.
+                  </p>
                 </div>
               </div>
             </div>
