@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Truck, Package, ShieldCheck, Plane } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { Truck, Package, ShieldCheck, Plane, MapPin, Plus } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,15 +16,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/lib/cart-store";
 import { useLogistics } from "@/lib/queries";
 import { useAuth } from "@/lib/auth-store";
 import { formatMoney } from "@/lib/format";
 import { importerApi } from "@/lib/api";
-import type { LogisticsCompany } from "@/lib/types";
+import type { LogisticsCompany, ShippingAddress } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type ShippingMode = "self" | "logistics";
+
+const NEW_ADDRESS = "__new__";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -34,10 +37,25 @@ export default function CheckoutPage() {
   const user = useAuth((s) => s.user);
   const logistics = useLogistics();
 
+  // Load saved shipping addresses
+  const addresses = useQuery<ShippingAddress[]>({
+    queryKey: ["importer-shipping"],
+    queryFn: () => importerApi.getShipping(),
+    staleTime: 60_000,
+  });
+
   const [mode, setMode] = useState<ShippingMode>("logistics");
   const [logisticsId, setLogisticsId] = useState<string>("");
-  const [delivery, setDelivery] = useState({
-    recipient_name: user ? `${user.firstname} ${user.lastname}` : "",
+
+  // `pickedAddressId` is whatever the user explicitly selected. While it's
+  // null we fall back to the default saved address (or "__new__" if there
+  // isn't one). Deriving the active selection this way means we never need
+  // to setState in an effect.
+  const [pickedAddressId, setPickedAddressId] = useState<string | null>(null);
+  // `manualDelivery` holds the form values when the user is editing a fresh
+  // address. We only consult it when selectedAddressId === NEW_ADDRESS.
+  const [manualDelivery, setManualDelivery] = useState({
+    recipient_name: user ? `${user.firstname} ${user.lastname}`.trim() : "",
     phone: user?.phone ?? "",
     address: "",
     city: "",
@@ -45,6 +63,51 @@ export default function CheckoutPage() {
     country: "United Kingdom",
     postal_code: "",
   });
+  const [saveAddress, setSaveAddress] = useState(true);
+  const [makeDefault, setMakeDefault] = useState(false);
+
+  // Derived: the currently-selected address ID. Prefers user pick, falls
+  // back to default-on-file, otherwise "new".
+  const selectedAddressId = useMemo(() => {
+    if (pickedAddressId) return pickedAddressId;
+    const rows = addresses.data ?? [];
+    if (rows.length === 0) return NEW_ADDRESS;
+    const def = rows.find((a) => a.is_default === 1) ?? rows[0];
+    return def.id;
+  }, [pickedAddressId, addresses.data]);
+
+  const activeAddress = useMemo(() => {
+    if (selectedAddressId === NEW_ADDRESS) return null;
+    return (addresses.data ?? []).find((a) => a.id === selectedAddressId) ?? null;
+  }, [addresses.data, selectedAddressId]);
+
+  // Derived: the delivery form data sent to the API. When a saved address is
+  // selected we use its fields; in "new" mode we use the manual form state.
+  const delivery = useMemo(() => {
+    if (activeAddress) {
+      return {
+        recipient_name: activeAddress.recipient_name,
+        phone: activeAddress.phone,
+        address: activeAddress.address,
+        city: activeAddress.city,
+        state: activeAddress.state ?? "",
+        country: activeAddress.country,
+        postal_code: activeAddress.postal_code ?? "",
+      };
+    }
+    return manualDelivery;
+  }, [activeAddress, manualDelivery]);
+
+  const isEditing = selectedAddressId === NEW_ADDRESS;
+
+  const onPickAddress = (id: string) => {
+    setPickedAddressId(id);
+    if (id === NEW_ADDRESS) {
+      setSaveAddress(true);
+    } else {
+      setSaveAddress(false);
+    }
+  };
 
   const subtotal = items.reduce((acc, i) => acc + i.subtotal, 0);
   const platformFee = subtotal * 0.02;
@@ -54,10 +117,28 @@ export default function CheckoutPage() {
   const placeOrder = useMutation({
     mutationFn: async () => {
       if (!remoteCartId) {
-        // Without a server-issued cart ID, we'd need to sync first.
-        // For now, surface a clear error so the API team can wire up the missing endpoint.
         throw new Error("Cart sync required - please add at least one item to your live cart.");
       }
+      // If the user typed a new address and asked to save it, persist before
+      // we create the order so they can pick it next time.
+      if (selectedAddressId === NEW_ADDRESS && saveAddress) {
+        try {
+          await importerApi.addShipping({
+            recipient_name: delivery.recipient_name,
+            phone: delivery.phone,
+            address: delivery.address,
+            city: delivery.city,
+            state: delivery.state,
+            country: delivery.country,
+            postal_code: delivery.postal_code,
+            is_default: makeDefault ? 1 : 0,
+          });
+        } catch (err) {
+          // Saving the address is best-effort - never block the actual order.
+          console.warn("Save shipping address failed:", err);
+        }
+      }
+
       const order = await importerApi.createOrder({
         cart_id: remoteCartId,
         logistic_id: mode === "logistics" ? logisticsId : undefined,
@@ -67,7 +148,7 @@ export default function CheckoutPage() {
       return { order, session };
     },
     onSuccess: ({ order }) => {
-      toast.success("Order placed", { description: "Redirecting you to payment…" });
+      toast.success("Order placed", { description: "Redirecting you to payment..." });
       clearCart();
       router.push(`/importer/orders/${encodeURIComponent(order.order_id)}/pay`);
     },
@@ -89,6 +170,8 @@ export default function CheckoutPage() {
       </>
     );
   }
+
+  const addressRows = addresses.data ?? [];
 
   return (
     <>
@@ -157,23 +240,111 @@ export default function CheckoutPage() {
             </CardContent>
           </Card>
 
-          {/* Delivery details */}
+          {/* Delivery details - saved addresses + new form */}
           <Card>
             <CardContent className="space-y-4 p-6">
-              <h2 className="font-semibold">
-                {mode === "logistics" ? "Delivery details" : "Your shipping address"}
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Recipient" id="recipient_name" value={delivery.recipient_name} onChange={(v) => setDelivery({ ...delivery, recipient_name: v })} />
-                <Field label="Phone" id="phone" type="tel" value={delivery.phone} onChange={(v) => setDelivery({ ...delivery, phone: v })} />
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 className="font-semibold">
+                  {mode === "logistics" ? "Delivery details" : "Your shipping address"}
+                </h2>
+                <Link
+                  href="/importer/shipping"
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Manage addresses
+                </Link>
               </div>
-              <Field label="Address" id="address" value={delivery.address} onChange={(v) => setDelivery({ ...delivery, address: v })} />
-              <div className="grid gap-4 sm:grid-cols-3">
-                <Field label="City" id="city" value={delivery.city} onChange={(v) => setDelivery({ ...delivery, city: v })} />
-                <Field label="County / State" id="state" value={delivery.state} onChange={(v) => setDelivery({ ...delivery, state: v })} />
-                <Field label="Postal code" id="postal_code" value={delivery.postal_code} onChange={(v) => setDelivery({ ...delivery, postal_code: v })} />
-              </div>
-              <Field label="Country" id="country" value={delivery.country} onChange={(v) => setDelivery({ ...delivery, country: v })} />
+
+              {/* Saved addresses picker (if any) */}
+              {addresses.isLoading ? (
+                <div className="space-y-2">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <div key={i} className="h-16 animate-pulse rounded-md border bg-muted" />
+                  ))}
+                </div>
+              ) : addressRows.length > 0 ? (
+                <RadioGroup value={selectedAddressId} onValueChange={onPickAddress} className="space-y-2">
+                  {addressRows.map((a) => (
+                    <label
+                      key={a.id}
+                      className={cn(
+                        "flex cursor-pointer items-start gap-3 rounded-md border p-3 text-sm transition-colors",
+                        selectedAddressId === a.id ? "border-primary bg-primary/5" : "hover:bg-muted/50",
+                      )}
+                    >
+                      <RadioGroupItem value={a.id} id={`addr-${a.id}`} className="mt-0.5" />
+                      <div className="flex flex-1 flex-col gap-0.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-medium">{a.recipient_name}</span>
+                          {a.is_default === 1 ? (
+                            <Badge variant="secondary" className="text-[10px]">Default</Badge>
+                          ) : null}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {a.address}, {a.city}{a.state ? `, ${a.state}` : ""} {a.postal_code ?? ""} - {a.country}
+                        </span>
+                        <span className="text-xs text-muted-foreground">{a.phone}</span>
+                      </div>
+                      <MapPin className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+                    </label>
+                  ))}
+                  <label
+                    className={cn(
+                      "flex cursor-pointer items-center gap-3 rounded-md border border-dashed p-3 text-sm transition-colors",
+                      selectedAddressId === NEW_ADDRESS ? "border-primary bg-primary/5" : "hover:bg-muted/50",
+                    )}
+                  >
+                    <RadioGroupItem value={NEW_ADDRESS} id="addr-new" />
+                    <Plus className="size-4 text-primary" aria-hidden />
+                    <span className="font-medium">Use a different address</span>
+                  </label>
+                </RadioGroup>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  No saved addresses yet - your address below will be saved to your profile after you place this order.
+                </p>
+              )}
+
+              {/* Editable form: shown when no saved address exists OR user picked "new" */}
+              {(isEditing || addressRows.length === 0) ? (
+                <div className="space-y-4 border-t pt-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Recipient" id="recipient_name" value={delivery.recipient_name} onChange={(v) => setManualDelivery({ ...manualDelivery,recipient_name: v })} />
+                    <Field label="Phone" id="phone" type="tel" value={delivery.phone} onChange={(v) => setManualDelivery({ ...manualDelivery,phone: v })} />
+                  </div>
+                  <Field label="Address" id="address" value={delivery.address} onChange={(v) => setManualDelivery({ ...manualDelivery,address: v })} />
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <Field label="City" id="city" value={delivery.city} onChange={(v) => setManualDelivery({ ...manualDelivery,city: v })} />
+                    <Field label="County / State" id="state" value={delivery.state} onChange={(v) => setManualDelivery({ ...manualDelivery,state: v })} />
+                    <Field label="Postal code" id="postal_code" value={delivery.postal_code} onChange={(v) => setManualDelivery({ ...manualDelivery,postal_code: v })} />
+                  </div>
+                  <Field label="Country" id="country" value={delivery.country} onChange={(v) => setManualDelivery({ ...manualDelivery,country: v })} />
+
+                  <div className="flex flex-col gap-2 rounded-md bg-muted/40 p-3 text-sm">
+                    <label className="flex items-center gap-2">
+                      <Checkbox
+                        checked={saveAddress}
+                        onCheckedChange={(v) => setSaveAddress(Boolean(v))}
+                      />
+                      <span>Save this address to my profile</span>
+                    </label>
+                    {saveAddress ? (
+                      <label className="ml-6 flex items-center gap-2 text-xs text-muted-foreground">
+                        <Checkbox
+                          checked={makeDefault}
+                          onCheckedChange={(v) => setMakeDefault(Boolean(v))}
+                        />
+                        <span>Set as my default shipping address</span>
+                      </label>
+                    ) : null}
+                  </div>
+                </div>
+              ) : activeAddress ? (
+                <p className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground">
+                  Shipping to <strong className="text-foreground">{activeAddress.recipient_name}</strong> at{" "}
+                  {activeAddress.address}, {activeAddress.city}{activeAddress.state ? `, ${activeAddress.state}` : ""} {activeAddress.postal_code ?? ""}, {activeAddress.country}.
+                </p>
+              ) : null}
             </CardContent>
           </Card>
 
@@ -201,7 +372,7 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <li key={item.product_id} className="flex justify-between gap-3">
                     <span className="line-clamp-1 text-muted-foreground">
-                      {item.quantity}× {item.name}
+                      {item.quantity}x {item.name}
                     </span>
                     <span className="tabular-nums">{formatMoney(item.subtotal)}</span>
                   </li>
@@ -241,7 +412,7 @@ export default function CheckoutPage() {
                   (mode === "logistics" && !logisticsId)
                 }
               >
-                Place order · {formatMoney(total)}
+                Place order - {formatMoney(total)}
               </Button>
               <p className="text-center text-xs text-muted-foreground">
                 Pay securely via Flutterwave on the next step.

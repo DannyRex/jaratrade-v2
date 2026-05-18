@@ -3,24 +3,15 @@
 import Link from "next/link";
 import { Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/data-table";
 import { ProfileProgress } from "@/components/profile-progress";
+import { OrderStatusBadge } from "@/components/order-status-badge";
 import { useImporterOrders } from "@/lib/queries";
 import { formatDate, formatMoney, shortId } from "@/lib/format";
 import type { Order } from "@/lib/types";
-
-const statusVariant: Record<string, "secondary" | "warning" | "success" | "destructive"> = {
-  pending: "warning",
-  paid: "secondary",
-  shipped: "secondary",
-  delivered: "success",
-  cancelled: "destructive",
-  failed: "destructive",
-};
 
 export default function ImporterOrdersPage() {
   const { data, isLoading, isError, refetch } = useImporterOrders();
@@ -80,7 +71,10 @@ export default function ImporterOrdersPage() {
                 <TableCell className="font-medium">{shortId(order.order_id ?? order.id, 12)}</TableCell>
                 <TableCell className="text-muted-foreground">{formatDate(order.time_created)}</TableCell>
                 <TableCell>
-                  <Badge variant={statusVariant[order.status] ?? "secondary"}>{order.status}</Badge>
+                  <OrderStatusBadge
+                    status={order.status}
+                    confirmedReceived={Boolean(order.confirmed_received_at)}
+                  />
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
                   {formatMoney(order.total, order.currency)}

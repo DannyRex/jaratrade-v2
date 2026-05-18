@@ -53,7 +53,7 @@ const steps = [
     icon: Banknote,
     title: "Get paid",
     detail:
-      "Funds are held in escrow until the buyer confirms receipt - then your share lands in your Nigerian bank account within 48 hours.",
+      "Your share is held in a dedicated Flutterwave subaccount from the moment the buyer pays. It's released to your Nigerian bank account once the buyer confirms receipt, or 7 days after you mark the order delivered - whichever comes first.",
   },
 ];
 
@@ -84,6 +84,18 @@ const faqs = [
   {
     q: "How long does verification take?",
     a: "24-48 hours for clean applications. If we need additional documents, we'll email you with specifics and the same SLA restarts once you respond.",
+  },
+  {
+    q: "When exactly do I get paid?",
+    a: "We split each payment at the moment the buyer pays - your share lands in a dedicated Flutterwave subaccount in your name (not Jaratrade's bank). It's released to your nominated Nigerian bank account when either (a) the buyer presses 'Confirm receipt' on their order page, or (b) 7 days pass after you mark the order delivered, whichever happens first. Payouts go out on a nightly schedule via Flutterwave's Transfers API, so most sellers see funds T+0 or T+1.",
+  },
+  {
+    q: "What happens if a buyer disputes an order?",
+    a: "If a dispute is raised before payout, your share stays in escrow until our trust & safety team resolves the case (typically within 1 business day). Outcomes are refund, replacement, or dismissed with reasons. If the dispute is dismissed, the payout proceeds on the normal schedule.",
+  },
+  {
+    q: "How will I know what's happening with my orders?",
+    a: "You'll get an email the moment a buyer's payment clears (so you can start preparing the shipment), and another every time the buyer confirms receipt. The orders page in your dashboard always shows the live status of each order plus its payment + payout state.",
   },
   {
     q: "Who pays for shipping?",

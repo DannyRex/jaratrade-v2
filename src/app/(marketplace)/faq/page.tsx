@@ -19,11 +19,23 @@ const faqs = [
   },
   {
     q: "How does payment work?",
-    a: "Payments are processed by Flutterwave. Cards, bank transfers and USSD are supported. Funds are split - your payment goes to the exporter, the logistics provider, and Jaratrade's commission account in one secure transaction.",
+    a: "Payments are processed by Flutterwave. Cards, bank transfers and USSD are supported. At checkout your payment is split at the source: the seller's share lands in their Flutterwave subaccount, and Jaratrade's commission lands in our commission account - all in one secure transaction. The seller's share is held in escrow until the order completes (see 'When does the exporter get paid?' below).",
   },
   {
     q: "Can I arrange my own shipping?",
     a: "Yes. At checkout you'll see two options: pick a Jaratrade logistics partner with a unified quote, or use 'Importer arranged' and provide your own shipping address. Either way, the exporter ships to a verified destination.",
+  },
+  {
+    q: "Is my shipping address saved for future orders?",
+    a: "Yes. Once you place your first order with a shipping address, it's saved to your profile and auto-loaded at checkout next time. You can manage saved addresses, set a default, or add new ones from /importer/shipping. Picking a saved address skips the form entirely.",
+  },
+  {
+    q: "Will I be notified when my order status changes?",
+    a: "Yes. You'll get an email every time the exporter advances your order - paid, confirmed, preparing, shipped, delivered. Each email links straight to your order page. The exporter is notified by email the moment your payment clears so they can start preparing the shipment.",
+  },
+  {
+    q: "When does the exporter get paid?",
+    a: "The exporter is paid once the order is genuinely complete. Two paths trigger this: (1) you confirm receipt from the order page by pressing 'Confirm receipt' - the seller's payout is released right away, or (2) seven (7) calendar days pass after the exporter marks the order as delivered with no dispute raised - the payout is released automatically by our nightly process. Either way, funds transfer to the exporter's Nigerian bank account via Flutterwave's Transfers API. We hold the money in escrow throughout - it never enters Jaratrade's bank balance.",
   },
   {
     q: "What does subscription cost?",
@@ -31,11 +43,11 @@ const faqs = [
   },
   {
     q: "What's the commission?",
-    a: "Free plan users pay 2% per transaction. Premium subscribers pay 1.5%. The fee is split automatically at checkout - no manual invoicing.",
+    a: "Free plan users pay 2% per transaction. Premium subscribers pay 1.5%. The rate is administered by Jaratrade and displayed on every order at checkout - the fee is split automatically by Flutterwave at the moment of payment, so there's no manual invoicing and no waiting for us to deduct it later.",
   },
   {
     q: "What if my order is delayed or damaged?",
-    a: "Funds aren't released to the exporter until you confirm receipt. If an issue arises, raise it from the order page within 7 days and our support team will mediate.",
+    a: "Don't confirm receipt - that releases the payout. Instead, raise a dispute from your order page within seven (7) days of delivery. Our trust & safety team reviews the case (usually within one business day) and lands on one of three outcomes: refund, replacement, or dismissed with reasons. The seller is held in escrow throughout, so funds can't be released while a dispute is open.",
   },
   {
     q: "Can I leave a review?",

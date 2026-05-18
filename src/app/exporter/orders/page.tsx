@@ -5,7 +5,7 @@ import { Truck } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { OrderStatusBadge } from "@/components/order-status-badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -72,7 +72,10 @@ export default function ExporterOrdersPage() {
                 <TableCell className="font-medium">{shortId(order.order_id ?? order.id, 12)}</TableCell>
                 <TableCell className="text-muted-foreground">{formatDate(order.time_created)}</TableCell>
                 <TableCell>
-                  <Badge variant="secondary">{order.status}</Badge>
+                  <OrderStatusBadge
+                    status={order.status}
+                    confirmedReceived={Boolean(order.confirmed_received_at)}
+                  />
                 </TableCell>
                 <TableCell className="text-right tabular-nums">
                   {formatMoney(order.total, order.currency)}

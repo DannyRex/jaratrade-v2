@@ -5,11 +5,15 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 const items = [
   {
     q: "How do I get paid?",
-    a: "Add your bank details during onboarding. Funds clear to your account within 24 hours of order delivery confirmation.",
+    a: "Add your CAC, director ID and bank details during onboarding - we provision a Flutterwave subaccount in your name once you're KYC-approved. Each buyer's payment is split at source: your share lands in your subaccount (in escrow), Jaratrade's commission lands in ours. Your share is paid out to your Nigerian bank account either (a) the moment the buyer presses 'Confirm receipt' on their order, or (b) 7 days after you mark the order as delivered - whichever comes first. Payouts run on a nightly schedule via Flutterwave's Transfers API.",
   },
   {
     q: "What if a buyer disputes an order?",
-    a: "Funds stay in escrow during disputes. Our team mediates and contacts both parties within 24 hours.",
+    a: "Your escrow share stays locked until the dispute resolves. Our trust & safety team mediates within 1 business day. Outcomes are refund, replacement, or dismissed with reasons. A dismissed dispute lets the normal payout schedule resume.",
+  },
+  {
+    q: "How do I update the status of an order?",
+    a: "Open the order from your Orders tab and move it along the lifecycle: paid → confirmed → preparing → shipped → delivered. Each transition emails the buyer with a link back to their order page. Important: marking 'delivered' is what starts the 7-day payout clock, so only mark it once the order is actually with the buyer.",
   },
   {
     q: "Can I run sponsored listings?",

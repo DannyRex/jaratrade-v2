@@ -317,6 +317,12 @@ export const importerApi = {
   viewOrders: () => request<PagedData<Order>>("/imp/order"),
   getOrder: (id: string) => request<Order>(`/imp/order/${id}`),
   deleteOrder: (id: string) => request(`/imp/order/${id}`, { method: "DELETE" }),
+  /** Buyer confirms they received the order - releases payout immediately. */
+  confirmReceipt: (id: string) =>
+    request<{ confirmed_received_at: string; already_confirmed: boolean }>(
+      `/imp/order/${id}/confirm-receipt`,
+      { method: "POST" },
+    ),
 
   // Payments
   initPayment: (orderId: string) =>
@@ -460,6 +466,29 @@ export const adminApi = {
     request(`/adm/category/${id}`, { method: "POST", body: multipart(payload) }),
   deleteCategory: (id: string) =>
     request(`/adm/category/${id}`, { method: "POST", body: multipart({ delete: 1 }) }),
+
+  // Orders (admin overview)
+  listOrders: (filters?: {
+    status?: string;
+    q?: string;
+    p?: number;
+    len?: number;
+  }) =>
+    request<{
+      rows: AdminOrderRow[];
+      total_length: number;
+      page: number;
+      len: number;
+    }>("/adm/orders", { query: filters }),
+  orderStats: () =>
+    request<{
+      total_orders: number;
+      by_status: Record<string, number>;
+      gmv: string;
+      pending_payouts: number;
+      open_disputes: number;
+    }>("/adm/orders/stats"),
+  getOrder: (id: string) => request<AdminOrderDetail>(`/adm/orders/${id}`),
 
   // Logistics
   getLogistics: () => request<PagedRows<LogisticsCompany>>("/adm/logistics"),
@@ -670,6 +699,63 @@ export interface PayoutRow {
   initiated_by: string | null;
   time_created: string;
   time_updated: string;
+}
+
+/** A single row from GET /adm/orders. Enriched with buyer/seller +
+ *  payment/payout state so the admin grid can render everything in one go. */
+export interface AdminOrderRow {
+  id: string;
+  order_id: string;
+  status: string;
+  total: string;
+  currency: string;
+  items_count: number;
+  time_created: string;
+  time_updated: string;
+  confirmed_received_at: string | null;
+  buyer: { id: string | null; name: string | null; email: string | null };
+  seller: { id: string | null; business_name: string | null; email: string | null };
+  payment_status: string | null;
+  payout_status: "pending" | "sent" | "completed" | "failed" | null;
+  has_dispute: boolean;
+}
+
+/** Full detail from GET /adm/orders/{id}. Used in the admin detail drawer. */
+export interface AdminOrderDetail extends AdminOrderRow {
+  platform_fee: string;
+  logistics_fee: string;
+  shipping_mode: string;
+  logistics_id: string | null;
+  delivery_info: Record<string, unknown>;
+  buyer: AdminOrderRow["buyer"] & { phone: string | null };
+  seller: AdminOrderRow["seller"] & { phone: string | null };
+  items: Array<{
+    id: string;
+    product_id: string;
+    product_name: string;
+    quantity: number;
+    unit_price: string;
+    subtotal: string;
+  }>;
+  payments: Array<{
+    id: string;
+    tx_ref: string;
+    amount: string;
+    currency: string;
+    status: string;
+    provider: string;
+    time_created: string;
+  }>;
+  payouts: Array<{
+    id: string;
+    reference: string;
+    amount: string;
+    currency: string;
+    status: string;
+    failure_reason: string | null;
+    time_created: string;
+  }>;
+  dispute: { id: string; status: string; reason: string | null } | null;
 }
 
 export interface EligiblePayout {

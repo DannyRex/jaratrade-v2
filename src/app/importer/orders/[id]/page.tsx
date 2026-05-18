@@ -2,14 +2,16 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { OrderStatusBadge } from "@/components/order-status-badge";
 import { importerApi } from "@/lib/api";
 import { formatDate, formatMoney, shortId } from "@/lib/format";
 import type { Order } from "@/lib/types";
@@ -23,6 +25,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
 }
 
 function OrderDetail({ id }: { id: string }) {
+  const queryClient = useQueryClient();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["importer", "orders", id],
     queryFn: () => importerApi.getOrder(id) as Promise<Order>,
@@ -32,6 +35,28 @@ function OrderDetail({ id }: { id: string }) {
   // instead of "Report issue" when one already exists.
   const { data: disputes } = useImporterDisputes();
   const existing = disputes?.rows.find((d) => d.order_id === id) ?? null;
+
+  const confirmReceipt = useMutation({
+    mutationFn: () => importerApi.confirmReceipt(id),
+    onSuccess: (res) => {
+      if (res.already_confirmed) {
+        toast.message("Already confirmed", {
+          description: "We have your receipt confirmation on file.",
+        });
+      } else {
+        toast.success("Thanks for confirming!", {
+          description: "We'll release the seller's payout right away.",
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: ["importer", "orders", id] });
+      queryClient.invalidateQueries({ queryKey: ["importer", "orders"] });
+    },
+    onError: (e: unknown) => {
+      toast.error("Couldn't confirm receipt", {
+        description: e instanceof Error ? e.message : "Please try again.",
+      });
+    },
+  });
 
   if (isError) {
     return (
@@ -69,7 +94,10 @@ function OrderDetail({ id }: { id: string }) {
         description={`Placed ${formatDate(data.time_created)}`}
         actions={
           <div className="flex items-center gap-2">
-            <Badge variant="secondary">{data.status}</Badge>
+            <OrderStatusBadge
+              status={data.status}
+              confirmedReceived={Boolean(data.confirmed_received_at)}
+            />
             {/* Buyer can dispute only on shipped/delivered orders that aren't
                 already disputed. Refunded/cancelled orders skip this. */}
             {existing ? (
@@ -84,6 +112,39 @@ function OrderDetail({ id }: { id: string }) {
           </div>
         }
       />
+
+      {/* Confirm-receipt nudge: shows only on delivered orders that the buyer
+          hasn't confirmed yet. Pressing the button releases escrow immediately
+          (otherwise we wait 7 days). */}
+      {data.status === "delivered" && !data.confirmed_received_at ? (
+        <Alert variant="info" className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="size-5 shrink-0 text-primary" />
+            <AlertDescription className="flex-1">
+              The exporter marked this order as delivered. Once you confirm receipt
+              we&apos;ll release their payout right away - otherwise we hold it for 7
+              days in case you need to raise a dispute.
+            </AlertDescription>
+          </div>
+          <Button
+            onClick={() => confirmReceipt.mutate()}
+            loading={confirmReceipt.isPending}
+            className="shrink-0"
+          >
+            Confirm receipt
+          </Button>
+        </Alert>
+      ) : null}
+
+      {data.confirmed_received_at ? (
+        <Alert variant="success" className="mb-6">
+          <CheckCircle2 className="size-4" />
+          <AlertDescription>
+            You confirmed receipt on {formatDate(data.confirmed_received_at)}. The seller&apos;s
+            payout has been released.
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">

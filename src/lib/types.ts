@@ -298,6 +298,9 @@ export interface Order {
   items?: OrderItem[];
   time_created: string;
   time_updated: string;
+  /** ISO timestamp set when the buyer explicitly confirmed receipt -
+   *  immediate-payout signal. Null until the buyer presses the button. */
+  confirmed_received_at?: string | null;
 }
 
 export interface OrderItem {

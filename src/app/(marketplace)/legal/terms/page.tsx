@@ -147,21 +147,56 @@ export default function TermsPage() {
           </p>
           <h3>5.4 Escrow &amp; release</h3>
           <p>
-            Buyer payments are held in escrow by Flutterwave from the time of payment
-            until (i) the Buyer confirms receipt of the Goods, (ii) the dispute window
-            expires without a dispute being raised, or (iii) Jaratrade releases funds
-            following resolution of a dispute under Section 9. Funds are then
-            transferred to the Seller&apos;s nominated Nigerian bank account, less
-            Jaratrade Commission and any agreed logistics or refund amounts.
+            Buyer payments are split at the moment of payment by Flutterwave between
+            (a) a Seller-specific Flutterwave subaccount that holds the Seller&apos;s
+            share in escrow, and (b) Jaratrade&apos;s commission account. The
+            Seller&apos;s share remains in escrow until one of the following triggers
+            occurs:
+          </p>
+          <ol>
+            <li>
+              <strong>Buyer confirmation:</strong> the Buyer presses
+              &quot;Confirm receipt&quot; on the Order page. The Seller&apos;s payout
+              is released by our next nightly disbursement run, typically within
+              twenty-four (24) hours;
+            </li>
+            <li>
+              <strong>Dispute-window expiry:</strong> seven (7) calendar days have
+              elapsed since the Seller marked the Order as delivered and no dispute
+              has been raised. The Seller&apos;s payout is then released
+              automatically by our nightly process;
+            </li>
+            <li>
+              <strong>Dispute resolution:</strong> a dispute is resolved under
+              Section 7 and Jaratrade releases funds in accordance with that
+              resolution.
+            </li>
+          </ol>
+          <p>
+            Payouts are dispatched to the Seller&apos;s nominated Nigerian bank
+            account via Flutterwave&apos;s Transfers service. Funds at all times
+            remain with our regulated payment partner; they never enter Jaratrade&apos;s
+            operating bank balance. The Seller receives a payout reference for each
+            disbursement.
+          </p>
+          <p>
+            <strong>Pressing &quot;Confirm receipt&quot; is final.</strong> Once you
+            confirm receipt you waive the 7-day dispute window and the Seller is paid
+            on the next nightly run. If you have any concern about the Order &mdash;
+            damage, missing items, late delivery &mdash; raise a dispute first (see
+            Section 7) instead of confirming receipt.
           </p>
           <h3>5.5 Commission &amp; fees</h3>
           <p>
             Jaratrade charges a transaction Commission, currently 2% on the Free Tier
-            and 1.5% on the Premium Tier. We may from time to time vary the Commission
-            on at least thirty (30) days&apos; written notice. We reserve the right to
-            introduce additional fees (for example, withdrawal fees or expedited-
-            verification fees) on the same notice period. No listing fees, no setup
-            fees, and no monthly minimums apply to the Free Tier.
+            and 1.5% on the Premium Tier. The prevailing rate is administered by
+            Jaratrade and is displayed on every Order at checkout, so you always see
+            the exact rate that will apply before you pay. We may from time to time
+            vary the Commission on at least thirty (30) days&apos; written notice. We
+            reserve the right to introduce additional fees (for example, withdrawal
+            fees or expedited-verification fees) on the same notice period. No
+            listing fees, no setup fees, and no monthly minimums apply to the Free
+            Tier.
           </p>
 
           <h2>6. Shipping &amp; risk</h2>
@@ -193,11 +228,20 @@ export default function TermsPage() {
           <h2>7. Disputes &amp; refunds</h2>
           <h3>7.1 Dispute window</h3>
           <p>
-            A Buyer may raise a dispute within seven (7) calendar days of confirmed
-            delivery (or, where delivery confirmation is unavailable, within seven (7)
-            calendar days of the latest tracking event). Disputes raised outside this
-            window will be considered only at Jaratrade&apos;s discretion and only on
-            production of new material evidence.
+            A Buyer may raise a dispute within seven (7) calendar days of the Order
+            being marked as delivered by the Seller (or, where delivery confirmation
+            is unavailable, within seven (7) calendar days of the latest tracking
+            event). Disputes raised outside this window will be considered only at
+            Jaratrade&apos;s discretion and only on production of new material
+            evidence.
+          </p>
+          <p>
+            The Buyer will receive an email notification each time the Seller advances
+            the Order status (paid, confirmed, preparing, shipped, delivered) so the
+            dispute window is clearly anchored. A Buyer who presses &quot;Confirm
+            receipt&quot; on the Order page waives the remainder of the dispute window
+            (see Section 5.4); the Buyer should raise any concern <em>before</em>
+            confirming receipt.
           </p>
           <h3>7.2 Process</h3>
           <p>The dispute process has three stages:</p>
