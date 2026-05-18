@@ -476,6 +476,10 @@ export const adminApi = {
     request(`/adm/logistics/${orderId}`, { method: "PATCH", body: multipart(payload) }),
 
   // Settings
+  getCommissionAccount: () =>
+    request<{ bank_name?: string; account_name?: string; account_number?: string }>(
+      "/settings/commision_account",
+    ),
   updateCommissionAccount: (payload: Record<string, unknown>) =>
     request("/settings/commision_account", { method: "PUT", body: multipart(payload) }),
 
