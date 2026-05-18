@@ -19,7 +19,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AlertCircle, Percent } from "lucide-react";
+import { AlertCircle, ArrowRightLeft, Percent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -43,12 +43,28 @@ interface CommissionRate {
   max: number;
 }
 
+interface FxRate {
+  from: string;
+  to: string;
+  effective_rate: number | null;
+  override_rate: number | null;
+  live_rate: number | null;
+  fallback_rate: number | null;
+  example_1000: number | null;
+}
+
 export default function AdminSettingsPage() {
   const isAdmin = useAuth((s) => Boolean(s.token) && s.role === "admin");
 
   const rateQ = useQuery({
     queryKey: ["admin", "commission-rate"],
     queryFn: adminApi.getCommissionRate,
+    enabled: isAdmin,
+  });
+
+  const fxQ = useQuery({
+    queryKey: ["admin", "fx-rate", "NGN", "GBP"],
+    queryFn: () => adminApi.getFxRate("NGN", "GBP"),
     enabled: isAdmin,
   });
 
@@ -74,6 +90,17 @@ export default function AdminSettingsPage() {
             const rate = (rateQ.data as CommissionRate | undefined) ?? null;
             const key = `rate:${rate?.percent ?? "default"}`;
             return <CommissionRateCard key={key} initial={rate} />;
+          })()
+        )}
+
+        {/* FX rate — drives buyer-side dual-currency display */}
+        {fxQ.isLoading ? (
+          <Skeleton className="h-48 w-full rounded-2xl" />
+        ) : (
+          (() => {
+            const fx = (fxQ.data as FxRate | undefined) ?? null;
+            const key = `fx:${fx?.override_rate ?? "auto"}`;
+            return <FxRateCard key={key} initial={fx} />;
           })()
         )}
 
@@ -309,6 +336,139 @@ function CommissionAccountCard({ initial }: { initial: CommissionAccount | null 
             ) : null}
             <Button type="submit" loading={save.isPending}>
               Save commission account
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+function FxRateCard({ initial }: { initial: FxRate | null }) {
+  const qc = useQueryClient();
+  // We display the rate as "1 GBP = N NGN" because that's how people think
+  // about it day-to-day; persist as NGN->GBP because that matches the
+  // backend's internal direction.
+  const ngnPerGbp = initial?.effective_rate ? (1 / initial.effective_rate) : 0;
+  const [perGbp, setPerGbp] = useState<string>(ngnPerGbp ? ngnPerGbp.toFixed(2) : "1700");
+  const overridden = initial?.override_rate != null;
+  const parsed = parseFloat(perGbp);
+  const invalid = Number.isNaN(parsed) || parsed <= 0;
+
+  const save = useMutation({
+    mutationFn: () => {
+      const ngnToGbp = 1 / parsed;
+      return adminApi.updateFxRate("NGN", "GBP", ngnToGbp);
+    },
+    onSuccess: () => {
+      toast.success(`FX rate set to £1 = ₦${parsed.toFixed(2)}`);
+      qc.invalidateQueries({ queryKey: ["admin", "fx-rate"] });
+    },
+    onError: (err: Error) =>
+      toast.error("Couldn't save FX rate", { description: err.message }),
+  });
+
+  const clear = useMutation({
+    mutationFn: () => adminApi.clearFxRate("NGN", "GBP"),
+    onSuccess: () => {
+      toast.success("FX override cleared — using live rate");
+      qc.invalidateQueries({ queryKey: ["admin", "fx-rate"] });
+    },
+  });
+
+  return (
+    <Card className="rounded-2xl">
+      <CardContent className="p-6 sm:p-7">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!invalid) save.mutate();
+          }}
+          className="space-y-5"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="font-display text-lg font-semibold tracking-tight">
+                FX rate (NGN ↔ GBP)
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Powers the &quot;₦18,000 / ~£10.40&quot; display next to every product
+                price. Override locks the rate; clearing it falls back to the
+                live FX feed.
+              </p>
+            </div>
+            <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+              <ArrowRightLeft className="size-5" aria-hidden />
+            </div>
+          </div>
+
+          {/* Context strip — what's live + what's the fallback */}
+          <dl className="grid grid-cols-3 gap-3 rounded-xl bg-muted/40 p-4 text-xs">
+            <div>
+              <dt className="text-muted-foreground">Live</dt>
+              <dd className="mt-0.5 font-mono tabular-nums">
+                {initial?.live_rate ? (1 / initial.live_rate).toFixed(2) : "—"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">Override</dt>
+              <dd className="mt-0.5 font-mono tabular-nums">
+                {initial?.override_rate ? (1 / initial.override_rate).toFixed(2) : "—"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">Fallback</dt>
+              <dd className="mt-0.5 font-mono tabular-nums">
+                {initial?.fallback_rate ? (1 / initial.fallback_rate).toFixed(2) : "—"}
+              </dd>
+            </div>
+          </dl>
+
+          <div className="space-y-2">
+            <Label htmlFor="ngn_per_gbp">£1 GBP = how many ₦ NGN?</Label>
+            <div className="relative max-w-[14rem]">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">
+                ₦
+              </span>
+              <Input
+                id="ngn_per_gbp"
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min={0.01}
+                value={perGbp}
+                onChange={(e) => setPerGbp(e.target.value)}
+                className="pl-7 text-base tabular-nums"
+                aria-invalid={invalid}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Decimal stored as NGN&nbsp;→&nbsp;GBP:{" "}
+              <span className="font-mono tabular-nums">
+                {invalid ? "—" : (1 / parsed).toFixed(8)}
+              </span>
+            </p>
+            {invalid ? (
+              <p className="text-xs font-medium text-destructive">
+                Enter a positive number.
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            {overridden ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => clear.mutate()}
+                loading={clear.isPending}
+              >
+                Clear override
+              </Button>
+            ) : null}
+            <Button type="submit" loading={save.isPending} disabled={invalid}>
+              Save FX rate
             </Button>
           </div>
         </form>

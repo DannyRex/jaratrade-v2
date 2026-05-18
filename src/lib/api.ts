@@ -498,6 +498,28 @@ export const adminApi = {
       { method: "PUT", body: multipart({ percent }) },
     ),
 
+  // Settings — FX rate (NGN ↔ GBP for buyer-side display)
+  getFxRate: (from_currency = "NGN", to_currency = "GBP") =>
+    request<{
+      from: string;
+      to: string;
+      effective_rate: number | null;
+      override_rate: number | null;
+      live_rate: number | null;
+      fallback_rate: number | null;
+      example_1000: number | null;
+    }>("/settings/fx_rate", { query: { from_currency, to_currency } }),
+  updateFxRate: (from_currency: string, to_currency: string, rate: number) =>
+    request<{ from: string; to: string; rate: number }>(
+      "/settings/fx_rate",
+      { method: "PUT", body: multipart({ from_currency, to_currency, rate }) },
+    ),
+  clearFxRate: (from_currency = "NGN", to_currency = "GBP") =>
+    request("/settings/fx_rate", {
+      method: "DELETE",
+      query: { from_currency, to_currency },
+    }),
+
   // Subaccount management (v3.5 — Flutterwave integration)
   reprovisionSubaccount: (userId: string) =>
     request<AdminUser>(`/adm/users/${userId}/reprovision-subaccount`, { method: "POST" }),

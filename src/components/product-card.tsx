@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { StockBadge } from "@/components/stock-badge";
 import { parseProductImages, type ProductSummary } from "@/lib/types";
 import { formatMoney } from "@/lib/format";
+import { useCurrencyPreference, pickPriceDisplay } from "@/lib/currency-preference";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -34,6 +35,8 @@ export function ProductCard({ product, className, priority = false }: ProductCar
   const images = parseProductImages(product.images);
   const cover = images.find((u) => /\.(jpg|jpeg|png|webp|gif|avif)(\?|$)/i.test(u));
   const sellerLabel = product.business_name?.trim() || product.exporter_name;
+  const preference = useCurrencyPreference((s) => s.preference);
+  const { primary, secondary } = pickPriceDisplay(preference, product);
 
   return (
     <article
@@ -111,14 +114,21 @@ export function ProductCard({ product, className, priority = false }: ProductCar
           <p className="line-clamp-1 text-xs text-muted-foreground">by {sellerLabel}</p>
         </div>
 
-        {/* Price row */}
-        <div className="mt-auto flex items-baseline gap-1.5">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">
-            From
-          </p>
-          <p className="text-lg font-bold tracking-tight tabular-nums">
-            {formatMoney(product.price, product.currency || "NGN")}
-          </p>
+        {/* Price row — primary in big, secondary (e.g. GBP equivalent) muted */}
+        <div className="mt-auto space-y-0.5">
+          <div className="flex items-baseline gap-1.5">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">
+              From
+            </p>
+            <p className="text-lg font-bold tracking-tight tabular-nums">
+              {formatMoney(primary.amount, primary.currency)}
+            </p>
+          </div>
+          {secondary ? (
+            <p className="text-[11px] tabular-nums text-muted-foreground">
+              ≈ {formatMoney(secondary.amount, secondary.currency)}
+            </p>
+          ) : null}
         </div>
 
         {/* Provenance row - one line, truncates with ellipses if it overflows */}

@@ -176,6 +176,11 @@ export interface ProductSummary {
   stock_quantity?: number;
   low_stock_threshold?: number;
   last_inventory_update_at?: string | null;
+  /** Approximate display in a secondary currency (added v3.6). Currently
+   *  always GBP — UK buyers see "₦18,000 / ~£10.40" next to the price. */
+  secondary_currency?: string | null;
+  secondary_amount?: string | null;
+  secondary_rate?: number | null;
 }
 
 /** Detail shape (from /public/products/:id) */
@@ -210,6 +215,10 @@ export interface ProductDetail {
   stock_quantity?: number;
   low_stock_threshold?: number;
   last_inventory_update_at?: string | null;
+  /** Secondary-currency display (added v3.6) */
+  secondary_currency?: string | null;
+  secondary_amount?: string | null;
+  secondary_rate?: number | null;
 }
 
 export interface Store {

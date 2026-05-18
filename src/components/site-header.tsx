@@ -28,6 +28,7 @@ import { Logo } from "./logo";
 import { CartButton } from "./cart-button";
 import { UserMenu } from "./user-menu";
 import { ThemeToggle } from "./theme-toggle";
+import { CurrencyToggle } from "./currency-toggle";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -97,6 +98,14 @@ export function SiteHeader() {
               ))}
             </nav>
             <div className="mt-auto border-t border-border/60 p-6">
+              {/* Currency switcher — useful on phones where the header
+                  toggle is hidden to save horizontal space. */}
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                  Display currency
+                </p>
+                <CurrencyToggle />
+              </div>
               <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
                 Get started
               </p>
@@ -148,9 +157,9 @@ export function SiteHeader() {
           </div>
         </form>
 
-        {/* Right-side action cluster - search (mobile only), theme, cart,
-            user. `ml-auto` here so the whole group hugs the right edge on
-            mobile (where the search form is hidden). */}
+        {/* Right-side action cluster - search (mobile only), currency,
+            theme, cart, user. `ml-auto` here so the whole group hugs the
+            right edge on mobile (where the search form is hidden). */}
         <div className="ml-auto flex items-center gap-0.5 md:ml-2 md:gap-1">
           <Button
             variant="ghost"
@@ -161,6 +170,9 @@ export function SiteHeader() {
           >
             {mobileSearchOpen ? <X className="size-5" /> : <Search className="size-5" />}
           </Button>
+          {/* Currency toggle - hidden on smallest viewports, surfaces in the
+              mobile sheet instead via the same component. */}
+          <CurrencyToggle className="hidden sm:inline-flex" />
           <ThemeToggle />
           <CartButton />
           <UserMenu />

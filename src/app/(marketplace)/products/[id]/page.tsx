@@ -16,6 +16,7 @@ import { useProduct } from "@/lib/queries";
 import { parseProductImages, parseProductProperties } from "@/lib/types";
 import { formatMoney, formatDate } from "@/lib/format";
 import { useCart } from "@/lib/cart-store";
+import { useCurrencyPreference, pickPriceDisplay } from "@/lib/currency-preference";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -152,17 +153,7 @@ function ProductDetail({ id }: { id: string }) {
 
         {/* Details */}
         <div className="space-y-6">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">{data.name}</p>
-            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{data.product_name}</h1>
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <p className="text-3xl font-bold tracking-tight">
-                {formatMoney(data.price, data.currency || "NGN")}
-              </p>
-              {data.has_tax ? <Badge variant="outline">Tax included</Badge> : null}
-              <StockBadge stock={data.stock_quantity} threshold={data.low_stock_threshold} />
-            </div>
-          </div>
+          <DetailPriceBlock data={data} />
 
           <div className="space-y-2 rounded-lg border p-4">
             <h2 className="text-sm font-semibold">Order requirements</h2>
@@ -327,6 +318,31 @@ function Spec({ label, value }: { label: string; value: string }) {
     <div className="flex items-baseline justify-between gap-3 border-b pb-2 text-sm">
       <dt className="capitalize text-muted-foreground">{label}</dt>
       <dd className="text-right font-medium">{value}</dd>
+    </div>
+  );
+}
+
+function DetailPriceBlock({ data }: { data: import("@/lib/types").ProductDetail }) {
+  const preference = useCurrencyPreference((s) => s.preference);
+  const { primary, secondary } = pickPriceDisplay(preference, data);
+  return (
+    <div className="space-y-2">
+      <p className="text-sm text-muted-foreground">{data.name}</p>
+      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{data.product_name}</h1>
+      <div className="flex flex-wrap items-center gap-3 pt-1">
+        <div>
+          <p className="text-3xl font-bold tracking-tight">
+            {formatMoney(primary.amount, primary.currency)}
+          </p>
+          {secondary ? (
+            <p className="mt-0.5 text-sm tabular-nums text-muted-foreground">
+              ≈ {formatMoney(secondary.amount, secondary.currency)}
+            </p>
+          ) : null}
+        </div>
+        {data.has_tax ? <Badge variant="outline">Tax included</Badge> : null}
+        <StockBadge stock={data.stock_quantity} threshold={data.low_stock_threshold} />
+      </div>
     </div>
   );
 }
