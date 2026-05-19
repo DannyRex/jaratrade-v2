@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Mail } from "lucide-react";
@@ -27,7 +27,8 @@ function VerifyEmailContent() {
   const email = params.get("email") ?? "";
   const role = (params.get("role") as Role) || "importer";
   const reviewMode = params.get("review") === "1";
-  const [code, setCode] = useState("");
+  const codeFromUrl = params.get("code") ?? "";
+  const [code, setCode] = useState(codeFromUrl);
 
   const verify = useMutation({
     mutationFn: (c: string) => authApi.verifyAccount(role as "importer" | "exporter", c),
@@ -36,6 +37,20 @@ function VerifyEmailContent() {
       router.push(`/auth/login/${role}`);
     },
   });
+
+  // Auto-verify when the user lands here from the email "Verify my email"
+  // button (URL has ?code=...). Without this the user gets sent to an
+  // empty-looking form that ignores their click. Ref-guarded so we only
+  // fire once even under React 18's strict-mode double-mount.
+  const autoTried = useRef(false);
+  useEffect(() => {
+    if (autoTried.current) return;
+    if (!codeFromUrl || reviewMode) return;
+    autoTried.current = true;
+    verify.mutate(codeFromUrl);
+    // verify is referentially stable across renders for our use here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codeFromUrl, reviewMode]);
 
   const resend = useMutation({
     mutationFn: () => authApi.requestVerificationEmail(role as "importer" | "exporter", email),
