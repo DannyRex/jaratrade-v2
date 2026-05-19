@@ -21,7 +21,21 @@ declare global {
   }
 }
 
-const FLW_INLINE_SCRIPT = "https://checkout.flutterwave.com/v3.js";
+const FLW_INLINE_SCRIPT_BASE = "https://checkout.flutterwave.com/v3.js";
+
+/** Build the script URL with a cache-busting param.
+ *
+ * Flutterwave's CDN (Cloudflare) intermittently serves a 404 for v3.js and
+ * caches that 404 for up to 4 hours (`cache-control: public, max-age=14400`,
+ * `cf-cache-status: HIT`). When that happens, every user whose POP captured
+ * the bad response sees a disabled Pay button until TTL expires. Appending a
+ * unique query param forces Cloudflare to MISS, refetch from origin, and
+ * serve the working 200. Slightly more origin traffic, but bulletproof
+ * against this specific failure mode.
+ */
+function flwScriptUrl(): string {
+  return `${FLW_INLINE_SCRIPT_BASE}?_cb=${Date.now()}`;
+}
 
 function loadFlutterwave(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -29,23 +43,25 @@ function loadFlutterwave(): Promise<void> {
     if (window.FlutterwaveCheckout) return resolve();
     // Verify `window.FlutterwaveCheckout` actually exists after the script
     // claims to have loaded. Without this check, script-tag onload fires
-    // even when an ad-blocker substitutes a no-op response, so we'd
-    // optimistically resolve and end up with a disabled-forever Pay button
-    // when the user clicks. Now we treat "loaded but no global" as a
-    // failure so the UI can surface it.
+    // even when an ad-blocker substitutes a no-op response (or when the CDN
+    // serves an HTML 404 page with a 2xx code), so we'd optimistically
+    // resolve and end up with a disabled-forever Pay button when the user
+    // clicks. Treating "loaded but no global" as a failure surfaces this.
     const onLoadCheck = () => {
       if (window.FlutterwaveCheckout) resolve();
-      else reject(new Error("Flutterwave script loaded but didn't initialise (ad-blocker?)"));
+      else reject(new Error("Flutterwave script loaded but didn't initialise"));
     };
-    const existing = document.querySelector(`script[src="${FLW_INLINE_SCRIPT}"]`);
-    if (existing) {
-      existing.addEventListener("load", onLoadCheck);
-      existing.addEventListener("error", () => reject(new Error("script failed to load")));
-      return;
-    }
+    // If a previous attempt left a script tag behind without setting the
+    // global, that tag has already fired its load event and re-attaching
+    // listeners would never fire again. Yank it so the fresh insert below
+    // gets a clean shot (and a freshly cache-busted URL).
+    const stale = document.querySelectorAll('script[data-flw-inline="1"]');
+    stale.forEach((node) => node.parentNode?.removeChild(node));
+
     const s = document.createElement("script");
-    s.src = FLW_INLINE_SCRIPT;
+    s.src = flwScriptUrl();
     s.async = true;
+    s.dataset.flwInline = "1";
     s.onload = onLoadCheck;
     s.onerror = () => reject(new Error("script failed to load"));
     document.head.appendChild(s);
