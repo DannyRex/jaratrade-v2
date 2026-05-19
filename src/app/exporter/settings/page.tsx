@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/ui/page-header";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Switch } from "@/components/ui/switch";
 import { exporterApi } from "@/lib/api";
 
 export default function ExporterSettingsPage() {
@@ -74,40 +73,11 @@ export default function ExporterSettingsPage() {
             </form>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardContent className="space-y-4 p-6">
-            <h2 className="font-semibold">Notifications</h2>
-            <SettingRow
-              title="New order alerts"
-              description="Email me when a buyer places an order."
-              defaultChecked
-            />
-            <SettingRow
-              title="Weekly digest"
-              description="Performance summary every Monday."
-              defaultChecked
-            />
-            <SettingRow
-              title="Marketing emails"
-              description="Tips, new feature announcements."
-              defaultChecked={false}
-            />
-          </CardContent>
-        </Card>
       </div>
     </>
   );
 }
 
-function SettingRow({ title, description, defaultChecked }: { title: string; description: string; defaultChecked?: boolean }) {
-  return (
-    <div className="flex items-start justify-between gap-4">
-      <div>
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </div>
-      <Switch defaultChecked={defaultChecked} />
-    </div>
-  );
-}
+// Notifications toggles removed - the on/off state never persisted (no
+// mutation behind them) so the UX was misleading. Will return as a real
+// opt-in/out surface once we wire it to NotificationLog preferences.

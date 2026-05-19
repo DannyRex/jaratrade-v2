@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { MapPin } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -21,7 +23,6 @@ type ProfileShape = {
   firstname?: string;
   lastname?: string;
   phone?: string;
-  address?: string;
   profile_name?: string;
   totp_enabled?: boolean;
 };
@@ -42,10 +43,9 @@ export default function AccountPage() {
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile" className="mt-6">
+        <TabsContent value="profile" className="mt-6 space-y-4">
           <Card>
             <CardContent className="p-6">
               {isLoading ? (
@@ -59,6 +59,28 @@ export default function AccountPage() {
                 // fresh state once the query resolves. Avoids setState-in-effect.
                 <ProfileForm key={profile.id ?? "loading"} initial={profile} />
               )}
+            </CardContent>
+          </Card>
+
+          {/* Shipping addresses are a separate concern from the profile row -
+              they live in their own table with default-flag, recipient name,
+              etc. Surface a clear link rather than show a single "Address"
+              field that doesn't reflect the actual checkout pickers. */}
+          <Card>
+            <CardContent className="flex flex-wrap items-start justify-between gap-3 p-6">
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+                <div>
+                  <h3 className="font-semibold">Shipping addresses</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Add, edit and set a default address for checkout. Saved addresses
+                    auto-load on the cart.
+                  </p>
+                </div>
+              </div>
+              <Button asChild variant="outline">
+                <Link href="/importer/shipping">Manage addresses</Link>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -77,18 +99,6 @@ export default function AccountPage() {
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="notifications" className="mt-6">
-          <Card>
-            <CardContent className="space-y-2 p-6">
-              <h3 className="font-semibold">Email notifications</h3>
-              <p className="text-sm text-muted-foreground">
-                Coming soon - granular control over order updates, product alerts and security
-                emails.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </>
   );
@@ -101,7 +111,6 @@ function ProfileForm({ initial }: { initial: ProfileShape }) {
     firstname: initial.firstname ?? "",
     lastname: initial.lastname ?? "",
     phone: initial.phone ?? "",
-    address: initial.address ?? "",
     profile_name: initial.profile_name ?? "",
   });
 
@@ -127,7 +136,6 @@ function ProfileForm({ initial }: { initial: ProfileShape }) {
         <Field label="Last name" id="lastname" value={form.lastname} onChange={(v) => setForm({ ...form, lastname: v })} />
       </div>
       <Field label="Phone" id="phone" type="tel" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-      <Field label="Address" id="address" value={form.address} onChange={(v) => setForm({ ...form, address: v })} />
       <Field label="Profile name" id="profile_name" value={form.profile_name} onChange={(v) => setForm({ ...form, profile_name: v })} />
       <Button type="submit" loading={update.isPending}>
         Save changes
