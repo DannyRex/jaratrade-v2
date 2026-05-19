@@ -581,6 +581,11 @@ export const adminApi = {
   suspendUser: (id: string, reason?: string) =>
     request(`/adm/users/${id}/suspend`, { method: "POST", body: multipart({ reason: reason ?? "" }) }),
   reactivateUser: (id: string) => request(`/adm/users/${id}/reactivate`, { method: "POST" }),
+  /** Manually re-fire the "account approved" email. Useful when the original
+   *  send failed silently (SMTP outage, blocked port, etc) and the exporter
+   *  is sitting in their inbox waiting on a welcome email that never came. */
+  resendApprovalEmail: (id: string) =>
+    request<{ sent: boolean }>(`/adm/users/${id}/resend-approval-email`, { method: "POST" }),
 
   // Disputes (added v2.5)
   listDisputes: (params?: { status?: "open" | "in_review" | "resolved" | "rejected"; p?: number; len?: number }) =>

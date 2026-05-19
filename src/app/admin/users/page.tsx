@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, Users, ShieldCheck, ShieldOff } from "lucide-react";
+import { Search, Users, ShieldCheck, ShieldOff, Mail } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -53,6 +53,12 @@ export default function AdminUsersPage() {
       qc.invalidateQueries({ queryKey: ["admin", "users"] });
       toast.success("User reactivated");
     },
+  });
+  const resendApproval = useMutation({
+    mutationFn: (id: string) => adminApi.resendApprovalEmail(id),
+    onSuccess: () => toast.success("Approval email re-sent"),
+    onError: (err: Error) =>
+      toast.error("Couldn't re-send approval email", { description: err.message }),
   });
 
   const users = data?.rows ?? [];
@@ -130,9 +136,19 @@ export default function AdminUsersPage() {
                 </TableCell>
                 <TableCell><Badge variant="secondary" className="capitalize">{u.role}</Badge></TableCell>
                 <TableCell>
-                  <Badge variant={u.kyc_status === "approved" ? "success" : u.kyc_status === "rejected" ? "destructive" : "warning"}>
-                    {u.kyc_status}
-                  </Badge>
+                  {u.role === "exporter" ? (
+                    <Badge variant={u.kyc_status === "approved" ? "success" : u.kyc_status === "rejected" ? "destructive" : "warning"}>
+                      {u.kyc_status}
+                    </Badge>
+                  ) : (
+                    // KYC doesn't apply to importers or admins - their
+                    // kyc_status column stays at the default "pending"
+                    // forever because no endpoint transitions it. Showing
+                    // "pending" here gave admins the wrong impression that
+                    // every importer was awaiting review. Render em-dash
+                    // instead to signal "not applicable".
+                    <span className="text-muted-foreground">-</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   {u.totp_enabled ? <Badge variant="success">on</Badge> : <Badge variant="outline">off</Badge>}
@@ -142,15 +158,28 @@ export default function AdminUsersPage() {
                 </TableCell>
                 <TableCell className="text-muted-foreground">{formatDate(u.time_created)}</TableCell>
                 <TableCell>
-                  {u.is_active ? (
-                    <Button size="sm" variant="ghost" onClick={() => suspend.mutate(u.id)}>
-                      <ShieldOff className="size-3.5" /> Suspend
-                    </Button>
-                  ) : (
-                    <Button size="sm" variant="ghost" onClick={() => reactivate.mutate(u.id)}>
-                      <ShieldCheck className="size-3.5" /> Reactivate
-                    </Button>
-                  )}
+                  <div className="flex flex-col gap-1">
+                    {u.is_active ? (
+                      <Button size="sm" variant="ghost" onClick={() => suspend.mutate(u.id)}>
+                        <ShieldOff className="size-3.5" /> Suspend
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="ghost" onClick={() => reactivate.mutate(u.id)}>
+                        <ShieldCheck className="size-3.5" /> Reactivate
+                      </Button>
+                    )}
+                    {u.role === "exporter" && u.kyc_status === "approved" ? (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => resendApproval.mutate(u.id)}
+                        loading={resendApproval.isPending && resendApproval.variables === u.id}
+                        title="Re-send the activation email (useful if the original send failed silently)"
+                      >
+                        <Mail className="size-3.5" /> Resend email
+                      </Button>
+                    ) : null}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
