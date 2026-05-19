@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
@@ -27,16 +27,26 @@ function loadFlutterwave(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (typeof window === "undefined") return reject(new Error("not in browser"));
     if (window.FlutterwaveCheckout) return resolve();
+    // Verify `window.FlutterwaveCheckout` actually exists after the script
+    // claims to have loaded. Without this check, script-tag onload fires
+    // even when an ad-blocker substitutes a no-op response, so we'd
+    // optimistically resolve and end up with a disabled-forever Pay button
+    // when the user clicks. Now we treat "loaded but no global" as a
+    // failure so the UI can surface it.
+    const onLoadCheck = () => {
+      if (window.FlutterwaveCheckout) resolve();
+      else reject(new Error("Flutterwave script loaded but didn't initialise (ad-blocker?)"));
+    };
     const existing = document.querySelector(`script[src="${FLW_INLINE_SCRIPT}"]`);
     if (existing) {
-      existing.addEventListener("load", () => resolve());
+      existing.addEventListener("load", onLoadCheck);
       existing.addEventListener("error", () => reject(new Error("script failed to load")));
       return;
     }
     const s = document.createElement("script");
     s.src = FLW_INLINE_SCRIPT;
     s.async = true;
-    s.onload = () => resolve();
+    s.onload = onLoadCheck;
     s.onerror = () => reject(new Error("script failed to load"));
     document.head.appendChild(s);
   });
@@ -50,7 +60,8 @@ export default function PayPage({ params }: { params: Promise<{ id: string }> })
 function PayContent({ orderId }: { orderId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [scriptReady, setScriptReady] = useState(false);
+  // Bumping this re-keys the script-load query, which is how we retry.
+  const [scriptAttempt, setScriptAttempt] = useState(0);
 
   const order = useQuery({
     queryKey: ["importer", "orders", orderId],
@@ -63,9 +74,23 @@ function PayContent({ orderId }: { orderId: string }) {
     enabled: Boolean(order.data),
   });
 
-  useEffect(() => {
-    loadFlutterwave().then(() => setScriptReady(true)).catch(() => setScriptReady(false));
-  }, []);
+  // The Flutterwave inline checkout script. Modelling the load as a
+  // useQuery (rather than useState + useEffect) gets us isLoading /
+  // isError / isSuccess flags directly, so the UI can show a "Loading
+  // payment provider..." spinner or a Retry button when an ad-blocker /
+  // network failure swallows the script.
+  const flwScript = useQuery({
+    queryKey: ["flw-inline-script", scriptAttempt],
+    queryFn: loadFlutterwave,
+    retry: false,
+    staleTime: Infinity,
+  });
+  const scriptState: "loading" | "ready" | "failed" = flwScript.isSuccess
+    ? "ready"
+    : flwScript.isError
+    ? "failed"
+    : "loading";
+  const scriptReady = scriptState === "ready";
 
   const verify = useMutation({
     mutationFn: (txRef: string) => importerApi.verifyPayment(txRef),
@@ -158,7 +183,26 @@ function PayContent({ orderId }: { orderId: string }) {
               </div>
               {initSession.isError ? (
                 <Alert variant="destructive">
-                  <AlertDescription>{(initSession.error as Error).message}</AlertDescription>
+                  <AlertDescription>
+                    Couldn&apos;t initialise payment: {(initSession.error as Error).message}
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+              {scriptState === "failed" ? (
+                <Alert variant="destructive">
+                  <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
+                    <span>
+                      Couldn&apos;t load the Flutterwave payment script. Check your network
+                      (an ad-blocker or strict firewall can block it) and retry.
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setScriptAttempt((n) => n + 1)}
+                    >
+                      Retry
+                    </Button>
+                  </AlertDescription>
                 </Alert>
               ) : null}
               <Button
@@ -168,7 +212,13 @@ function PayContent({ orderId }: { orderId: string }) {
                 loading={verify.isPending}
                 onClick={() => initSession.data && launch(initSession.data)}
               >
-                Pay {formatMoney(order.data?.total, order.data?.currency)}
+                {verify.isPending
+                  ? "Confirming payment..."
+                  : scriptState === "loading"
+                  ? "Loading payment provider..."
+                  : !initSession.data
+                  ? "Preparing your order..."
+                  : `Pay ${formatMoney(order.data?.total, order.data?.currency)}`}
               </Button>
               <p className="inline-flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
                 <ShieldCheck className="size-3 text-success" /> 256-bit SSL · Funds split via
