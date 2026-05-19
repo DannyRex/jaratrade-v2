@@ -252,7 +252,10 @@ export const publicApi = {
  * Login response - either a full LoginPayload (token + user fields) OR a 2FA
  * challenge ({requires_2fa: true, email}). The frontend branches on this.
  */
-export type LoginResponse = LoginPayload | { requires_2fa: true; email: string };
+export type LoginResponse =
+  | LoginPayload
+  | { requires_2fa: true; email: string }
+  | { requires_verification: true; email: string; role: Role };
 
 export const authApi = {
   login: (role: Role, email: string, password: string) => {

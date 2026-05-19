@@ -59,6 +59,15 @@ function LoginForm({ role }: { role: Role }) {
             setNeedsTwoFactor(true);
             return;
           }
+          // The API gates login on email verification. If the account isn't
+          // verified, it auto-sends a fresh code and tells us to redirect
+          // the user to the verify page instead of issuing a token.
+          if ("requires_verification" in data && data.requires_verification) {
+            router.push(
+              `/auth/verify-email?email=${encodeURIComponent(email.trim())}&role=${role}`,
+            );
+            return;
+          }
           router.push(successDest);
         },
       },

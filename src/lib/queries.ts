@@ -101,6 +101,9 @@ export function useLogin() {
       // 2FA challenge: backend returns {requires_2fa: true, email} instead of a token.
       // The login page handles this by switching to a 2FA-code input.
       if ("requires_2fa" in data) return;
+      // Email-verification gate: same shape, different flag. Login page
+      // redirects to /auth/verify-email; nothing to store here.
+      if ("requires_verification" in data) return;
       const { token, ...userFields } = data;
       signIn(token, vars.role, userFields as UserProfile);
     },
