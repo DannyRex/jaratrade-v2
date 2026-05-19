@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -49,6 +49,7 @@ export default function PayPage({ params }: { params: Promise<{ id: string }> })
 
 function PayContent({ orderId }: { orderId: string }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [scriptReady, setScriptReady] = useState(false);
 
   const order = useQuery({
@@ -68,9 +69,30 @@ function PayContent({ orderId }: { orderId: string }) {
 
   const verify = useMutation({
     mutationFn: (txRef: string) => importerApi.verifyPayment(txRef),
-    onSuccess: () => {
-      toast.success("Payment confirmed", { description: "We'll notify the exporter to ship your order." });
+    onSuccess: async (data) => {
+      // The API returns 200 with payload.status="successful" OR "failed"
+      // (i.e. FLW says the charge didn't actually clear). Treat the latter
+      // as a real failure - don't redirect, don't claim success.
+      const payload = data as { status?: string; tx_ref?: string };
+      if (payload?.status !== "successful") {
+        toast.error("Payment couldn't be confirmed", {
+          description: "Flutterwave says the charge didn't clear. Try again.",
+        });
+        return;
+      }
+      toast.success("Payment confirmed", {
+        description: "We'll notify the exporter to ship your order.",
+      });
+      // The order detail page reads from the same React Query key. If we
+      // don't invalidate, the cached pending-status row stays visible and
+      // the Pay button persists until the next mount. Invalidate both the
+      // single-order query and the orders list so all surfaces refetch.
+      await queryClient.invalidateQueries({ queryKey: ["importer", "orders", orderId] });
+      await queryClient.invalidateQueries({ queryKey: ["importer", "orders"] });
       router.push(`/importer/orders/${encodeURIComponent(orderId)}`);
+    },
+    onError: (err: Error) => {
+      toast.error("Couldn't confirm payment", { description: err.message });
     },
   });
 
@@ -88,15 +110,22 @@ function PayContent({ orderId }: { orderId: string }) {
       customer: session.customer,
       customizations: session.customizations,
       meta: { order_id: orderId },
-      callback: (response: { status: string; tx_ref: string }) => {
-        if (response.status === "successful") {
-          verify.mutate(response.tx_ref);
-        } else {
+      // FLW inline v3 fires this callback when the user closes the modal
+      // after charging. The `status` field is "successful" / "completed" /
+      // "failed" / etc depending on the path - we always re-verify with
+      // our backend (which goes back to FLW for the source of truth)
+      // unless FLW explicitly told us it failed.
+      callback: (response: { status?: string; tx_ref?: string; transaction_id?: string }) => {
+        const txRef = response.tx_ref ?? session.tx_ref;
+        const status = (response.status ?? "").toLowerCase();
+        if (status === "failed" || status === "cancelled") {
           toast.error("Payment failed", { description: "No charge was made. Try again." });
+          return;
         }
+        verify.mutate(txRef);
       },
       onclose: () => {
-        // user cancelled - no-op
+        // User dismissed the modal without paying. No verify, no error.
       },
     });
   };
