@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { importerApi, exporterApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
+import { queryKeys } from "@/lib/queries";
 
 type Role = "importer" | "exporter";
 
@@ -36,9 +37,14 @@ interface CompletionCheck {
 function computeImporterChecks(profile: Record<string, unknown> | undefined): CompletionCheck[] {
   const get = (k: string) => Boolean(profile?.[k]);
   const biz = (profile?.business as Record<string, unknown> | undefined) ?? {};
+  // The "Shipping address" item ticks the moment the importer adds at
+  // least one address via /importer/shipping. Reading user.address (the
+  // home/personal address column on the users row) would be wrong - that
+  // never gets touched by the shipping flow.
+  const hasShipping = Boolean(profile?.has_shipping_address);
   return [
     { label: "Name & phone", done: get("firstname") && get("lastname") && get("phone"), href: "/importer/account" },
-    { label: "Shipping address", done: get("address"), href: "/importer/shipping" },
+    { label: "Shipping address", done: hasShipping, href: "/importer/shipping" },
     { label: "Profile name", done: get("profile_name"), href: "/importer/account" },
     { label: "Business details (optional)", done: Boolean(biz?.business_name), href: "/importer/account" },
   ];
@@ -59,8 +65,12 @@ function computeExporterChecks(profile: Record<string, unknown> | undefined): Co
 
 export function ProfileProgress({ role }: { role: Role }) {
   const token = useAuth((s) => s.token);
+  // Share the same query key the rest of the app uses for /profile so that
+  // any mutation that invalidates the profile query (e.g. adding a shipping
+  // address, updating business details) instantly refreshes the progress
+  // bar without needing its own bespoke invalidation path.
   const profileQ = useQuery({
-    queryKey: [role, "profile-for-progress"],
+    queryKey: role === "importer" ? queryKeys.importerProfile : queryKeys.exporterProfile,
     queryFn: () => (role === "importer" ? importerApi.profile() : exporterApi.profile()),
     enabled: Boolean(token),
   });

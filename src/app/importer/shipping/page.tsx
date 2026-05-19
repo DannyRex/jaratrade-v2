@@ -97,6 +97,10 @@ function AddressDialog({ onClose }: { onClose: () => void }) {
     mutationFn: () => importerApi.addShipping({ ...form, is_default: 0 }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.importerShipping });
+      // Profile-progress reads has_shipping_address from /imp/profile - bump
+      // it so the "Shipping address" checklist item ticks immediately rather
+      // than waiting for the next session.
+      qc.invalidateQueries({ queryKey: queryKeys.importerProfile });
       toast.success("Address saved");
       onClose();
     },

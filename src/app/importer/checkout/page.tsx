@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Truck, Package, ShieldCheck, Plane, MapPin, Plus } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,7 +18,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/lib/cart-store";
-import { useLogistics } from "@/lib/queries";
+import { queryKeys, useLogistics } from "@/lib/queries";
 import { useAuth } from "@/lib/auth-store";
 import { formatMoney } from "@/lib/format";
 import { importerApi } from "@/lib/api";
@@ -31,6 +31,7 @@ const NEW_ADDRESS = "__new__";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const items = useCart((s) => s.items);
   const clearCart = useCart((s) => s.clear);
   const remoteCartId = useCart((s) => s.remoteCartId);
@@ -150,6 +151,11 @@ export default function CheckoutPage() {
     onSuccess: ({ order }) => {
       toast.success("Order placed", { description: "Redirecting you to payment..." });
       clearCart();
+      // If we just saved a new shipping address as part of this checkout,
+      // refresh the profile query so /importer/orders' progress bar ticks
+      // the "Shipping address" checklist item next time the user lands.
+      queryClient.invalidateQueries({ queryKey: queryKeys.importerShipping });
+      queryClient.invalidateQueries({ queryKey: queryKeys.importerProfile });
       router.push(`/importer/orders/${encodeURIComponent(order.order_id)}/pay`);
     },
   });
