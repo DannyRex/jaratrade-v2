@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { Mail } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -26,7 +25,6 @@ function VerifyEmailContent() {
   const params = useSearchParams();
   const email = params.get("email") ?? "";
   const role = (params.get("role") as Role) || "importer";
-  const reviewMode = params.get("review") === "1";
   const codeFromUrl = params.get("code") ?? "";
   const [code, setCode] = useState(codeFromUrl);
 
@@ -45,38 +43,17 @@ function VerifyEmailContent() {
   const autoTried = useRef(false);
   useEffect(() => {
     if (autoTried.current) return;
-    if (!codeFromUrl || reviewMode) return;
+    if (!codeFromUrl) return;
     autoTried.current = true;
     verify.mutate(codeFromUrl);
     // verify is referentially stable across renders for our use here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [codeFromUrl, reviewMode]);
+  }, [codeFromUrl]);
 
   const resend = useMutation({
     mutationFn: () => authApi.requestVerificationEmail(role as "importer" | "exporter", email),
     onSuccess: () => toast.success("Verification email sent - check your inbox."),
   });
-
-  if (reviewMode) {
-    return (
-      <div className="space-y-6 text-center">
-        <div className="mx-auto grid size-14 place-items-center rounded-full bg-warning/15 text-warning">
-          <Mail className="size-6" />
-        </div>
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Application under review</h1>
-          <p className="text-sm text-muted-foreground">
-            Thanks for applying - your business details are being verified. We&apos;ll email{" "}
-            <span className="font-medium text-foreground">{email}</span> once your account is
-            activated. This usually takes 1–2 business days.
-          </p>
-        </div>
-        <Button asChild variant="outline" className="w-full">
-          <Link href="/">Back to homepage</Link>
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

@@ -112,11 +112,11 @@ function SignupForm({ role }: { role: Role }) {
       toast.success("Account created", {
         description:
           role === "exporter"
-            ? "Verify your email, then complete your business profile to start listing."
+            ? "Verify your email, then complete your business profile and submit it for review."
             : "Verify your email to start sourcing.",
       });
       router.push(
-        `/auth/verify-email?email=${encodeURIComponent(form.email)}&role=${role}${role === "exporter" ? "&review=1" : ""}`,
+        `/auth/verify-email?email=${encodeURIComponent(form.email)}&role=${role}`,
       );
     },
   });
