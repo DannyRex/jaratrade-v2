@@ -180,6 +180,10 @@ function ProfileEditor({
     // KYC fields
     business_reg_num: initial.business_reg_number ?? "",
     business_type: initial.business_type ?? "",
+    business_country: initial.business_country ?? "",
+    duration_in_business:
+      initial.duration_in_business != null ? String(initial.duration_in_business) : "",
+    annual_turnover: initial.annual_turnover ?? "",
     tin: initial.tin ?? "",
     bank_id: initial.bank_id ?? "",
     account_name: "",
@@ -249,6 +253,25 @@ function ProfileEditor({
             <form onSubmit={submit} className="space-y-4">
               <Field label="Business registration (CAC) number" id="business_reg_num" value={form.business_reg_num} onChange={(v) => set("business_reg_num", v)} />
               <Field label="Business type" id="business_type" value={form.business_type} onChange={(v) => set("business_type", v)} placeholder="e.g. food_beverage" />
+              <Field label="Country" id="business_country" value={form.business_country} onChange={(v) => set("business_country", v)} placeholder="e.g. Nigeria" />
+              <Field label="Years in business" id="duration_in_business" type="number" value={form.duration_in_business} onChange={(v) => set("duration_in_business", v)} placeholder="e.g. 4" />
+
+              <div className="space-y-2">
+                <Label htmlFor="annual_turnover">Annual turnover</Label>
+                <Select value={form.annual_turnover} onValueChange={(v) => set("annual_turnover", v)}>
+                  <SelectTrigger id="annual_turnover">
+                    <SelectValue placeholder="Select a range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Under ₦1M">Under ₦1M</SelectItem>
+                    <SelectItem value="₦1M – ₦5M">₦1M – ₦5M</SelectItem>
+                    <SelectItem value="₦5M – ₦20M">₦5M – ₦20M</SelectItem>
+                    <SelectItem value="₦20M – ₦100M">₦20M – ₦100M</SelectItem>
+                    <SelectItem value="Over ₦100M">Over ₦100M</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <Field label="Tax ID (TIN)" id="tin" value={form.tin} onChange={(v) => set("tin", v)} />
 
               <div className="space-y-2">
