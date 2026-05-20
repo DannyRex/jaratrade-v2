@@ -331,6 +331,14 @@ export const importerApi = {
   initPayment: (orderId: string) =>
     request<FlutterwavePaymentSession>("/imp/payment/init", { method: "POST", body: multipart({ order_id: orderId }) }),
   verifyPayment: (txRef: string) => request("/imp/payment/verify", { query: { tx_ref: txRef } }),
+  /** Flutterwave Standard (hosted) checkout - server creates a session,
+   *  returns a URL the browser redirects to. Used when the inline
+   *  modal can't load reliably (CDN flakes, browser extensions, etc). */
+  initPaymentStandard: (orderId: string) =>
+    request<{ link: string; tx_ref: string }>("/imp/payment/init_standard", {
+      method: "POST",
+      body: multipart({ order_id: orderId }),
+    }),
   transactionHistory: () => request<PagedData<unknown>>("/imp/payment"),
 
   // Shipping

@@ -1,10 +1,33 @@
 "use client";
 
-import { use, useState } from "react";
-import { useRouter } from "next/navigation";
+/**
+ * Pay page — uses Flutterwave Standard (hosted) checkout.
+ *
+ * Flow:
+ *   1. User lands here from /checkout flow.
+ *   2. Page calls /imp/payment/init_standard → API hits FLW and returns
+ *      a hosted-checkout URL (https://checkout.flutterwave.com/<hash>).
+ *   3. User clicks "Pay" → we redirect to that URL. FLW owns the page,
+ *      handles card / bank transfer / USSD itself.
+ *   4. After payment (success, failure, or cancel), FLW redirects the
+ *      user back to /importer/orders/<id>/pay?from=flw&tx_ref=...&status=...
+ *   5. We detect `from=flw` on mount, call /imp/payment/verify with the
+ *      tx_ref to confirm with FLW's source of truth, then redirect to
+ *      the order detail page.
+ *
+ * Why Standard instead of Inline:
+ * - No `v3.js` script tag to load → no Cloudflare-cached 404s, no
+ *   ad-blocker / privacy-extension interference, no race with FLW's
+ *   deferred global init.
+ * - One less surface to fail. The user redirects to FLW's hosted page;
+ *   FLW handles everything until the redirect-back.
+ */
+import { Suspense, use, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -12,120 +35,34 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { importerApi } from "@/lib/api";
 import { formatMoney } from "@/lib/format";
-import { toast } from "sonner";
-import type { FlutterwavePaymentSession, Order } from "@/lib/types";
-
-declare global {
-  interface Window {
-    FlutterwaveCheckout?: (config: Record<string, unknown>) => void;
-  }
-}
-
-const FLW_INLINE_SCRIPT_BASE = "https://checkout.flutterwave.com/v3.js";
-
-/** Build the script URL with a cache-busting param.
- *
- * Flutterwave's CDN (Cloudflare) intermittently serves a 404 for v3.js and
- * caches that 404 for up to 4 hours (`cache-control: public, max-age=14400`,
- * `cf-cache-status: HIT`). When that happens, every user whose POP captured
- * the bad response sees a disabled Pay button until TTL expires. Appending a
- * unique query param forces Cloudflare to MISS, refetch from origin, and
- * serve the working 200. Slightly more origin traffic, but bulletproof
- * against this specific failure mode.
- */
-function flwScriptUrl(): string {
-  return `${FLW_INLINE_SCRIPT_BASE}?_cb=${Date.now()}`;
-}
-
-function loadFlutterwave(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") return reject(new Error("not in browser"));
-    if (window.FlutterwaveCheckout) return resolve();
-    // The script's onload event fires the moment its JS finishes parsing,
-    // but FLW v3.js defers attaching `window.FlutterwaveCheckout` (likely
-    // inside a microtask / DOMContentLoaded handler). A strict check right
-    // at onload sees `undefined` and rejects, even though the global lands
-    // a few ticks later.
-    //
-    // Poll for up to 3 seconds after onload (30 x 100ms). Resolves the
-    // instant the global appears; rejects if it genuinely never does
-    // (real blocker / CDN serving HTML 404 with a 2xx).
-    const onLoadCheck = () => {
-      if (window.FlutterwaveCheckout) return resolve();
-      let attempts = 0;
-      const interval = setInterval(() => {
-        if (window.FlutterwaveCheckout) {
-          clearInterval(interval);
-          resolve();
-        } else if (++attempts >= 30) {
-          clearInterval(interval);
-          reject(new Error("Flutterwave script loaded but didn't initialise"));
-        }
-      }, 100);
-    };
-    // If a previous attempt left a script tag behind without setting the
-    // global, that tag has already fired its load event and re-attaching
-    // listeners would never fire again. Yank it so the fresh insert below
-    // gets a clean shot (and a freshly cache-busted URL).
-    const stale = document.querySelectorAll('script[data-flw-inline="1"]');
-    stale.forEach((node) => node.parentNode?.removeChild(node));
-
-    const s = document.createElement("script");
-    s.src = flwScriptUrl();
-    s.async = true;
-    s.dataset.flwInline = "1";
-    s.onload = onLoadCheck;
-    s.onerror = () => reject(new Error("script failed to load"));
-    document.head.appendChild(s);
-  });
-}
+import type { Order } from "@/lib/types";
 
 export default function PayPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  return <PayContent orderId={decodeURIComponent(id)} />;
+  // useSearchParams requires a Suspense boundary (the inner content reads
+  // the FLW redirect-back querystring on mount).
+  return (
+    <Suspense fallback={<Skeleton className="h-32 w-full max-w-3xl" />}>
+      <PayContent orderId={decodeURIComponent(id)} />
+    </Suspense>
+  );
 }
 
 function PayContent({ orderId }: { orderId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  // Bumping this re-keys the script-load query, which is how we retry.
-  const [scriptAttempt, setScriptAttempt] = useState(0);
+  const searchParams = useSearchParams();
 
   const order = useQuery({
     queryKey: ["importer", "orders", orderId],
     queryFn: () => importerApi.getOrder(orderId) as Promise<Order>,
   });
 
-  const initSession = useQuery({
-    queryKey: ["importer", "payment-session", orderId],
-    queryFn: () => importerApi.initPayment(orderId),
-    enabled: Boolean(order.data),
-  });
-
-  // The Flutterwave inline checkout script. Modelling the load as a
-  // useQuery (rather than useState + useEffect) gets us isLoading /
-  // isError / isSuccess flags directly, so the UI can show a "Loading
-  // payment provider..." spinner or a Retry button when an ad-blocker /
-  // network failure swallows the script.
-  const flwScript = useQuery({
-    queryKey: ["flw-inline-script", scriptAttempt],
-    queryFn: loadFlutterwave,
-    retry: false,
-    staleTime: Infinity,
-  });
-  const scriptState: "loading" | "ready" | "failed" = flwScript.isSuccess
-    ? "ready"
-    : flwScript.isError
-    ? "failed"
-    : "loading";
-  const scriptReady = scriptState === "ready";
-
+  // Verify mutation - used both for the redirect-back from FLW and for
+  // any manual retry button we expose if verification stalls.
   const verify = useMutation({
     mutationFn: (txRef: string) => importerApi.verifyPayment(txRef),
     onSuccess: async (data) => {
-      // The API returns 200 with payload.status="successful" OR "failed"
-      // (i.e. FLW says the charge didn't actually clear). Treat the latter
-      // as a real failure - don't redirect, don't claim success.
       const payload = data as { status?: string; tx_ref?: string };
       if (payload?.status !== "successful") {
         toast.error("Payment couldn't be confirmed", {
@@ -136,10 +73,6 @@ function PayContent({ orderId }: { orderId: string }) {
       toast.success("Payment confirmed", {
         description: "We'll notify the exporter to ship your order.",
       });
-      // The order detail page reads from the same React Query key. If we
-      // don't invalidate, the cached pending-status row stays visible and
-      // the Pay button persists until the next mount. Invalidate both the
-      // single-order query and the orders list so all surfaces refetch.
       await queryClient.invalidateQueries({ queryKey: ["importer", "orders", orderId] });
       await queryClient.invalidateQueries({ queryKey: ["importer", "orders"] });
       router.push(`/importer/orders/${encodeURIComponent(orderId)}`);
@@ -149,39 +82,54 @@ function PayContent({ orderId }: { orderId: string }) {
     },
   });
 
-  const launch = (session: FlutterwavePaymentSession) => {
-    if (!scriptReady || !window.FlutterwaveCheckout) {
-      toast.error("Payment unavailable", { description: "Please refresh and try again." });
+  // Detect the redirect-back from FLW. When the user finishes payment on
+  // FLW's hosted page, FLW redirects to:
+  //   /importer/orders/<id>/pay?from=flw&tx_ref=...&status=...&transaction_id=...
+  // We pick that up, call verify, then route on to the order page.
+  // Ref-guarded so React strict-mode's double-mount doesn't fire twice.
+  const verifiedOnce = useRef(false);
+  useEffect(() => {
+    if (verifiedOnce.current) return;
+    if (searchParams.get("from") !== "flw") return;
+    const txRef = searchParams.get("tx_ref");
+    const status = (searchParams.get("status") ?? "").toLowerCase();
+    if (!txRef) return;
+    verifiedOnce.current = true;
+    if (status === "cancelled") {
+      toast.message("Payment cancelled", {
+        description: "No charge was made. Try again when you're ready.",
+      });
       return;
     }
-    window.FlutterwaveCheckout({
-      public_key: session.public_key,
-      tx_ref: session.tx_ref,
-      amount: session.amount,
-      currency: session.currency,
-      payment_options: session.payment_options,
-      customer: session.customer,
-      customizations: session.customizations,
-      meta: { order_id: orderId },
-      // FLW inline v3 fires this callback when the user closes the modal
-      // after charging. The `status` field is "successful" / "completed" /
-      // "failed" / etc depending on the path - we always re-verify with
-      // our backend (which goes back to FLW for the source of truth)
-      // unless FLW explicitly told us it failed.
-      callback: (response: { status?: string; tx_ref?: string; transaction_id?: string }) => {
-        const txRef = response.tx_ref ?? session.tx_ref;
-        const status = (response.status ?? "").toLowerCase();
-        if (status === "failed" || status === "cancelled") {
-          toast.error("Payment failed", { description: "No charge was made. Try again." });
-          return;
-        }
-        verify.mutate(txRef);
-      },
-      onclose: () => {
-        // User dismissed the modal without paying. No verify, no error.
-      },
-    });
-  };
+    // FLW reports "successful" / "completed" / "failed". We verify
+    // regardless of what they say unless it's an explicit failed/cancelled
+    // - the backend re-checks against FLW directly for source-of-truth.
+    if (status === "failed") {
+      toast.error("Payment failed", { description: "No charge was made. Try again." });
+      return;
+    }
+    verify.mutate(txRef);
+    // verify is referentially stable for this purpose. Keeping deps tight
+    // since this is meant to run once on mount when the URL has ?from=flw.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const initStandard = useMutation({
+    mutationFn: () => importerApi.initPaymentStandard(orderId),
+    onSuccess: (data) => {
+      // Same window navigation - FLW will redirect the user back here
+      // (?from=flw&tx_ref=...&status=...) once payment completes.
+      window.location.href = data.link;
+    },
+    onError: (err: Error) => {
+      toast.error("Couldn't initialise payment", { description: err.message });
+    },
+  });
+
+  // While the redirect-back verify is running, show a clear state instead
+  // of letting the user think the page is broken.
+  const isVerifying = verify.isPending;
+  const isCancelledReturn = searchParams.get("from") === "flw" && searchParams.get("status") === "cancelled";
 
   return (
     <>
@@ -209,48 +157,42 @@ function PayContent({ orderId }: { orderId: string }) {
                   {formatMoney(order.data?.total, order.data?.currency)}
                 </p>
               </div>
-              {initSession.isError ? (
+
+              {isCancelledReturn ? (
+                <Alert variant="info">
+                  <AlertDescription>
+                    Last attempt was cancelled. No charge was made — you can try again below.
+                  </AlertDescription>
+                </Alert>
+              ) : null}
+
+              {initStandard.isError ? (
                 <Alert variant="destructive">
                   <AlertDescription>
-                    Couldn&apos;t initialise payment: {(initSession.error as Error).message}
+                    {(initStandard.error as Error).message}
                   </AlertDescription>
                 </Alert>
               ) : null}
-              {scriptState === "failed" ? (
-                <Alert variant="destructive">
-                  <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
-                    <span>
-                      Couldn&apos;t load the Flutterwave payment script. Check your network
-                      (an ad-blocker or strict firewall can block it) and retry.
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setScriptAttempt((n) => n + 1)}
-                    >
-                      Retry
-                    </Button>
-                  </AlertDescription>
-                </Alert>
-              ) : null}
+
               <Button
                 size="lg"
                 className="w-full"
-                disabled={!scriptReady || !initSession.data || verify.isPending}
-                loading={verify.isPending}
-                onClick={() => initSession.data && launch(initSession.data)}
+                loading={initStandard.isPending || isVerifying}
+                disabled={initStandard.isPending || isVerifying}
+                onClick={() => initStandard.mutate()}
               >
-                {verify.isPending
+                {isVerifying
                   ? "Confirming payment..."
-                  : scriptState === "loading"
-                  ? "Loading payment provider..."
-                  : !initSession.data
-                  ? "Preparing your order..."
+                  : initStandard.isPending
+                  ? "Opening Flutterwave..."
                   : `Pay ${formatMoney(order.data?.total, order.data?.currency)}`}
               </Button>
               <p className="inline-flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
                 <ShieldCheck className="size-3 text-success" /> 256-bit SSL · Funds split via
                 Flutterwave
+              </p>
+              <p className="text-center text-[11px] text-muted-foreground">
+                You&apos;ll be redirected to Flutterwave&apos;s secure page to complete payment, and brought back here when done.
               </p>
             </CardContent>
           </Card>
