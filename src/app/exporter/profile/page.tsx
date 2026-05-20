@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ShieldCheck, Clock, AlertTriangle, FileText } from "lucide-react";
+import { ShieldCheck, Clock, AlertTriangle, FileText, Upload, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,9 +36,15 @@ export default function ExporterProfilePage() {
       ) : (
         <div className="space-y-6">
           <KycStatusBanner profile={data} />
-          {/* Key the editor on data identity so it re-mounts with fresh
-              state once the profile loads - avoids setState-in-effect. */}
-          <ProfileEditor key={data.id ?? "loading"} initial={data} />
+          {/* The text-field form is keyed on data identity so it re-mounts
+              with fresh useState once the profile loads (avoids
+              setState-in-effect). `documents` is passed as a live prop
+              (not frozen in useState) so uploads reflect immediately. */}
+          <ProfileEditor
+            key={data.id ?? "loading"}
+            initial={data}
+            documents={data.documents ?? {}}
+          />
         </div>
       )}
     </>
@@ -156,7 +162,13 @@ function KycStatusBanner({ profile }: { profile: ExporterProfile }) {
   );
 }
 
-function ProfileEditor({ initial }: { initial: ExporterProfile }) {
+function ProfileEditor({
+  initial,
+  documents,
+}: {
+  initial: ExporterProfile;
+  documents: Record<string, string>;
+}) {
   const qc = useQueryClient();
   const banks = useBanks();
   const [form, setForm] = useState({
@@ -169,7 +181,6 @@ function ProfileEditor({ initial }: { initial: ExporterProfile }) {
     business_reg_num: initial.business_reg_number ?? "",
     business_type: initial.business_type ?? "",
     tin: initial.tin ?? "",
-    valid_ID: initial.valid_identification ?? "",
     bank_id: initial.bank_id ?? "",
     account_name: "",
     account_number: initial.account_number ?? "",
@@ -228,7 +239,7 @@ function ProfileEditor({ initial }: { initial: ExporterProfile }) {
         </Card>
       </TabsContent>
 
-      <TabsContent value="verification" className="mt-6">
+      <TabsContent value="verification" className="mt-6 space-y-6">
         <Card>
           <CardContent className="p-6">
             <p className="mb-4 text-sm text-muted-foreground">
@@ -239,7 +250,6 @@ function ProfileEditor({ initial }: { initial: ExporterProfile }) {
               <Field label="Business registration (CAC) number" id="business_reg_num" value={form.business_reg_num} onChange={(v) => set("business_reg_num", v)} />
               <Field label="Business type" id="business_type" value={form.business_type} onChange={(v) => set("business_type", v)} placeholder="e.g. food_beverage" />
               <Field label="Tax ID (TIN)" id="tin" value={form.tin} onChange={(v) => set("tin", v)} />
-              <Field label="Means of ID" id="valid_ID" value={form.valid_ID} onChange={(v) => set("valid_ID", v)} placeholder="e.g. passport, NIN, driver's licence" />
 
               <div className="space-y-2">
                 <Label htmlFor="bank_id">Bank</Label>
@@ -261,8 +271,110 @@ function ProfileEditor({ initial }: { initial: ExporterProfile }) {
             </form>
           </CardContent>
         </Card>
+
+        {/* Document uploads - separate card. These upload immediately on
+            file select (not on the form Save), and read their current
+            state from the live `documents` prop so the upload reflects
+            without a remount. */}
+        <Card>
+          <CardContent className="space-y-4 p-6">
+            <div>
+              <h3 className="font-semibold">Verification documents</h3>
+              <p className="text-sm text-muted-foreground">
+                Upload a clear photo or scan. Images (JPG/PNG/WebP) or PDF, up to 10MB.
+              </p>
+            </div>
+            <DocumentUpload
+              label="Means of ID"
+              hint="Passport, NIN slip, or driver's licence"
+              docType="id"
+              currentUrl={documents.id}
+              onUploaded={() => qc.invalidateQueries({ queryKey: queryKeys.exporterProfile })}
+            />
+            <DocumentUpload
+              label="Business registration (CAC) certificate"
+              hint="Optional but speeds up review"
+              docType="cac"
+              currentUrl={documents.cac}
+              onUploaded={() => qc.invalidateQueries({ queryKey: queryKeys.exporterProfile })}
+            />
+          </CardContent>
+        </Card>
       </TabsContent>
     </Tabs>
+  );
+}
+
+function DocumentUpload({
+  label,
+  hint,
+  docType,
+  currentUrl,
+  onUploaded,
+}: {
+  label: string;
+  hint: string;
+  docType: "id" | "cac";
+  currentUrl?: string;
+  onUploaded: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      await exporterApi.uploadKycDocument(docType, file);
+      toast.success(`${label} uploaded`);
+      onUploaded();
+    } catch (err) {
+      toast.error("Upload failed", {
+        description: err instanceof Error ? err.message : "Try again.",
+      });
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
+      <div className="min-w-0">
+        <p className="flex items-center gap-1.5 text-sm font-medium">
+          {label}
+          {currentUrl ? <CheckCircle2 className="size-4 text-success" aria-label="Uploaded" /> : null}
+        </p>
+        {currentUrl ? (
+          <a
+            href={currentUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary hover:underline"
+          >
+            View uploaded document
+          </a>
+        ) : (
+          <p className="text-xs text-muted-foreground">{hint}</p>
+        )}
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*,application/pdf"
+        className="hidden"
+        onChange={(e) => handleFile(e.target.files?.[0])}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        loading={uploading}
+        onClick={() => inputRef.current?.click()}
+      >
+        <Upload className="size-4" /> {currentUrl ? "Replace" : "Upload"}
+      </Button>
+    </div>
   );
 }
 

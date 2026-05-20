@@ -392,6 +392,13 @@ export const exporterApi = {
       "/exp/submit-for-review",
       { method: "POST" },
     ),
+  /** Upload a KYC proof document. docType: "id" (means of ID) or "cac"
+   *  (registration certificate). Returns the stored URL + full doc map. */
+  uploadKycDocument: (docType: "id" | "cac", file: File) =>
+    request<{ doc_type: string; url: string; documents: Record<string, string> }>(
+      "/exp/kyc-document",
+      { method: "POST", body: multipart({ doc_type: docType, file }) },
+    ),
 
   // Stores
   getStores: () => request<PagedData<Store>>("/exp/store"),
@@ -702,8 +709,20 @@ export interface AdminUser {
   review_count: number;
   product_delivered: number;
   business_name: string | null;
+  business_email: string | null;
+  business_address: string | null;
   business_country: string | null;
   business_reg_number: string | null;
+  business_type: string | null;
+  annual_turnover: string | null;
+  duration_in_business: number | null;
+  tin: string | null;
+  valid_identification: string | null;
+  bank_id: string | null;
+  account_name: string | null;
+  account_number: string | null;
+  /** Uploaded KYC documents — { id?: url, cac?: url }. */
+  documents: Record<string, string>;
   flw_subaccount_id?: string | null;
   time_created: string;
 }

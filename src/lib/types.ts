@@ -175,6 +175,8 @@ export interface ExporterProfile {
   bank_id?: string | null;
   account_number?: string | null;
   description?: string | null;
+  /** Uploaded KYC documents — { id?: url, cac?: url }. */
+  documents?: Record<string, string>;
   // KYC lifecycle
   kyc_status?: "pending" | "approved" | "rejected";
   kyc_submitted_at?: string | null;
