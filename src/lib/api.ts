@@ -21,6 +21,7 @@ import type {
   Dispute,
   DisputeReason,
   ExporterPlan,
+  ExporterProfile,
   HomeData,
   ImporterPlan,
   LogisticsCompany,
@@ -380,11 +381,17 @@ export const importerApi = {
 
 export const exporterApi = {
   profile: (range?: { from?: string; to?: string }) =>
-    request<unknown>("/exp/profile", { query: range }),
+    request<ExporterProfile>("/exp/profile", { query: range }),
   updateProfile: (payload: Record<string, unknown>) =>
     request("/exp/profile", { method: "POST", body: multipart(payload) }),
   changePassword: (payload: { old_password: string; new_password: string }) =>
     request("/exp/change_password", { method: "POST", body: multipart(payload) }),
+  /** Hand the completed business profile to admin for KYC review. */
+  submitForReview: () =>
+    request<{ kyc_status: string; kyc_submitted_at: string }>(
+      "/exp/submit-for-review",
+      { method: "POST" },
+    ),
 
   // Stores
   getStores: () => request<PagedData<Store>>("/exp/store"),
@@ -686,6 +693,7 @@ export interface AdminUser {
   is_active: boolean;
   email_verified: boolean;
   kyc_status: "pending" | "approved" | "rejected";
+  kyc_submitted_at: string | null;
   kyc_reviewed_at: string | null;
   kyc_rejection_reason: string | null;
   totp_enabled: boolean;

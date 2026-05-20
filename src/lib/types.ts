@@ -152,6 +152,39 @@ export interface ExporterSummary {
   kyc_status?: "pending" | "approved" | "rejected";
 }
 
+/** Full /exp/profile payload — drives the exporter dashboard + KYC flow. */
+export interface ExporterProfile {
+  id?: string;
+  firstname?: string;
+  lastname?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  country?: string;
+  profile_name?: string;
+  business_name?: string | null;
+  business_email?: string | null;
+  business_address?: string | null;
+  business_country?: string | null;
+  business_reg_number?: string | null;
+  business_type?: string | null;
+  annual_turnover?: string | null;
+  duration_in_business?: number | null;
+  tin?: string | null;
+  valid_identification?: string | null;
+  bank_id?: string | null;
+  account_number?: string | null;
+  description?: string | null;
+  // KYC lifecycle
+  kyc_status?: "pending" | "approved" | "rejected";
+  kyc_submitted_at?: string | null;
+  kyc_rejection_reason?: string | null;
+  kyc_missing_fields?: string[];
+  total_orders?: number;
+  pending_orders?: number;
+  total_revenue?: string;
+}
+
 /** Listing-card shape (from /public/products) */
 export interface ProductSummary {
   id: string;

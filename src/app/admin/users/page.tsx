@@ -14,7 +14,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/data-table";
-import { adminApi } from "@/lib/api";
+import { adminApi, type AdminUser } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
 import { useDebounce } from "@/hooks/use-debounce";
 import { formatDate, initials } from "@/lib/format";
@@ -137,16 +137,10 @@ export default function AdminUsersPage() {
                 <TableCell><Badge variant="secondary" className="capitalize">{u.role}</Badge></TableCell>
                 <TableCell>
                   {u.role === "exporter" ? (
-                    <Badge variant={u.kyc_status === "approved" ? "success" : u.kyc_status === "rejected" ? "destructive" : "warning"}>
-                      {u.kyc_status}
-                    </Badge>
+                    <KycBadge user={u} />
                   ) : (
-                    // KYC doesn't apply to importers or admins - their
-                    // kyc_status column stays at the default "pending"
-                    // forever because no endpoint transitions it. Showing
-                    // "pending" here gave admins the wrong impression that
-                    // every importer was awaiting review. Render em-dash
-                    // instead to signal "not applicable".
+                    // KYC doesn't apply to importers or admins - render an
+                    // em-dash to signal "not applicable".
                     <span className="text-muted-foreground">-</span>
                   )}
                 </TableCell>
@@ -188,4 +182,24 @@ export default function AdminUsersPage() {
       )}
     </>
   );
+}
+
+/** KYC status badge for an exporter row.
+ *
+ * kyc_status alone is ambiguous: "pending" covers both "signed up but
+ * hasn't submitted" and "submitted, waiting on us". kyc_submitted_at
+ * disambiguates - non-null means they've handed it over for review.
+ */
+function KycBadge({ user }: { user: AdminUser }) {
+  if (user.kyc_status === "approved") {
+    return <Badge variant="success">Approved</Badge>;
+  }
+  if (user.kyc_status === "rejected") {
+    return <Badge variant="destructive">Rejected</Badge>;
+  }
+  // pending
+  if (user.kyc_submitted_at) {
+    return <Badge variant="warning">Awaiting review</Badge>;
+  }
+  return <Badge variant="outline">Incomplete</Badge>;
 }
