@@ -38,14 +38,37 @@ export default function NewProductPage() {
   const [images, setImages] = useState<File[]>([]);
 
   const create = useMutation({
-    mutationFn: () =>
-      exporterApi.addProduct({
+    mutationFn: async () => {
+      const created = await exporterApi.addProduct({
         ...form,
         properties: { weight: form.weight },
-      }),
-    onSuccess: () => {
+      });
+      // Actually upload the selected images. The file input collects them
+      // but the old mutationFn never sent them - products were created with
+      // an empty images array and the "saved after creation" hint was a lie.
+      const newId = (created as { id?: string } | undefined)?.id;
+      let imageError = false;
+      if (newId && images.length > 0) {
+        try {
+          await exporterApi.addProductImages(newId, images);
+        } catch {
+          // Product creation already succeeded; don't lose it over an image
+          // upload hiccup. Surface a warning so the exporter can retry from
+          // the product's edit page.
+          imageError = true;
+        }
+      }
+      return { imageError };
+    },
+    onSuccess: ({ imageError }) => {
       qc.invalidateQueries({ queryKey: queryKeys.exporterProducts });
-      toast.success("Product created");
+      if (imageError) {
+        toast.warning("Product created — but the images didn't upload", {
+          description: "Add them from the product's Edit page.",
+        });
+      } else {
+        toast.success("Product created");
+      }
       router.push("/exporter/products");
     },
   });
