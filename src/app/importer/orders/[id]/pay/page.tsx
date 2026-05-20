@@ -41,15 +41,27 @@ function loadFlutterwave(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (typeof window === "undefined") return reject(new Error("not in browser"));
     if (window.FlutterwaveCheckout) return resolve();
-    // Verify `window.FlutterwaveCheckout` actually exists after the script
-    // claims to have loaded. Without this check, script-tag onload fires
-    // even when an ad-blocker substitutes a no-op response (or when the CDN
-    // serves an HTML 404 page with a 2xx code), so we'd optimistically
-    // resolve and end up with a disabled-forever Pay button when the user
-    // clicks. Treating "loaded but no global" as a failure surfaces this.
+    // The script's onload event fires the moment its JS finishes parsing,
+    // but FLW v3.js defers attaching `window.FlutterwaveCheckout` (likely
+    // inside a microtask / DOMContentLoaded handler). A strict check right
+    // at onload sees `undefined` and rejects, even though the global lands
+    // a few ticks later.
+    //
+    // Poll for up to 3 seconds after onload (30 x 100ms). Resolves the
+    // instant the global appears; rejects if it genuinely never does
+    // (real blocker / CDN serving HTML 404 with a 2xx).
     const onLoadCheck = () => {
-      if (window.FlutterwaveCheckout) resolve();
-      else reject(new Error("Flutterwave script loaded but didn't initialise"));
+      if (window.FlutterwaveCheckout) return resolve();
+      let attempts = 0;
+      const interval = setInterval(() => {
+        if (window.FlutterwaveCheckout) {
+          clearInterval(interval);
+          resolve();
+        } else if (++attempts >= 30) {
+          clearInterval(interval);
+          reject(new Error("Flutterwave script loaded but didn't initialise"));
+        }
+      }, 100);
     };
     // If a previous attempt left a script tag behind without setting the
     // global, that tag has already fired its load event and re-attaching
