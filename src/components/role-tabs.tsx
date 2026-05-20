@@ -35,7 +35,15 @@ export function RoleTabs({ active, hrefBuilder, showAdmin = true, className }: R
   const visible = showAdmin ? roles : roles.filter((r) => r.id !== "admin");
   return (
     <div role="tablist" aria-label="Choose your role" className={cn("grid gap-2", className)}>
-      <div className="inline-grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 sm:grid-cols-3">
+      {/* Column count tracks the number of visible tabs. With showAdmin
+          false (the register page) only 2 tabs render - a hardcoded
+          sm:grid-cols-3 left an empty third slot squeezing them off-centre. */}
+      <div
+        className={cn(
+          "grid gap-1 rounded-lg bg-muted p-1",
+          visible.length === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2",
+        )}
+      >
         {visible.map((role) => {
           const Icon = role.icon;
           const isActive = role.id === active;
