@@ -310,6 +310,8 @@ export interface CartItem {
   category: string;
   price: number;
   quantity: number;
+  /** The product's minimum order quantity - a line can't drop below this. */
+  min_order_quantity?: number;
   unit: string;
   subtotal: number;
   exporter_id?: string;

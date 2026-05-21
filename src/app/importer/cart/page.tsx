@@ -74,12 +74,18 @@ export default function CartPage() {
                       <p className="text-xs text-muted-foreground">by {item.exporter_name}</p>
                     ) : null}
                     <p className="text-xs text-muted-foreground capitalize">{item.unit}</p>
+                    {(item.min_order_quantity || 1) > 1 ? (
+                      <p className="text-xs text-muted-foreground">
+                        Minimum order: {item.min_order_quantity} units
+                      </p>
+                    ) : null}
                     <div className="flex items-center justify-between gap-2 pt-1">
                       <div className="inline-flex items-center rounded-md border">
                         <Button
                           variant="ghost"
                           size="icon-sm"
                           aria-label="Decrease"
+                          disabled={item.quantity <= (item.min_order_quantity || 1)}
                           onClick={() => setQuantity(item.product_id, item.quantity - 1)}
                         >
                           <Minus className="size-3.5" />

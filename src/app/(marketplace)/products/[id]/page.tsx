@@ -29,7 +29,7 @@ function ProductDetail({ id }: { id: string }) {
   const router = useRouter();
   const { data, isLoading, isError, refetch } = useProduct(id);
   const addToCart = useCart((s) => s.add);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState<number | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
 
   if (isError) {
@@ -73,17 +73,6 @@ function ProductDetail({ id }: { id: string }) {
   const properties = parseProductProperties(data.properties);
   const cover = imageList[selectedImage] ?? imageList[0];
 
-  const handleAddToCart = () => {
-    addToCart(data, quantity);
-    toast.success("Added to cart", {
-      description: `${quantity} × ${data.product_name}`,
-      action: {
-        label: "View cart",
-        onClick: () => router.push("/importer/cart"),
-      },
-    });
-  };
-
   const moq = data.min_order_quantity || 1;
   // If the seller has tracked stock, cap max order at the available units so
   // the user can't accidentally exceed it. Falls back to the configured max.
@@ -91,6 +80,20 @@ function ProductDetail({ id }: { id: string }) {
   const configuredMax = data.max_order_quantity > 0 ? data.max_order_quantity : 9999;
   const maxOrder = stockCap !== null ? Math.min(stockCap, configuredMax) : configuredMax;
   const outOfStock = typeof data.stock_quantity === "number" && data.stock_quantity <= 0;
+  // Quantity defaults to the minimum order quantity. `data` loads async so the
+  // state stays null until the shopper picks a value of their own.
+  const qty = quantity ?? moq;
+
+  const handleAddToCart = () => {
+    addToCart(data, qty);
+    toast.success("Added to cart", {
+      description: `${qty} × ${data.product_name}`,
+      action: {
+        label: "View cart",
+        onClick: () => router.push("/importer/cart"),
+      },
+    });
+  };
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -181,7 +184,7 @@ function ProductDetail({ id }: { id: string }) {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setQuantity((q) => Math.max(moq, q - 1))}
+                onClick={() => setQuantity(Math.max(moq, qty - 1))}
                 aria-label="Decrease quantity"
               >
                 <Minus className="size-4" />
@@ -190,7 +193,7 @@ function ProductDetail({ id }: { id: string }) {
                 type="number"
                 min={moq}
                 max={maxOrder}
-                value={quantity}
+                value={qty}
                 onChange={(e) => {
                   const v = Number(e.target.value);
                   setQuantity(Number.isFinite(v) ? Math.max(moq, Math.min(maxOrder, v)) : moq);
@@ -201,7 +204,7 @@ function ProductDetail({ id }: { id: string }) {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setQuantity((q) => Math.min(maxOrder, q + 1))}
+                onClick={() => setQuantity(Math.min(maxOrder, qty + 1))}
                 aria-label="Increase quantity"
               >
                 <Plus className="size-4" />
@@ -209,7 +212,7 @@ function ProductDetail({ id }: { id: string }) {
             </div>
             <Button size="lg" onClick={handleAddToCart} className="flex-1" disabled={outOfStock}>
               <ShoppingCart className="size-4" />
-              {outOfStock ? "Out of stock" : `Add to cart · ${formatMoney(Number(data.price) * quantity, data.currency || "NGN")}`}
+              {outOfStock ? "Out of stock" : `Add to cart · ${formatMoney(Number(data.price) * qty, data.currency || "NGN")}`}
             </Button>
             <Button size="lg" variant="outline" aria-label="Save to favourites">
               <Heart className="size-4" />

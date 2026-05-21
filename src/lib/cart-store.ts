@@ -34,6 +34,10 @@ export const useCart = create<CartState>()(
         const name = "product_name" in product ? product.product_name : "Untitled";
         const category = "category" in product ? (product as ProductSummary).category : (product as ProductDetail).name;
         const price = asNumber(product.price);
+        // The product's minimum order quantity - a new cart line never starts
+        // below it. ProductSummary carries no MOQ, so default to 1.
+        const moq =
+          "min_order_quantity" in product ? Number(product.min_order_quantity) || 1 : 1;
         const exporterId = "exporter_id" in product ? (product as ProductDetail).exporter_id : undefined;
         const exporterName = "exporter_name" in product ? (product as ProductSummary).exporter_name : undefined;
         const storeId = "store_id" in product ? (product as ProductDetail).store_id : undefined;
@@ -53,11 +57,18 @@ export const useCart = create<CartState>()(
           set({
             items: get().items.map((i) =>
               i.product_id === productId
-                ? { ...i, quantity: i.quantity + quantity, subtotal: (i.quantity + quantity) * i.price }
+                ? {
+                    ...i,
+                    quantity: i.quantity + quantity,
+                    subtotal: (i.quantity + quantity) * i.price,
+                    min_order_quantity: i.min_order_quantity ?? moq,
+                  }
                 : i,
             ),
           });
         } else {
+          // Never start a line below the minimum order quantity.
+          const startQty = Math.max(quantity, moq);
           set({
             items: [
               ...get().items,
@@ -66,9 +77,10 @@ export const useCart = create<CartState>()(
                 name,
                 category,
                 price,
-                quantity,
+                quantity: startQty,
+                min_order_quantity: moq,
                 unit,
-                subtotal: price * quantity,
+                subtotal: price * startQty,
                 exporter_id: exporterId,
                 exporter_name: exporterName,
                 store_id: storeId,
@@ -85,9 +97,12 @@ export const useCart = create<CartState>()(
           return;
         }
         set({
-          items: get().items.map((i) =>
-            i.product_id === productId ? { ...i, quantity, subtotal: i.price * quantity } : i,
-          ),
+          items: get().items.map((i) => {
+            if (i.product_id !== productId) return i;
+            // A line can never drop below the product's minimum order quantity.
+            const qty = Math.max(quantity, i.min_order_quantity || 1);
+            return { ...i, quantity: qty, subtotal: i.price * qty };
+          }),
         });
       },
       remove: (productId) => set({ items: get().items.filter((i) => i.product_id !== productId) }),
