@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * /admin/payouts — Manual seller payout queue.
+ * /admin/payouts - Manual seller payout queue.
  *
  * Two surfaces:
- *  1. "Eligible" — orders that have been delivered + are past the 7-day
+ *  1. "Eligible" - orders that have been delivered + are past the 7-day
  *     dispute window with a successful payment and no payout yet. Admin
  *     clicks "Pay out" to dispatch via Flutterwave's transfers API.
- *  2. "History" — every payout we've initiated, with status (pending /
+ *  2. "History" - every payout we've initiated, with status (pending /
  *     sent / completed / failed) and FLW reference.
  */
 import { useState } from "react";
@@ -53,7 +53,7 @@ export default function AdminPayoutsPage() {
   const send = useMutation({
     mutationFn: (orderId: string) => adminApi.sendPayout(orderId),
     onSuccess: (data) => {
-      toast.success(`Payout dispatched — ${data.amount} ${data.currency}`, {
+      toast.success(`Payout dispatched - ${data.amount} ${data.currency}`, {
         description: `Reference ${data.reference}`,
       });
       qc.invalidateQueries({ queryKey: ["admin", "payouts"] });
@@ -142,20 +142,20 @@ export default function AdminPayoutsPage() {
                   <dl className="grid grid-cols-2 gap-3 rounded-xl bg-muted/40 p-4 text-xs sm:grid-cols-4">
                     <div>
                       <dt className="text-muted-foreground">Bank</dt>
-                      <dd className="mt-0.5 font-semibold">{row.seller_bank ?? "—"}</dd>
+                      <dd className="mt-0.5 font-semibold">{row.seller_bank ?? "-"}</dd>
                     </div>
                     <div>
                       <dt className="text-muted-foreground">Account</dt>
-                      <dd className="mt-0.5 font-mono">{row.seller_account_number ?? "—"}</dd>
+                      <dd className="mt-0.5 font-mono">{row.seller_account_number ?? "-"}</dd>
                     </div>
                     <div>
                       <dt className="text-muted-foreground">FLW code</dt>
-                      <dd className="mt-0.5 font-mono">{row.bank_code ?? "—"}</dd>
+                      <dd className="mt-0.5 font-mono">{row.bank_code ?? "-"}</dd>
                     </div>
                     <div>
                       <dt className="text-muted-foreground">Subaccount</dt>
                       <dd className="mt-0.5 truncate font-mono" title={row.flw_subaccount_id ?? ""}>
-                        {row.flw_subaccount_id ? shortId(row.flw_subaccount_id, 12) : "—"}
+                        {row.flw_subaccount_id ? shortId(row.flw_subaccount_id, 12) : "-"}
                       </dd>
                     </div>
                   </dl>

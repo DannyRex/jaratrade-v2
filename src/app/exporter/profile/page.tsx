@@ -76,7 +76,7 @@ function KycStatusBanner({ profile }: { profile: ExporterProfile }) {
       <Alert variant="success">
         <ShieldCheck className="size-4" />
         <AlertDescription>
-          <strong>Verified.</strong> Your account is approved — your listings are live to buyers.
+          <strong>Verified.</strong> Your account is approved - your listings are live to buyers.
         </AlertDescription>
       </Alert>
     );
@@ -90,13 +90,13 @@ function KycStatusBanner({ profile }: { profile: ExporterProfile }) {
         <AlertDescription>
           <strong>Awaiting review.</strong> You submitted on{" "}
           {formatDate(profile.kyc_submitted_at!)}. We&apos;ll email you once an admin
-          has reviewed your application — usually within 1-2 business days.
+          has reviewed your application - usually within 1-2 business days.
         </AlertDescription>
       </Alert>
     );
   }
 
-  // ── Rejected — can fix + resubmit ─────────────────────────────────────
+  // ── Rejected - can fix + resubmit ─────────────────────────────────────
   if (kyc === "rejected") {
     return (
       <Alert variant="destructive">
@@ -125,7 +125,7 @@ function KycStatusBanner({ profile }: { profile: ExporterProfile }) {
     );
   }
 
-  // ── Incomplete — needs to complete + submit ───────────────────────────
+  // ── Incomplete - needs to complete + submit ───────────────────────────
   return (
     <Card className="border-primary/30 bg-primary/5">
       <CardContent className="space-y-3 p-5">
@@ -264,9 +264,9 @@ function ProfileEditor({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Under ₦1M">Under ₦1M</SelectItem>
-                    <SelectItem value="₦1M – ₦5M">₦1M – ₦5M</SelectItem>
-                    <SelectItem value="₦5M – ₦20M">₦5M – ₦20M</SelectItem>
-                    <SelectItem value="₦20M – ₦100M">₦20M – ₦100M</SelectItem>
+                    <SelectItem value="₦1M - ₦5M">₦1M - ₦5M</SelectItem>
+                    <SelectItem value="₦5M - ₦20M">₦5M - ₦20M</SelectItem>
+                    <SelectItem value="₦20M - ₦100M">₦20M - ₦100M</SelectItem>
                     <SelectItem value="Over ₦100M">Over ₦100M</SelectItem>
                   </SelectContent>
                 </Select>

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * /services — Plans & pricing (exporter-only).
+ * /services - Plans & pricing (exporter-only).
  *
  * v3.4 change: importers don't subscribe anymore - buying is free across
  * the board. This page now only presents exporter plans, with a small

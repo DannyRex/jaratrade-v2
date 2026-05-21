@@ -604,14 +604,14 @@ function OrderDetailDrawer({ id, onClose }: { id: string | null; onClose: () => 
               {data.payouts.length === 0 ? (
                 payout?.state === "eligible" ? (
                   <p className="text-xs text-muted-foreground">
-                    No payout dispatched yet — this order is eligible for release.{" "}
+                    No payout dispatched yet - this order is eligible for release.{" "}
                     <Link href="/admin/payouts" className="text-primary hover:underline">
                       Go to payouts
                     </Link>
                   </p>
                 ) : payout?.state === "waiting" ? (
                   <p className="text-xs text-muted-foreground">
-                    No payout yet — eligible for release on{" "}
+                    No payout yet - eligible for release on{" "}
                     <span className="font-medium text-foreground">
                       {payout.opensAt ? formatDate(payout.opensAt.toISOString()) : ""}
                     </span>

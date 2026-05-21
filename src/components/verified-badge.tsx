@@ -1,5 +1,5 @@
 /**
- * VerifiedBadge — single source of truth for the "this seller has cleared
+ * VerifiedBadge - single source of truth for the "this seller has cleared
  * KYC and is admin-approved" visual.
  *
  * Two sizes:

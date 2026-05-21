@@ -113,7 +113,7 @@ export default function TrustPage() {
       <section className="border-y border-border/60 bg-muted/30">
         <div className="container mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
           <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr] lg:items-stretch lg:gap-14">
-            {/* Flutterwave card — no aspect ratio, natural height. On lg+ a
+            {/* Flutterwave card - no aspect ratio, natural height. On lg+ a
                 min-height makes the card look intentional next to the wider
                 text column. */}
             <div className="flex">

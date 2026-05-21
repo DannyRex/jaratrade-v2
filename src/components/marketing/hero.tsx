@@ -167,7 +167,7 @@ function LiveStats() {
 function HeroVisual() {
   return (
     <div className="relative aspect-square w-full max-w-md animate-rise [animation-delay:200ms]">
-      {/* Solid brand canvas (was a brand gradient panel — flattened for v3.4 */}
+      {/* Solid brand canvas (was a brand gradient panel - flattened for v3.4 */}
       <div className="absolute inset-0 rounded-[2rem] bg-primary shadow-[var(--shadow-pop)]" aria-hidden />
 
       {/* Floating product chips */}

@@ -3,13 +3,13 @@
 import { use, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, notFound } from "next/navigation";
-import { Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RoleTabs, getRoleMeta } from "@/components/role-tabs";
-import { useLogin, useLoginWith2FA } from "@/lib/queries";
+import { useLogin } from "@/lib/queries";
 import type { Role } from "@/lib/types";
 
 const validRoles: Role[] = ["importer", "exporter", "admin"];
@@ -32,33 +32,19 @@ function LoginForm({ role }: { role: Role }) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [code, setCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [needsTwoFactor, setNeedsTwoFactor] = useState(false);
 
   const login = useLogin();
-  const login2fa = useLoginWith2FA();
 
   const successDest =
     next ?? (role === "admin" ? "/admin" : role === "exporter" ? "/exporter" : "/importer/orders");
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (needsTwoFactor) {
-      login2fa.mutate(
-        { role, email: email.trim(), password, code: code.trim() },
-        { onSuccess: () => router.push(successDest) },
-      );
-      return;
-    }
     login.mutate(
       { role, email: email.trim(), password },
       {
         onSuccess: (data) => {
-          if ("requires_2fa" in data && data.requires_2fa) {
-            setNeedsTwoFactor(true);
-            return;
-          }
           // The API gates login on email verification. If the account isn't
           // verified, it auto-sends a fresh code and tells us to redirect
           // the user to the verify page instead of issuing a token.
@@ -73,49 +59,6 @@ function LoginForm({ role }: { role: Role }) {
       },
     );
   };
-
-  if (needsTwoFactor) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-3 text-center">
-          <div className="mx-auto grid size-14 place-items-center rounded-full bg-primary/10 text-primary">
-            <ShieldCheck className="size-6" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight">Two-factor required</h1>
-          <p className="text-sm text-muted-foreground">
-            Open your authenticator app and enter the 6-digit code for{" "}
-            <span className="font-medium text-foreground">{email}</span>.
-          </p>
-        </div>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="code">Authentication code</Label>
-            <Input
-              id="code"
-              autoComplete="one-time-code"
-              inputMode="numeric"
-              maxLength={6}
-              required
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              autoFocus
-            />
-          </div>
-          {login2fa.isError ? (
-            <Alert variant="destructive">
-              <AlertDescription>{(login2fa.error as Error).message}</AlertDescription>
-            </Alert>
-          ) : null}
-          <Button type="submit" className="w-full" size="lg" loading={login2fa.isPending} disabled={code.length !== 6}>
-            Verify and log in
-          </Button>
-          <Button type="button" variant="ghost" className="w-full" onClick={() => { setNeedsTwoFactor(false); setCode(""); }}>
-            Back
-          </Button>
-        </form>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-7">

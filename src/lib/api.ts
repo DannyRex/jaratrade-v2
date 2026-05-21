@@ -529,7 +529,7 @@ export const adminApi = {
   updateDeliveryStatus: (orderId: string, payload: { status: string }) =>
     request(`/adm/logistics/${orderId}`, { method: "PATCH", body: multipart(payload) }),
 
-  // Settings — commission account (reference record)
+  // Settings - commission account (reference record)
   getCommissionAccount: () =>
     request<{ bank_name?: string; account_name?: string; account_number?: string }>(
       "/settings/commision_account",
@@ -537,7 +537,7 @@ export const adminApi = {
   updateCommissionAccount: (payload: Record<string, unknown>) =>
     request("/settings/commision_account", { method: "PUT", body: multipart(payload) }),
 
-  // Settings — commission rate (the % FLW splits to the platform on every order)
+  // Settings - commission rate (the % FLW splits to the platform on every order)
   getCommissionRate: () =>
     request<{
       percent: number;
@@ -552,7 +552,7 @@ export const adminApi = {
       { method: "PUT", body: multipart({ percent }) },
     ),
 
-  // Settings — FX rate (NGN ↔ GBP for buyer-side display)
+  // Settings - FX rate (NGN ↔ GBP for buyer-side display)
   getFxRate: (from_currency = "NGN", to_currency = "GBP") =>
     request<{
       from: string;
@@ -574,11 +574,11 @@ export const adminApi = {
       query: { from_currency, to_currency },
     }),
 
-  // Subaccount management (v3.5 — Flutterwave integration)
+  // Subaccount management (v3.5 - Flutterwave integration)
   reprovisionSubaccount: (userId: string) =>
     request<AdminUser>(`/adm/users/${userId}/reprovision-subaccount`, { method: "POST" }),
 
-  // Payouts (v3.5 — manual seller disbursement)
+  // Payouts (v3.5 - manual seller disbursement)
   listPayouts: (params?: { status?: "pending" | "sent" | "completed" | "failed"; p?: number; len?: number }) =>
     request<PagedRows<PayoutRow>>("/adm/payouts", { query: params }),
   eligiblePayouts: () =>
@@ -724,13 +724,13 @@ export interface AdminUser {
   bank_id: string | null;
   account_name: string | null;
   account_number: string | null;
-  /** Uploaded KYC documents — { id?: url, cac?: url }. */
+  /** Uploaded KYC documents - { id?: url, cac?: url }. */
   documents: Record<string, string>;
   flw_subaccount_id?: string | null;
   time_created: string;
 }
 
-// v3.5 — Flutterwave payout types
+// v3.5 - Flutterwave payout types
 export interface PayoutRow {
   id: string;
   order_id: string;

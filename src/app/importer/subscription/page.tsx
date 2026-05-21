@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * /importer/subscription — kept as a route for old bookmarks, but importers
+ * /importer/subscription - kept as a route for old bookmarks, but importers
  * don't subscribe. Renders a friendly "this isn't a thing here" message
  * with a link back to the marketplace.
  */

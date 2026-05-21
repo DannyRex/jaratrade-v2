@@ -114,7 +114,7 @@ export function ProductCard({ product, className, priority = false }: ProductCar
           <p className="line-clamp-1 text-xs text-muted-foreground">by {sellerLabel}</p>
         </div>
 
-        {/* Price row — primary in big, secondary (e.g. GBP equivalent) muted */}
+        {/* Price row - primary in big, secondary (e.g. GBP equivalent) muted */}
         <div className="mt-auto space-y-0.5">
           <div className="flex items-baseline gap-1.5">
             <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">

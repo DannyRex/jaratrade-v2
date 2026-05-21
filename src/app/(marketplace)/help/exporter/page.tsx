@@ -61,7 +61,7 @@ const supportCadence = [
   {
     icon: MessageCircle,
     label: "Day-to-day",
-    detail: "WhatsApp support, weekdays 8am–7pm WAT",
+    detail: "WhatsApp support, weekdays 8am-7pm WAT",
   },
   {
     icon: Phone,

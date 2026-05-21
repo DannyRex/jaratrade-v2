@@ -5,7 +5,7 @@ import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 /**
- * Auth shell — split layout.
+ * Auth shell - split layout.
  *
  * Left panel (lg+ only): brand mark, value-prop headline, three trust pills,
  * sits over a brand gradient with the logo glyph faintly in the back. The

@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Pay page — uses Flutterwave Standard (hosted) checkout.
+ * Pay page - uses Flutterwave Standard (hosted) checkout.
  *
  * Flow:
  *   1. User lands here from /checkout flow.
@@ -161,7 +161,7 @@ function PayContent({ orderId }: { orderId: string }) {
               {isCancelledReturn ? (
                 <Alert variant="info">
                   <AlertDescription>
-                    Last attempt was cancelled. No charge was made — you can try again below.
+                    Last attempt was cancelled. No charge was made - you can try again below.
                   </AlertDescription>
                 </Alert>
               ) : null}

@@ -85,7 +85,7 @@ const incoterms = [
 const faqs = [
   {
     q: "How long does shipping take?",
-    a: "7–14 days door-to-door for sea freight; 3–5 days for air. Quotes at checkout show the partner's specific SLA.",
+    a: "7-14 days door-to-door for sea freight; 3-5 days for air. Quotes at checkout show the partner's specific SLA.",
   },
   {
     q: "What if my goods are seized at customs?",

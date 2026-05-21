@@ -247,6 +247,20 @@
   ::selection {
     background: color-mix(in oklab, var(--primary) 30%, transparent);
   }
+  /* Every interactive control shows the hand pointer cursor. */
+  button:not(:disabled),
+  a[href],
+  label[for],
+  summary,
+  select:not(:disabled),
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [role="option"],
+  [role="switch"],
+  [role="checkbox"] {
+    cursor: pointer;
+  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;

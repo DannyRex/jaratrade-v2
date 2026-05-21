@@ -16,7 +16,6 @@ import { Badge } from "@/components/ui/badge";
 import { useImporterProfile, queryKeys } from "@/lib/queries";
 import { useAuth } from "@/lib/auth-store";
 import { importerApi } from "@/lib/api";
-import { TwoFactorCard } from "@/components/two-factor-card";
 
 type ProfileShape = {
   id?: string;
@@ -86,7 +85,6 @@ export default function AccountPage() {
         </TabsContent>
 
         <TabsContent value="security" className="mt-6 space-y-4">
-          <TwoFactorCard enabled={Boolean(profile.totp_enabled)} />
           <Card>
             <CardContent className="space-y-4 p-6">
               <h3 className="font-semibold">Password</h3>

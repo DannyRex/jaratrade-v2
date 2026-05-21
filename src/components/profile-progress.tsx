@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * ProfileProgress — drop-in completion bar shown on importer + exporter
+ * ProfileProgress - drop-in completion bar shown on importer + exporter
  * dashboards. Computes percentage from the same field list the verification
  * team uses, so what the user sees in the UI matches what gates listing /
  * verification on the backend.
@@ -36,7 +36,6 @@ interface CompletionCheck {
 
 function computeImporterChecks(profile: Record<string, unknown> | undefined): CompletionCheck[] {
   const get = (k: string) => Boolean(profile?.[k]);
-  const biz = (profile?.business as Record<string, unknown> | undefined) ?? {};
   // The "Shipping address" item ticks the moment the importer adds at
   // least one address via /importer/shipping. Reading user.address (the
   // home/personal address column on the users row) would be wrong - that
@@ -46,7 +45,6 @@ function computeImporterChecks(profile: Record<string, unknown> | undefined): Co
     { label: "Name & phone", done: get("firstname") && get("lastname") && get("phone"), href: "/importer/account" },
     { label: "Shipping address", done: hasShipping, href: "/importer/shipping" },
     { label: "Profile name", done: get("profile_name"), href: "/importer/account" },
-    { label: "Business details (optional)", done: Boolean(biz?.business_name), href: "/importer/account" },
   ];
 }
 

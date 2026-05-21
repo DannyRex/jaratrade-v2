@@ -82,7 +82,7 @@ export default function AdminSettingsPage() {
       />
 
       <div className="max-w-2xl space-y-5">
-        {/* Commission rate — actually drives the FLW split */}
+        {/* Commission rate - actually drives the FLW split */}
         {rateQ.isLoading ? (
           <Skeleton className="h-48 w-full rounded-2xl" />
         ) : (
@@ -93,7 +93,7 @@ export default function AdminSettingsPage() {
           })()
         )}
 
-        {/* FX rate — drives buyer-side dual-currency display */}
+        {/* FX rate - drives buyer-side dual-currency display */}
         {fxQ.isLoading ? (
           <Skeleton className="h-48 w-full rounded-2xl" />
         ) : (
@@ -108,7 +108,7 @@ export default function AdminSettingsPage() {
           <Skeleton className="h-72 w-full rounded-2xl" />
         ) : (
           /* Keyed so the child remounts and useState picks up fresh defaults
-             whenever the underlying record changes — keeps the form a pure
+             whenever the underlying record changes - keeps the form a pure
              local-state component without any setState-in-effect dance. */
           (() => {
             const initial = (accountQ.data as CommissionAccount | undefined) ?? null;
@@ -228,7 +228,7 @@ function CommissionRateCard({ initial }: { initial: CommissionRate | null }) {
             <p className="text-xs text-muted-foreground">
               Equivalent decimal split:{" "}
               <span className="font-mono tabular-nums">
-                {invalid ? "—" : (parsed / 100).toFixed(4)}
+                {invalid ? "-" : (parsed / 100).toFixed(4)}
               </span>
             </p>
             {invalid ? (
@@ -257,7 +257,7 @@ function CommissionRateCard({ initial }: { initial: CommissionRate | null }) {
 function CommissionAccountCard({ initial }: { initial: CommissionAccount | null }) {
   // Initial values come from the loaded server record. If the record changes
   // (e.g. another admin saves from another tab) the parent re-keys us and we
-  // remount with fresh defaults — no setState-in-effect required.
+  // remount with fresh defaults - no setState-in-effect required.
   const [form, setForm] = useState<CommissionAccount>({
     bank_name: initial?.bank_name ?? "",
     account_name: initial?.account_name ?? "",
@@ -371,7 +371,7 @@ function FxRateCard({ initial }: { initial: FxRate | null }) {
   const clear = useMutation({
     mutationFn: () => adminApi.clearFxRate("NGN", "GBP"),
     onSuccess: () => {
-      toast.success("FX override cleared — using live rate");
+      toast.success("FX override cleared - using live rate");
       qc.invalidateQueries({ queryKey: ["admin", "fx-rate"] });
     },
   });
@@ -402,24 +402,24 @@ function FxRateCard({ initial }: { initial: FxRate | null }) {
             </div>
           </div>
 
-          {/* Context strip — what's live + what's the fallback */}
+          {/* Context strip - what's live + what's the fallback */}
           <dl className="grid grid-cols-3 gap-3 rounded-xl bg-muted/40 p-4 text-xs">
             <div>
               <dt className="text-muted-foreground">Live</dt>
               <dd className="mt-0.5 font-mono tabular-nums">
-                {initial?.live_rate ? (1 / initial.live_rate).toFixed(2) : "—"}
+                {initial?.live_rate ? (1 / initial.live_rate).toFixed(2) : "-"}
               </dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Override</dt>
               <dd className="mt-0.5 font-mono tabular-nums">
-                {initial?.override_rate ? (1 / initial.override_rate).toFixed(2) : "—"}
+                {initial?.override_rate ? (1 / initial.override_rate).toFixed(2) : "-"}
               </dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Fallback</dt>
               <dd className="mt-0.5 font-mono tabular-nums">
-                {initial?.fallback_rate ? (1 / initial.fallback_rate).toFixed(2) : "—"}
+                {initial?.fallback_rate ? (1 / initial.fallback_rate).toFixed(2) : "-"}
               </dd>
             </div>
           </dl>
@@ -445,7 +445,7 @@ function FxRateCard({ initial }: { initial: FxRate | null }) {
             <p className="text-xs text-muted-foreground">
               Decimal stored as NGN&nbsp;→&nbsp;GBP:{" "}
               <span className="font-mono tabular-nums">
-                {invalid ? "—" : (1 / parsed).toFixed(8)}
+                {invalid ? "-" : (1 / parsed).toFixed(8)}
               </span>
             </p>
             {invalid ? (

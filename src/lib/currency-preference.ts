@@ -4,8 +4,8 @@
  * Buyer-side currency preference.
  *
  * Stored in a long-lived cookie (`jara_ccy`) so SSR can read it too. Values:
- *   "local"      — show the listing's native currency only (default for NG buyers)
- *   "secondary"  — show the secondary (GBP) figure prominently with native in muted text
+ *   "local"      - show the listing's native currency only (default for NG buyers)
+ *   "secondary"  - show the secondary (GBP) figure prominently with native in muted text
  *
  * Backed by a tiny zustand store so any component (product card, detail, cart)
  * can subscribe without a context provider.

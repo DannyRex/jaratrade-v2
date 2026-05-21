@@ -8,7 +8,7 @@ import { useHydrated } from "@/hooks/use-hydrated";
 import { useAuth } from "@/lib/auth-store";
 
 /**
- * CartButton — header chip that opens /importer/cart.
+ * CartButton - header chip that opens /importer/cart.
  *
  * Visibility rules (v3.4):
  *  - Logged-out visitors: hidden. They can still add to the local cart from

@@ -98,7 +98,7 @@ export function SiteHeader() {
               ))}
             </nav>
             <div className="mt-auto border-t border-border/60 p-6">
-              {/* Currency switcher — useful on phones where the header
+              {/* Currency switcher - useful on phones where the header
                   toggle is hidden to save horizontal space. */}
               <div className="mb-5 flex items-center justify-between gap-3">
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">

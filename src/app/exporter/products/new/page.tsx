@@ -63,7 +63,7 @@ export default function NewProductPage() {
     onSuccess: ({ imageError }) => {
       qc.invalidateQueries({ queryKey: queryKeys.exporterProducts });
       if (imageError) {
-        toast.warning("Product created — but the images didn't upload", {
+        toast.warning("Product created - but the images didn't upload", {
           description: "Add them from the product's Edit page.",
         });
       } else {

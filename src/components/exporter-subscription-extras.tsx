@@ -1,5 +1,5 @@
 /**
- * ExporterSubscriptionExtras — benefits comparison + FAQ section appended
+ * ExporterSubscriptionExtras - benefits comparison + FAQ section appended
  * below the SubscriptionPage component on /exporter/subscription.
  *
  * Why a separate component:

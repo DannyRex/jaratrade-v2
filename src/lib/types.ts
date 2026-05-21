@@ -152,7 +152,7 @@ export interface ExporterSummary {
   kyc_status?: "pending" | "approved" | "rejected";
 }
 
-/** Full /exp/profile payload — drives the exporter dashboard + KYC flow. */
+/** Full /exp/profile payload - drives the exporter dashboard + KYC flow. */
 export interface ExporterProfile {
   id?: string;
   firstname?: string;
@@ -175,7 +175,7 @@ export interface ExporterProfile {
   bank_id?: string | null;
   account_number?: string | null;
   description?: string | null;
-  /** Uploaded KYC documents — { id?: url, cac?: url }. */
+  /** Uploaded KYC documents - { id?: url, cac?: url }. */
   documents?: Record<string, string>;
   // KYC lifecycle
   kyc_status?: "pending" | "approved" | "rejected";
@@ -212,7 +212,7 @@ export interface ProductSummary {
   low_stock_threshold?: number;
   last_inventory_update_at?: string | null;
   /** Approximate display in a secondary currency (added v3.6). Currently
-   *  always GBP — UK buyers see "₦18,000 / ~£10.40" next to the price. */
+   *  always GBP - UK buyers see "₦18,000 / ~£10.40" next to the price. */
   secondary_currency?: string | null;
   secondary_amount?: string | null;
   secondary_rate?: number | null;
