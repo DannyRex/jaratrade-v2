@@ -50,14 +50,18 @@ function computeImporterChecks(profile: Record<string, unknown> | undefined): Co
 
 function computeExporterChecks(profile: Record<string, unknown> | undefined): CompletionCheck[] {
   const get = (k: string) => Boolean(profile?.[k]);
-  const biz = (profile?.business as Record<string, unknown> | undefined) ?? {};
+  // The /exp/profile response is flat: business fields sit at the top level,
+  // not under a nested `business` object, and uploaded KYC files live in the
+  // `documents` map. These checks mirror the backend KYC gate
+  // (_kyc_missing_fields) so the bar stays in sync with what's been provided.
+  const documents = (profile?.documents as Record<string, unknown> | undefined) ?? {};
   return [
     { label: "Name & contact", done: get("firstname") && get("lastname") && get("phone"), href: "/exporter/profile" },
-    { label: "Business name & CAC", done: Boolean(biz?.business_name && biz?.business_reg_number), href: "/exporter/profile" },
-    { label: "Business address", done: Boolean(biz?.business_address), href: "/exporter/profile" },
-    { label: "Valid ID uploaded", done: Boolean(biz?.valid_identification), href: "/exporter/profile" },
-    { label: "TIN / tax ID", done: Boolean(biz?.tin), href: "/exporter/profile" },
-    { label: "Bank account", done: Boolean((profile as { bank_account_id?: string })?.bank_account_id ?? biz?.bank_id), href: "/exporter/settings" },
+    { label: "Business name & CAC", done: get("business_name") && get("business_reg_number"), href: "/exporter/profile" },
+    { label: "Business address", done: get("business_address"), href: "/exporter/profile" },
+    { label: "ID document uploaded", done: Boolean(documents.id), href: "/exporter/profile" },
+    { label: "TIN / tax ID", done: get("tin"), href: "/exporter/profile" },
+    { label: "Bank account", done: get("bank_id") && get("account_number"), href: "/exporter/profile" },
   ];
 }
 
