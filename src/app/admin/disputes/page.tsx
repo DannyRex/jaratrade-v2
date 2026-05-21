@@ -95,24 +95,32 @@ export default function AdminDisputesPage() {
           TabsContent registered. A button group keeps the click->state path
           dead simple. */}
       <div role="tablist" aria-label="Dispute status" className="mb-6 inline-flex h-10 items-center rounded-md bg-muted p-1">
-        {STATUSES.map((s) => (
-          <button
-            key={s.value}
-            type="button"
-            role="tab"
-            aria-selected={status === s.value}
-            onClick={() => setStatus(s.value)}
-            className={cn(
-              "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-colors",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              status === s.value
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {s.label}
-          </button>
-        ))}
+        {STATUSES.map((s) => {
+          const count = data?.counts?.[s.value] ?? 0;
+          return (
+            <button
+              key={s.value}
+              type="button"
+              role="tab"
+              aria-selected={status === s.value}
+              onClick={() => setStatus(s.value)}
+              className={cn(
+                "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                status === s.value
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {s.label}
+              {count > 0 ? (
+                <span className="ml-1.5 rounded-full border px-1.5 text-[10px] font-semibold tabular-nums">
+                  {count}
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
       </div>
 
       {isLoading ? (

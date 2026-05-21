@@ -289,6 +289,9 @@ export const useAdminDisputes = (status?: "open" | "in_review" | "resolved" | "r
     queryKey: queryKeys.adminDisputes(status),
     queryFn: () => adminApi.listDisputes({ status }),
     enabled: isAuthed,
+    // Keep the previous tab's data (and dispute counts) on screen while the
+    // newly-selected status loads, so the tab counters don't flicker away.
+    placeholderData: (prev) => prev,
   });
 };
 

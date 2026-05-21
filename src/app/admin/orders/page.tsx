@@ -54,7 +54,7 @@ import {
   TableRow,
 } from "@/components/ui/data-table";
 import { OrderStatusBadge } from "@/components/order-status-badge";
-import { adminApi } from "@/lib/api";
+import { adminApi, type AdminOrderDetail } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
 import { formatDate, formatMoney, shortId } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -72,6 +72,30 @@ const STATUS_FILTERS = [
 ] as const;
 
 const PAGE_SIZE = 25;
+
+// Mirror of the backend payout rule (payouts.py): a delivered order is only
+// payable once the buyer confirms receipt OR the 7-day dispute window closes.
+const DISPUTE_WINDOW_DAYS = 7;
+
+/**
+ * When can the seller be paid for this order? Keeps the order drawer honest:
+ * a freshly-delivered order reports "waiting", so we don't dangle a "Release
+ * payout" button that just lands the admin on an empty payouts queue.
+ */
+function payoutEligibility(o: AdminOrderDetail): {
+  state: "n/a" | "dispatched" | "eligible" | "waiting";
+  opensAt: Date | null;
+} {
+  if (o.payout_status != null) return { state: "dispatched", opensAt: null };
+  if (o.status !== "delivered") return { state: "n/a", opensAt: null };
+  if (o.confirmed_received_at) return { state: "eligible", opensAt: null };
+  const opensAt = new Date(
+    new Date(o.time_updated).getTime() + DISPUTE_WINDOW_DAYS * 86_400_000,
+  );
+  return opensAt.getTime() <= Date.now()
+    ? { state: "eligible", opensAt: null }
+    : { state: "waiting", opensAt };
+}
 
 export default function AdminOrdersPage() {
   const isAdmin = useAuth((s) => Boolean(s.token) && s.role === "admin");
@@ -452,6 +476,8 @@ function OrderDetailDrawer({ id, onClose }: { id: string | null; onClose: () => 
     enabled: Boolean(id),
   });
 
+  const payout = data ? payoutEligibility(data) : null;
+
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent side="right" className="flex w-full flex-col gap-0 overflow-y-auto sm:max-w-xl">
@@ -576,12 +602,26 @@ function OrderDetailDrawer({ id, onClose }: { id: string | null; onClose: () => 
             {/* Payouts */}
             <DetailCard title="Payouts">
               {data.payouts.length === 0 ? (
-                <p className="text-xs text-muted-foreground">
-                  No payout dispatched yet.{" "}
-                  <Link href="/admin/payouts" className="text-primary hover:underline">
-                    Go to payouts
-                  </Link>
-                </p>
+                payout?.state === "eligible" ? (
+                  <p className="text-xs text-muted-foreground">
+                    No payout dispatched yet — this order is eligible for release.{" "}
+                    <Link href="/admin/payouts" className="text-primary hover:underline">
+                      Go to payouts
+                    </Link>
+                  </p>
+                ) : payout?.state === "waiting" ? (
+                  <p className="text-xs text-muted-foreground">
+                    No payout yet — eligible for release on{" "}
+                    <span className="font-medium text-foreground">
+                      {payout.opensAt ? formatDate(payout.opensAt.toISOString()) : ""}
+                    </span>
+                    , once the {DISPUTE_WINDOW_DAYS}-day dispute window closes.
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    No payout dispatched yet.
+                  </p>
+                )
               ) : (
                 <ul className="space-y-2 text-sm">
                   {data.payouts.map((po) => (
@@ -621,7 +661,7 @@ function OrderDetailDrawer({ id, onClose }: { id: string | null; onClose: () => 
                   </Link>
                 </Button>
               ) : null}
-              {data.payout_status == null && data.status === "delivered" ? (
+              {payout?.state === "eligible" ? (
                 <Button asChild variant="outline" size="sm">
                   <Link href="/admin/payouts">
                     <Banknote className="size-4" /> Release payout

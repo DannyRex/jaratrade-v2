@@ -611,10 +611,13 @@ export const adminApi = {
 
   // Disputes (added v2.5)
   listDisputes: (params?: { status?: "open" | "in_review" | "resolved" | "rejected"; p?: number; len?: number }) =>
-    request<PagedRows<Dispute & { importer_email?: string | null; importer_name?: string | null }>>(
-      "/adm/disputes",
-      { query: params },
-    ),
+    request<
+      PagedRows<Dispute & { importer_email?: string | null; importer_name?: string | null }> & {
+        // Tally of every dispute by status (ignores the status filter) so the
+        // admin UI can show counts on each tab.
+        counts?: Record<"open" | "in_review" | "resolved" | "rejected", number>;
+      }
+    >("/adm/disputes", { query: params }),
   acknowledgeDispute: (id: string) =>
     request<Dispute>(`/adm/disputes/${id}/acknowledge`, { method: "POST" }),
   resolveDispute: (
