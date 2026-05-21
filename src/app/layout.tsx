@@ -83,14 +83,12 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: ["/twitter.png"],
   },
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-  },
+  // Icons are intentionally NOT declared here. They're handled by the App
+  // Router file convention (src/app/favicon.ico + src/app/apple-icon.png),
+  // which emits a single content-hashed <link> per icon. Declaring them in
+  // metadata as well produced a second, un-cache-busted <link rel="icon">
+  // for /favicon.ico - browsers flip-flopped between the two and latched
+  // onto a stale cached icon.
   manifest: "/manifest.webmanifest",
 };
 
