@@ -2,19 +2,22 @@ const formatters = new Map<string, Intl.NumberFormat>();
 
 export function formatMoney(
   amount: number | string | null | undefined,
-  currency: string = "NGN",
+  currency: string | null | undefined = "NGN",
   opts: { compact?: boolean } = {},
 ): string {
   if (amount === null || amount === undefined || amount === "") return "-";
   const value = typeof amount === "string" ? Number(amount) : amount;
   if (Number.isNaN(value)) return "-";
 
-  const key = `${currency}|${opts.compact ?? false}`;
+  // Tolerate a null/empty currency (e.g. an optional refund_currency) so
+  // callers don't each have to coalesce - default to NGN.
+  const ccy = currency || "NGN";
+  const key = `${ccy}|${opts.compact ?? false}`;
   let formatter = formatters.get(key);
   if (!formatter) {
     formatter = new Intl.NumberFormat("en-NG", {
       style: "currency",
-      currency,
+      currency: ccy,
       maximumFractionDigits: 2,
       notation: opts.compact ? "compact" : "standard",
     });

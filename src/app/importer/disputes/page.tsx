@@ -16,7 +16,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/data-table";
 import { useImporterDisputes } from "@/lib/queries";
-import { formatDate, shortId } from "@/lib/format";
+import { formatDate, formatMoney, shortId } from "@/lib/format";
 import type { DisputeStatus } from "@/lib/types";
 
 const STATUS_VARIANT: Record<DisputeStatus, "warning" | "secondary" | "success" | "destructive"> = {
@@ -92,7 +92,7 @@ export default function ImporterDisputesPage() {
                   <Badge variant={STATUS_VARIANT[d.status]}>{d.status.replace("_", " ")}</Badge>
                 </TableCell>
                 <TableCell className="text-right tabular-nums text-sm">
-                  {d.refund_amount ? `${d.refund_amount} ${d.refund_currency}` : "-"}
+                  {d.refund_amount ? formatMoney(d.refund_amount, d.refund_currency) : "-"}
                 </TableCell>
                 <TableCell className="text-right">
                   <Button asChild variant="ghost" size="sm">

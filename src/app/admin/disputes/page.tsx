@@ -38,7 +38,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { adminApi } from "@/lib/api";
 import { queryKeys, useAdminDisputes } from "@/lib/queries";
-import { formatDate, shortId } from "@/lib/format";
+import { formatDate, formatMoney, shortId } from "@/lib/format";
 import type { Dispute, DisputeResolution, DisputeStatus } from "@/lib/types";
 
 const STATUSES: Array<{ value: DisputeStatus; label: string }> = [
@@ -182,7 +182,7 @@ export default function AdminDisputesPage() {
                   <p className="text-sm">
                     Refund:{" "}
                     <span className="font-medium tabular-nums">
-                      {d.refund_amount} {d.refund_currency}
+                      {formatMoney(d.refund_amount, d.refund_currency)}
                     </span>
                   </p>
                 ) : null}

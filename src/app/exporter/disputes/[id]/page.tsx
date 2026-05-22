@@ -17,7 +17,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useExporterDispute } from "@/lib/queries";
-import { formatDate, shortId } from "@/lib/format";
+import { formatDate, formatMoney, shortId } from "@/lib/format";
 import type { DisputeStatus } from "@/lib/types";
 
 const STATUS_VARIANT: Record<DisputeStatus, "warning" | "secondary" | "success" | "destructive"> = {
@@ -135,7 +135,7 @@ function Detail({ id }: { id: string }) {
                   {data.refund_amount ? (
                     <div>
                       <div className="text-xs text-muted-foreground">Refund issued</div>
-                      <div className="tabular-nums">{data.refund_amount} {data.refund_currency}</div>
+                      <div className="tabular-nums">{formatMoney(data.refund_amount, data.refund_currency)}</div>
                     </div>
                   ) : null}
                 </>

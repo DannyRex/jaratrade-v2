@@ -22,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { adminApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
-import { formatDate, shortId } from "@/lib/format";
+import { formatDate, formatMoney, shortId } from "@/lib/format";
 import type { PayoutRow } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -53,7 +53,7 @@ export default function AdminPayoutsPage() {
   const send = useMutation({
     mutationFn: (orderId: string) => adminApi.sendPayout(orderId),
     onSuccess: (data) => {
-      toast.success(`Payout dispatched - ${data.amount} ${data.currency}`, {
+      toast.success(`Payout dispatched - ${formatMoney(data.amount, data.currency)}`, {
         description: `Reference ${data.reference}`,
       });
       qc.invalidateQueries({ queryKey: ["admin", "payouts"] });
@@ -130,11 +130,10 @@ export default function AdminPayoutsPage() {
                         Seller share
                       </p>
                       <p className="font-display text-2xl font-bold tabular-nums">
-                        {row.seller_share}
-                        <span className="ml-1 text-sm font-medium text-muted-foreground">{row.currency}</span>
+                        {formatMoney(row.seller_share, row.currency)}
                       </p>
                       <p className="mt-0.5 text-[11px] text-muted-foreground">
-                        of {row.gross_total} (− {row.commission_rate_percent}% commission)
+                        of {formatMoney(row.gross_total, row.currency)} (− {row.commission_rate_percent}% commission)
                       </p>
                     </div>
                   </div>
@@ -176,7 +175,7 @@ export default function AdminPayoutsPage() {
                       loading={send.isPending && send.variables === row.order_id}
                       disabled={!row.seller_account_number || !row.bank_code}
                     >
-                      <Send className="size-4" /> Pay out {row.seller_share} {row.currency}
+                      <Send className="size-4" /> Pay out {formatMoney(row.seller_share, row.currency)}
                     </Button>
                   </div>
                 </CardContent>
@@ -210,9 +209,8 @@ export default function AdminPayoutsPage() {
                   </div>
                   <div className="text-right">
                     <p className="font-display text-base font-bold tabular-nums">
-                      {p.amount}
+                      {formatMoney(p.amount, p.currency)}
                     </p>
-                    <p className="text-[11px] text-muted-foreground">{p.currency}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-mono text-[11px] text-muted-foreground">{p.reference}</p>
