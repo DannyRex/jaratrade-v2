@@ -80,8 +80,10 @@ export default function AdminUsersPage() {
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
           <Input placeholder="Email, name, business…" className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
+        {/* Selects: full-width on phones so they fall neatly under the search
+            input; fixed-width once we have the sm:flex-row layout. */}
         <Select value={role} onValueChange={(v) => setRole(v as Role | "all")}>
-          <SelectTrigger className="w-44"><SelectValue placeholder="Any role" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-44"><SelectValue placeholder="Any role" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All roles</SelectItem>
             <SelectItem value="importer">Importers</SelectItem>
@@ -90,7 +92,7 @@ export default function AdminUsersPage() {
           </SelectContent>
         </Select>
         <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
-          <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-40"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Any status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
@@ -106,79 +108,140 @@ export default function AdminUsersPage() {
       ) : users.length === 0 ? (
         <EmptyState icon={<Users />} title="No users match" description="Try a different filter or search." />
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>KYC</TableHead>
-              <TableHead>2FA</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Joined</TableHead>
-              <TableHead className="w-[120px]" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+        <>
+          {/* Mobile: card list. The 7-col table is unscannable on phones; the
+              card surfaces the same fields top-to-bottom with action buttons
+              wrapped at the bottom. */}
+          <ul className="space-y-3 sm:hidden">
             {users.map((u) => (
-              <TableRow key={u.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="size-8">
-                      <AvatarFallback className="bg-primary/10 text-xs text-primary">
-                        {initials(u.business_name || u.fullname)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="line-clamp-1 font-medium">{u.business_name || u.fullname || u.email}</p>
-                      <p className="text-xs text-muted-foreground">{u.email}</p>
-                    </div>
+              <li key={u.id} className="rounded-lg border bg-card p-4">
+                <div className="flex items-start gap-3">
+                  <Avatar className="size-9 shrink-0">
+                    <AvatarFallback className="bg-primary/10 text-xs text-primary">
+                      {initials(u.business_name || u.fullname)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-1 font-medium">
+                      {u.business_name || u.fullname || u.email}
+                    </p>
+                    <p className="line-clamp-1 text-xs text-muted-foreground">{u.email}</p>
                   </div>
-                </TableCell>
-                <TableCell><Badge variant="secondary" className="capitalize">{u.role}</Badge></TableCell>
-                <TableCell>
-                  {u.role === "exporter" ? (
-                    <KycBadge user={u} />
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
+                  <Badge variant="secondary" className="capitalize">{u.role}</Badge>
+                  {u.role === "exporter" ? <KycBadge user={u} /> : null}
+                  {u.totp_enabled ? <Badge variant="success">2FA on</Badge> : null}
+                  {u.is_active ? (
+                    <Badge variant="success">active</Badge>
                   ) : (
-                    // KYC doesn't apply to importers or admins - render an
-                    // em-dash to signal "not applicable".
-                    <span className="text-muted-foreground">-</span>
+                    <Badge variant="destructive">suspended</Badge>
                   )}
-                </TableCell>
-                <TableCell>
-                  {u.totp_enabled ? <Badge variant="success">on</Badge> : <Badge variant="outline">off</Badge>}
-                </TableCell>
-                <TableCell>
-                  {u.is_active ? <Badge variant="success">active</Badge> : <Badge variant="destructive">suspended</Badge>}
-                </TableCell>
-                <TableCell className="text-muted-foreground">{formatDate(u.time_created)}</TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-1">
-                    {u.is_active ? (
-                      <Button size="sm" variant="ghost" onClick={() => suspend.mutate(u.id)}>
-                        <ShieldOff className="size-3.5" /> Suspend
-                      </Button>
-                    ) : (
-                      <Button size="sm" variant="ghost" onClick={() => reactivate.mutate(u.id)}>
-                        <ShieldCheck className="size-3.5" /> Reactivate
-                      </Button>
-                    )}
-                    {u.role === "exporter" && u.kyc_status === "approved" ? (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => resendApproval.mutate(u.id)}
-                        loading={resendApproval.isPending && resendApproval.variables === u.id}
-                        title="Re-send the activation email (useful if the original send failed silently)"
-                      >
-                        <Mail className="size-3.5" /> Resend email
-                      </Button>
-                    ) : null}
-                  </div>
-                </TableCell>
-              </TableRow>
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Joined {formatDate(u.time_created)}
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-1 border-t pt-3">
+                  {u.is_active ? (
+                    <Button size="sm" variant="ghost" onClick={() => suspend.mutate(u.id)}>
+                      <ShieldOff className="size-3.5" /> Suspend
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="ghost" onClick={() => reactivate.mutate(u.id)}>
+                      <ShieldCheck className="size-3.5" /> Reactivate
+                    </Button>
+                  )}
+                  {u.role === "exporter" && u.kyc_status === "approved" ? (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => resendApproval.mutate(u.id)}
+                      loading={resendApproval.isPending && resendApproval.variables === u.id}
+                    >
+                      <Mail className="size-3.5" /> Resend email
+                    </Button>
+                  ) : null}
+                </div>
+              </li>
             ))}
-          </TableBody>
-        </Table>
+          </ul>
+          {/* Tablet / desktop: full 7-col table. */}
+          <div className="hidden sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>KYC</TableHead>
+                  <TableHead>2FA</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Joined</TableHead>
+                  <TableHead className="w-[120px]" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((u) => (
+                  <TableRow key={u.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="size-8">
+                          <AvatarFallback className="bg-primary/10 text-xs text-primary">
+                            {initials(u.business_name || u.fullname)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <p className="line-clamp-1 font-medium">{u.business_name || u.fullname || u.email}</p>
+                          <p className="text-xs text-muted-foreground">{u.email}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell><Badge variant="secondary" className="capitalize">{u.role}</Badge></TableCell>
+                    <TableCell>
+                      {u.role === "exporter" ? (
+                        <KycBadge user={u} />
+                      ) : (
+                        // KYC doesn't apply to importers or admins - render an
+                        // em-dash to signal "not applicable".
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {u.totp_enabled ? <Badge variant="success">on</Badge> : <Badge variant="outline">off</Badge>}
+                    </TableCell>
+                    <TableCell>
+                      {u.is_active ? <Badge variant="success">active</Badge> : <Badge variant="destructive">suspended</Badge>}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(u.time_created)}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        {u.is_active ? (
+                          <Button size="sm" variant="ghost" onClick={() => suspend.mutate(u.id)}>
+                            <ShieldOff className="size-3.5" /> Suspend
+                          </Button>
+                        ) : (
+                          <Button size="sm" variant="ghost" onClick={() => reactivate.mutate(u.id)}>
+                            <ShieldCheck className="size-3.5" /> Reactivate
+                          </Button>
+                        )}
+                        {u.role === "exporter" && u.kyc_status === "approved" ? (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => resendApproval.mutate(u.id)}
+                            loading={resendApproval.isPending && resendApproval.variables === u.id}
+                            title="Re-send the activation email (useful if the original send failed silently)"
+                          >
+                            <Mail className="size-3.5" /> Resend email
+                          </Button>
+                        ) : null}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
     </>
   );

@@ -299,69 +299,126 @@ export default function AdminOrdersPage() {
         />
       ) : (
         <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order</TableHead>
-                <TableHead>Buyer</TableHead>
-                <TableHead>Seller</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead>Payout</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="text-right">Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((o) => (
-                <TableRow
-                  key={o.id}
+          {/* Mobile: tap-target cards. An 8-col table on a phone is unreadable;
+              this surface what admin actually scans for (order #, buyer/seller,
+              status pills, total) and opens the same drawer on tap. */}
+          <ul className="space-y-3 sm:hidden">
+            {rows.map((o) => (
+              <li key={o.id}>
+                <button
+                  type="button"
                   onClick={() => setActiveId(o.id)}
-                  className="cursor-pointer hover:bg-muted/40"
+                  className="block w-full rounded-lg border bg-card p-4 text-left transition-colors hover:bg-muted/40"
                 >
-                  <TableCell>
-                    <div className="font-mono text-xs">{shortId(o.order_id ?? o.id, 12)}</div>
-                    <div className="text-[10px] text-muted-foreground">
-                      {o.items_count} {o.items_count === 1 ? "item" : "items"}
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-mono text-sm font-semibold">
+                      {shortId(o.order_id ?? o.id, 12)}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(o.time_created)}
+                    </span>
+                  </div>
+                  <dl className="mt-2 space-y-1 text-xs">
+                    <div className="flex justify-between gap-2">
+                      <dt className="text-muted-foreground">Buyer</dt>
+                      <dd className="truncate text-right font-medium">{o.buyer.name ?? o.buyer.email ?? "-"}</dd>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm font-medium">{o.buyer.name ?? "-"}</div>
-                    <div className="text-[11px] text-muted-foreground">{o.buyer.email ?? ""}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm font-medium">{o.seller.business_name ?? "-"}</div>
-                    <div className="text-[11px] text-muted-foreground">{o.seller.email ?? ""}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1.5">
-                      <OrderStatusBadge
-                        status={o.status}
-                        confirmedReceived={Boolean(o.confirmed_received_at)}
-                      />
-                      {o.has_dispute ? (
-                        <span title="Open dispute">
-                          <AlertTriangle className="size-3.5 text-destructive" aria-label="Open dispute" />
-                        </span>
-                      ) : null}
+                    <div className="flex justify-between gap-2">
+                      <dt className="text-muted-foreground">Seller</dt>
+                      <dd className="truncate text-right font-medium">{o.seller.business_name ?? o.seller.email ?? "-"}</dd>
                     </div>
-                  </TableCell>
-                  <TableCell>
+                  </dl>
+                  <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                    <OrderStatusBadge
+                      status={o.status}
+                      confirmedReceived={Boolean(o.confirmed_received_at)}
+                    />
+                    {o.has_dispute ? (
+                      <span title="Open dispute" className="inline-flex">
+                        <AlertTriangle className="size-3.5 text-destructive" aria-label="Open dispute" />
+                      </span>
+                    ) : null}
                     <PaymentChip status={o.payment_status} />
-                  </TableCell>
-                  <TableCell>
                     <PayoutChip status={o.payout_status} />
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums font-semibold">
-                    {formatMoney(o.total, o.currency)}
-                  </TableCell>
-                  <TableCell className="text-right text-xs text-muted-foreground">
-                    {formatDate(o.time_created)}
-                  </TableCell>
+                  </div>
+                  <div className="mt-3 flex items-baseline justify-between">
+                    <span className="text-[11px] text-muted-foreground">
+                      {o.items_count} {o.items_count === 1 ? "item" : "items"}
+                    </span>
+                    <span className="text-base font-bold tabular-nums">
+                      {formatMoney(o.total, o.currency)}
+                    </span>
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+          {/* Tablet / desktop: full 8-col table. */}
+          <div className="hidden sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Buyer</TableHead>
+                  <TableHead>Seller</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Payment</TableHead>
+                  <TableHead>Payout</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead className="text-right">Date</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {rows.map((o) => (
+                  <TableRow
+                    key={o.id}
+                    onClick={() => setActiveId(o.id)}
+                    className="cursor-pointer hover:bg-muted/40"
+                  >
+                    <TableCell>
+                      <div className="font-mono text-xs">{shortId(o.order_id ?? o.id, 12)}</div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {o.items_count} {o.items_count === 1 ? "item" : "items"}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm font-medium">{o.buyer.name ?? "-"}</div>
+                      <div className="text-[11px] text-muted-foreground">{o.buyer.email ?? ""}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm font-medium">{o.seller.business_name ?? "-"}</div>
+                      <div className="text-[11px] text-muted-foreground">{o.seller.email ?? ""}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5">
+                        <OrderStatusBadge
+                          status={o.status}
+                          confirmedReceived={Boolean(o.confirmed_received_at)}
+                        />
+                        {o.has_dispute ? (
+                          <span title="Open dispute">
+                            <AlertTriangle className="size-3.5 text-destructive" aria-label="Open dispute" />
+                          </span>
+                        ) : null}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <PaymentChip status={o.payment_status} />
+                    </TableCell>
+                    <TableCell>
+                      <PayoutChip status={o.payout_status} />
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums font-semibold">
+                      {formatMoney(o.total, o.currency)}
+                    </TableCell>
+                    <TableCell className="text-right text-xs text-muted-foreground">
+                      {formatDate(o.time_created)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Pagination */}
           {pageCount > 1 ? (
