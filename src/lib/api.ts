@@ -415,7 +415,10 @@ export const exporterApi = {
   deleteProduct: (id: string) => request(`/exp/product/${id}`, { method: "DELETE" }),
   addProductImages: (id: string, images: File[]) => {
     const fd = new FormData();
-    for (const img of images) fd.append("images[]", img);
+    // Backend expects field name "images" (List[UploadFile] = File(...));
+    // sending "images[]" made the endpoint see an empty list and silently
+    // drop every upload, so products were saved with images=[].
+    for (const img of images) fd.append("images", img);
     return request(`/exp/product/image/${id}`, { method: "POST", body: fd });
   },
   deleteProductImage: (id: string, image_path: string) =>
