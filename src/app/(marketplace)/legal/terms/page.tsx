@@ -181,7 +181,7 @@ export default function TermsPage() {
           </p>
           <p>
             <strong>Pressing &quot;Confirm receipt&quot; is final.</strong> Once you
-            confirm receipt you waive the 7-day dispute window and the Seller is paid
+            confirm receipt you waive the 1-day dispute window and the Seller is paid
             on the next nightly run. If you have any concern about the Order -
             damage, missing items, late delivery - raise a dispute first (see
             Section 7) instead of confirming receipt.

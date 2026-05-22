@@ -74,8 +74,8 @@ const STATUS_FILTERS = [
 const PAGE_SIZE = 25;
 
 // Mirror of the backend payout rule (payouts.py): a delivered order is only
-// payable once the buyer confirms receipt OR the 7-day dispute window closes.
-const DISPUTE_WINDOW_DAYS = 7;
+// payable once the buyer confirms receipt OR the 1-day dispute window closes.
+const DISPUTE_WINDOW_DAYS = 1;
 
 /**
  * When can the seller be paid for this order? Keeps the order drawer honest:

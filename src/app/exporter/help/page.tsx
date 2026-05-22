@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 const items = [
   {
     q: "How do I get paid?",
-    a: "Add your CAC, director ID and bank details during onboarding - we provision a Flutterwave subaccount in your name once you're KYC-approved. Each buyer's payment is split at source: your share lands in your subaccount (in escrow), Jaratrade's commission lands in ours. Your share is paid out to your Nigerian bank account either (a) the moment the buyer presses 'Confirm receipt' on their order, or (b) 7 days after you mark the order as delivered - whichever comes first. Payouts run on a nightly schedule via Flutterwave's Transfers API.",
+    a: "Add your CAC, director ID and bank details during onboarding - we provision a Flutterwave subaccount in your name once you're KYC-approved. Each buyer's payment is split at source: your share lands in your subaccount (in escrow), Jaratrade's commission lands in ours. Your share is paid out to your Nigerian bank account either (a) the moment the buyer presses 'Confirm receipt' on their order, or (b) 1 day after you mark the order as delivered - whichever comes first. Payouts run on a nightly schedule via Flutterwave's Transfers API.",
   },
   {
     q: "What if a buyer disputes an order?",
@@ -13,7 +13,7 @@ const items = [
   },
   {
     q: "How do I update the status of an order?",
-    a: "Open the order from your Orders tab and move it along the lifecycle: paid → confirmed → preparing → shipped → delivered. Each transition emails the buyer with a link back to their order page. Important: marking 'delivered' is what starts the 7-day payout clock, so only mark it once the order is actually with the buyer.",
+    a: "Open the order from your Orders tab and move it along the lifecycle: paid → confirmed → preparing → shipped → delivered. Each transition emails the buyer with a link back to their order page. Important: marking 'delivered' is what starts the 1-day payout clock, so only mark it once the order is actually with the buyer.",
   },
   {
     q: "Can I run sponsored listings?",

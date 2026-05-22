@@ -147,7 +147,7 @@ export default function AdminSettingsPage() {
                 <a href="/admin/payouts" className="font-medium text-primary underline-offset-4 hover:underline">
                   /admin/payouts
                 </a>
-                . Orders that have delivered + cleared the 7-day dispute window appear in
+                . Orders that have delivered + cleared the 1-day dispute window appear in
                 the &quot;Eligible&quot; tab; one click dispatches the seller&apos;s
                 share via Flutterwave&apos;s transfers API. Subaccounts are provisioned
                 automatically when an exporter clears KYC; the &quot;Reprovision&quot;

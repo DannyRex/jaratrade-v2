@@ -4,7 +4,7 @@
  * /admin/payouts - Manual seller payout queue.
  *
  * Two surfaces:
- *  1. "Eligible" - orders that have been delivered + are past the 7-day
+ *  1. "Eligible" - orders that have been delivered + are past the 1-day
  *     dispute window with a successful payment and no payout yet. Admin
  *     clicks "Pay out" to dispatch via Flutterwave's transfers API.
  *  2. "History" - every payout we've initiated, with status (pending /
@@ -66,7 +66,7 @@ export default function AdminPayoutsPage() {
     <>
       <PageHeader
         title="Payouts"
-        description="Release seller funds for orders that have delivered and passed the 7-day dispute window."
+        description="Release seller funds for orders that have delivered and passed the 1-day dispute window."
         actions={
           <Button
             variant="outline"
@@ -106,7 +106,7 @@ export default function AdminPayoutsPage() {
           <EmptyState
             icon={<Banknote />}
             title="No payouts eligible right now"
-            description="Once an order delivers and the 7-day dispute window closes, it'll appear here for release."
+            description="Once an order delivers and the 1-day dispute window closes, it'll appear here for release."
           />
         ) : (
           <div className="grid gap-4">

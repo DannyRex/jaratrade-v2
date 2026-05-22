@@ -82,7 +82,7 @@ export function RaiseDisputeDialog({ orderId, disabled }: RaiseDisputeDialogProp
         <DialogHeader>
           <DialogTitle>Report an issue with this order</DialogTitle>
           <DialogDescription>
-            Disputes can be raised up to 7 days after delivery. We&apos;ll review and respond within 1 business day.
+            Disputes can be raised up to 1 day after delivery. We&apos;ll review and respond within 1 business day.
           </DialogDescription>
         </DialogHeader>
         <form

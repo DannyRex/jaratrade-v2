@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Trust & safety",
   description:
-    "How Jaratrade protects buyers and sellers - KYC verification, Flutterwave-secured escrow, a 7-day dispute window. We review every claim.",
+    "How Jaratrade protects buyers and sellers - KYC verification, Flutterwave-secured escrow, a 1-day dispute window. We review every claim.",
 };
 
 const disputeStages = [
@@ -67,7 +67,7 @@ export default function TrustPage() {
             <span className="text-primary">confidence.</span>
           </>
         }
-        description="Every order on Jaratrade is backed by KYC verification, funds held in escrow, and a 7-day dispute window. We review every claim."
+        description="Every order on Jaratrade is backed by KYC verification, funds held in escrow, and a 1-day dispute window. We review every claim."
       />
 
       {/* KYC standards */}
@@ -177,7 +177,7 @@ export default function TrustPage() {
             Dispute resolution
           </p>
           <h2 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
-            7 days to raise it. We review every case.
+            1 day to raise it. We review every case.
           </h2>
           <p className="mt-4 text-muted-foreground">
             You can resolve disputes from the importer dashboard. We email the

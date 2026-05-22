@@ -115,7 +115,7 @@ function OrderDetail({ id }: { id: string }) {
 
       {/* Confirm-receipt nudge: shows only on delivered orders that the buyer
           hasn't confirmed yet. Pressing the button releases escrow immediately
-          (otherwise we wait 7 days). */}
+          (otherwise we wait 1 day). */}
       {data.status === "delivered" && !data.confirmed_received_at ? (
         <Alert variant="info" className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">

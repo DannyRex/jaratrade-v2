@@ -53,7 +53,7 @@ const steps = [
     icon: Banknote,
     title: "Get paid",
     detail:
-      "Your share is held in a dedicated Flutterwave subaccount from the moment the buyer pays. It's released to your Nigerian bank account once the buyer confirms receipt, or 7 days after you mark the order delivered - whichever comes first.",
+      "Your share is held in a dedicated Flutterwave subaccount from the moment the buyer pays. It's released to your Nigerian bank account once the buyer confirms receipt, or 1 day after you mark the order delivered - whichever comes first.",
   },
 ];
 
@@ -87,7 +87,7 @@ const faqs = [
   },
   {
     q: "When exactly do I get paid?",
-    a: "We split each payment at the moment the buyer pays - your share lands in a dedicated Flutterwave subaccount in your name (not Jaratrade's bank). It's released to your nominated Nigerian bank account when either (a) the buyer presses 'Confirm receipt' on their order page, or (b) 7 days pass after you mark the order delivered, whichever happens first. Payouts go out on a nightly schedule via Flutterwave's Transfers API, so most sellers see funds T+0 or T+1.",
+    a: "We split each payment at the moment the buyer pays - your share lands in a dedicated Flutterwave subaccount in your name (not Jaratrade's bank). It's released to your nominated Nigerian bank account when either (a) the buyer presses 'Confirm receipt' on their order page, or (b) 1 day passes after you mark the order delivered, whichever happens first. Payouts go out on a nightly schedule via Flutterwave's Transfers API, so most sellers see funds T+0 or T+1.",
   },
   {
     q: "What happens if a buyer disputes an order?",
