@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "date-fns"],
   },
   images: {
+    // Skip Vercel's image-optimization proxy. On the current plan its quota
+    // was exhausted, so /_next/image?url=... was returning HTTP 402 and every
+    // <Image> on the site went blank. Cloudinary already serves optimised
+    // images directly, so we don't lose anything by going to the source.
+    unoptimized: true,
     remotePatterns: [
       // Cloudinary - where backend stores product images
       { protocol: "https", hostname: "res.cloudinary.com" },
