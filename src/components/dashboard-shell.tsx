@@ -25,6 +25,10 @@ interface DashboardShellProps {
 }
 
 export function DashboardShell({ nav, brand, children }: DashboardShellProps) {
+  // Control the mobile drawer so we can close it when the user taps a nav
+  // item - Radix Sheet stays open by default, leaving the sidebar floating
+  // over the page the user just navigated to.
+  const [open, setOpen] = React.useState(false);
   return (
     <div className="grid min-h-svh lg:grid-cols-[260px_1fr] bg-muted/20">
       {/* Sidebar (desktop) */}
@@ -44,7 +48,7 @@ export function DashboardShell({ nav, brand, children }: DashboardShellProps) {
       <div className="flex flex-col">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/85 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:px-6">
           {/* Mobile sidebar */}
-          <Sheet>
+          <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
                 <Menu className="size-5" />
@@ -57,7 +61,7 @@ export function DashboardShell({ nav, brand, children }: DashboardShellProps) {
                 </SheetTitle>
                 <SheetDescription className="sr-only">{brand} navigation</SheetDescription>
               </SheetHeader>
-              <SidebarNav nav={nav} className="p-3" />
+              <SidebarNav nav={nav} className="p-3" onItemClick={() => setOpen(false)} />
             </SheetContent>
           </Sheet>
 
@@ -79,7 +83,18 @@ export function DashboardShell({ nav, brand, children }: DashboardShellProps) {
   );
 }
 
-function SidebarNav({ nav, className }: { nav: NavItem[]; className?: string }) {
+function SidebarNav({
+  nav,
+  className,
+  onItemClick,
+}: {
+  nav: NavItem[];
+  className?: string;
+  /** Called when a nav item is tapped - the mobile drawer uses this to
+   *  close itself so the user isn't left staring at an open sidebar over
+   *  the page they just navigated to. */
+  onItemClick?: () => void;
+}) {
   const pathname = usePathname();
 
   return (
@@ -91,6 +106,7 @@ function SidebarNav({ nav, className }: { nav: NavItem[]; className?: string }) 
           <Link
             key={item.href}
             href={item.href}
+            onClick={onItemClick}
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
               active

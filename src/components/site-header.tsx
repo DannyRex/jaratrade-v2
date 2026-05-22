@@ -43,6 +43,8 @@ export function SiteHeader() {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  // Controlled so the drawer can close itself when the user taps a nav item.
+  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -71,7 +73,7 @@ export function SiteHeader() {
     >
       <div className="container mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:gap-6 lg:px-8">
         {/* Mobile nav trigger */}
-        <Sheet>
+        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
               <Menu className="size-5" />
@@ -91,6 +93,7 @@ export function SiteHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => setMenuOpen(false)}
                   className="rounded-lg px-3 py-3 text-base font-medium text-foreground/85 transition-colors hover:bg-muted hover:text-foreground"
                 >
                   {item.label}
@@ -111,10 +114,14 @@ export function SiteHeader() {
               </p>
               <div className="space-y-2.5">
                 <Button asChild className="w-full rounded-full" size="lg">
-                  <Link href="/auth/login/importer">Sign in</Link>
+                  <Link href="/auth/login/importer" onClick={() => setMenuOpen(false)}>
+                    Sign in
+                  </Link>
                 </Button>
                 <Button asChild className="w-full rounded-full" variant="outline" size="lg">
-                  <Link href="/auth/register/importer">Create account</Link>
+                  <Link href="/auth/register/importer" onClick={() => setMenuOpen(false)}>
+                    Create account
+                  </Link>
                 </Button>
               </div>
             </div>
