@@ -261,6 +261,17 @@
   [role="checkbox"] {
     cursor: pointer;
   }
+  /* iOS Safari auto-zooms when the user focuses a form control whose
+   * font-size is below 16px - the page jumps and the layout shifts. Force
+   * at least 16px on phones to keep the page still. `!important` is
+   * needed to override Tailwind utilities like `text-sm`. */
+  @media (max-width: 640px) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
