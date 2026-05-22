@@ -67,43 +67,79 @@ export default function ExporterOrdersPage() {
       ) : orders.length === 0 ? (
         <EmptyState icon={<Truck />} title="No orders yet" description="Once buyers place orders, they appear here." />
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Order</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+        <>
+          {/* Mobile: card list. The whole card opens the update dialog so
+              there's a generous tap target on small screens. */}
+          <ul className="space-y-3 sm:hidden">
             {orders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-medium">{shortId(order.order_id ?? order.id, 12)}</TableCell>
-                <TableCell className="text-muted-foreground">{formatDate(order.time_created)}</TableCell>
-                <TableCell>
-                  <OrderStatusBadge
-                    status={order.status}
-                    confirmedReceived={Boolean(order.confirmed_received_at)}
-                  />
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {formatMoney(order.total, order.currency)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {(STATUS_TRANSITIONS[order.status]?.length ?? 0) > 0 ? (
-                    <Button size="sm" variant="ghost" onClick={() => setActive(order)}>
-                      Update
-                    </Button>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">No action</span>
-                  )}
-                </TableCell>
-              </TableRow>
+              <li key={order.id}>
+                <button
+                  type="button"
+                  onClick={() => setActive(order)}
+                  className="block w-full rounded-lg border bg-card p-4 text-left transition-colors hover:bg-muted/40"
+                >
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-mono text-sm font-semibold">
+                      {shortId(order.order_id ?? order.id, 12)}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(order.time_created)}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <OrderStatusBadge
+                      status={order.status}
+                      confirmedReceived={Boolean(order.confirmed_received_at)}
+                    />
+                    <span className="text-base font-bold tabular-nums">
+                      {formatMoney(order.total, order.currency)}
+                    </span>
+                  </div>
+                </button>
+              </li>
             ))}
-          </TableBody>
-        </Table>
+          </ul>
+          {/* Tablet / desktop: table. */}
+          <div className="hidden sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">{shortId(order.order_id ?? order.id, 12)}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(order.time_created)}</TableCell>
+                    <TableCell>
+                      <OrderStatusBadge
+                        status={order.status}
+                        confirmedReceived={Boolean(order.confirmed_received_at)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatMoney(order.total, order.currency)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {(STATUS_TRANSITIONS[order.status]?.length ?? 0) > 0 ? (
+                        <Button size="sm" variant="ghost" onClick={() => setActive(order)}>
+                          Update
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No action</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
 
       <UpdateStatusDialog order={active} onClose={() => setActive(null)} />
