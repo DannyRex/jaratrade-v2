@@ -122,8 +122,8 @@ function OrderDetail({ id }: { id: string }) {
             <CheckCircle2 className="size-5 shrink-0 text-primary" />
             <AlertDescription className="flex-1">
               The exporter marked this order as delivered. Once you confirm receipt
-              we&apos;ll release their payout right away - otherwise we hold it for 7
-              days in case you need to raise a dispute.
+              we&apos;ll release their payout right away - otherwise we hold it for 1
+              day in case you need to raise a dispute.
             </AlertDescription>
           </div>
           <Button
@@ -173,9 +173,7 @@ function OrderDetail({ id }: { id: string }) {
           <Card>
             <CardContent className="space-y-3 p-6">
               <h2 className="font-semibold">Shipping</h2>
-              <pre className="overflow-x-auto rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
-                {JSON.stringify(data.delivery_info ?? {}, null, 2)}
-              </pre>
+              <ShippingAddress info={data.delivery_info} />
             </CardContent>
           </Card>
 
@@ -213,5 +211,42 @@ function OrderDetail({ id }: { id: string }) {
         </aside>
       </div>
     </>
+  );
+}
+
+/** Render a delivery address from whatever shape checkout saved. Replaces
+ *  the previous raw JSON dump that was both ugly and unusable on mobile. */
+function ShippingAddress({ info }: { info: Record<string, unknown> | null | undefined }) {
+  const d = (info ?? {}) as Record<string, unknown>;
+  const get = (...keys: string[]): string | null => {
+    for (const k of keys) {
+      const v = d[k];
+      if (v != null && v !== "") return String(v);
+    }
+    return null;
+  };
+  const name = get("name", "recipient", "full_name");
+  const lines = [
+    get("address", "address_line1", "line1", "street"),
+    get("address_line2", "line2", "apartment"),
+    get("city", "town"),
+    get("state", "region", "county"),
+    get("postcode", "postal_code", "zip", "zipcode"),
+    get("country"),
+  ].filter((s): s is string => Boolean(s));
+  const phone = get("phone", "telephone");
+  if (!name && lines.length === 0 && !phone) {
+    return <p className="text-sm text-muted-foreground">No delivery details on file.</p>;
+  }
+  return (
+    <address className="not-italic text-sm leading-relaxed">
+      {name ? <p className="font-medium text-foreground">{name}</p> : null}
+      {lines.map((line, i) => (
+        <p key={i} className="text-muted-foreground">
+          {line}
+        </p>
+      ))}
+      {phone ? <p className="mt-2 text-xs text-muted-foreground">Tel: {phone}</p> : null}
+    </address>
   );
 }

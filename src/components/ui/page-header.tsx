@@ -16,7 +16,11 @@ export function PageHeader({ title, description, actions, eyebrow, className, ..
         <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">{title}</h1>
         {description ? <p className="max-w-2xl text-sm text-muted-foreground">{description}</p> : null}
       </div>
-      {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        // flex-wrap so a long status badge + buttons reflow onto a second
+        // line on phones instead of overflowing horizontally.
+        <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
+      ) : null}
     </header>
   );
 }

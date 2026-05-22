@@ -69,40 +69,72 @@ export default function ImporterDisputesPage() {
           }
         />
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Filed</TableHead>
-              <TableHead>Order</TableHead>
-              <TableHead>Reason</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Refund</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+        <>
+          {/* Mobile: card list - 6-column tables don't fit on phones. */}
+          <ul className="space-y-3 sm:hidden">
             {rows.map((d) => (
-              <TableRow key={d.id}>
-                <TableCell className="text-muted-foreground">{formatDate(d.time_created)}</TableCell>
-                <TableCell className="font-mono text-xs">
-                  {d.order_number ?? shortId(d.order_id, 10)}
-                </TableCell>
-                <TableCell className="text-sm">{REASON_LABEL[d.reason] ?? d.reason}</TableCell>
-                <TableCell>
-                  <Badge variant={STATUS_VARIANT[d.status]}>{d.status.replace("_", " ")}</Badge>
-                </TableCell>
-                <TableCell className="text-right tabular-nums text-sm">
-                  {d.refund_amount ? formatMoney(d.refund_amount, d.refund_currency) : "-"}
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button asChild variant="ghost" size="sm">
-                    <Link href={`/importer/disputes/${encodeURIComponent(d.id)}`}>View →</Link>
-                  </Button>
-                </TableCell>
-              </TableRow>
+              <li key={d.id}>
+                <Link
+                  href={`/importer/disputes/${encodeURIComponent(d.id)}`}
+                  className="block rounded-lg border bg-card p-4 transition-colors hover:bg-muted/40"
+                >
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-mono text-xs font-semibold">
+                      {d.order_number ?? shortId(d.order_id, 10)}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(d.time_created)}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm">{REASON_LABEL[d.reason] ?? d.reason}</p>
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <Badge variant={STATUS_VARIANT[d.status]}>{d.status.replace("_", " ")}</Badge>
+                    <span className="text-sm font-semibold tabular-nums">
+                      {d.refund_amount ? formatMoney(d.refund_amount, d.refund_currency) : "-"}
+                    </span>
+                  </div>
+                </Link>
+              </li>
             ))}
-          </TableBody>
-        </Table>
+          </ul>
+          {/* Tablet / desktop: table. */}
+          <div className="hidden sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Filed</TableHead>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Refund</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.map((d) => (
+                  <TableRow key={d.id}>
+                    <TableCell className="text-muted-foreground">{formatDate(d.time_created)}</TableCell>
+                    <TableCell className="font-mono text-xs">
+                      {d.order_number ?? shortId(d.order_id, 10)}
+                    </TableCell>
+                    <TableCell className="text-sm">{REASON_LABEL[d.reason] ?? d.reason}</TableCell>
+                    <TableCell>
+                      <Badge variant={STATUS_VARIANT[d.status]}>{d.status.replace("_", " ")}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-sm">
+                      {d.refund_amount ? formatMoney(d.refund_amount, d.refund_currency) : "-"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button asChild variant="ghost" size="sm">
+                        <Link href={`/importer/disputes/${encodeURIComponent(d.id)}`}>View →</Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </>
       )}
     </>
   );
