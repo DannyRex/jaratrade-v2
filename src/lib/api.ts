@@ -277,9 +277,15 @@ export const authApi = {
     request("/exp/register", { method: "PUT", body: multipart(payload), skipAuth: true }),
   registerAdmin: (payload: Record<string, unknown>) =>
     request("/adm/register", { method: "POST", body: multipart(payload) }),
-  verifyAccount: (role: Exclude<Role, "admin">, code: string) => {
+  // Backend scopes verification lookup by (email, code) because codes are
+  // 6-digit OTPs that can repeat across users. Email must be passed.
+  verifyAccount: (role: Exclude<Role, "admin">, email: string, code: string) => {
     const prefix = role === "exporter" ? "/exp" : "/imp";
-    return request(`${prefix}/account_verification`, { method: "POST", body: multipart({ code }), skipAuth: true });
+    return request(`${prefix}/account_verification`, {
+      method: "POST",
+      body: multipart({ email, code }),
+      skipAuth: true,
+    });
   },
   requestVerificationEmail: (role: Exclude<Role, "admin">, email: string) => {
     const prefix = role === "exporter" ? "/exp" : "/imp";
