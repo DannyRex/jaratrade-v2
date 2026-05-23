@@ -43,7 +43,7 @@ const benefits = [
     icon: Layers,
     title: "Unlimited stores &amp; listings",
     detail:
-      "Free tier caps you at 2 stores and 5 SKUs. Premium removes both ceilings - sell from every market you operate in.",
+      "Free tier caps you at 1 store and 5 SKUs. Premium removes both ceilings - sell from every market you operate in.",
   },
   {
     icon: Headphones,
@@ -62,11 +62,11 @@ const benefits = [
 const faqs = [
   {
     q: "Do I have to pay to list on Jaratrade?",
-    a: "No. The Free tier costs nothing per month and you can list up to 5 products across 2 stores. You only pay a 2% commission when you make a sale - and even that comes out of the buyer's payment, not your wallet.",
+    a: "No. The Free tier costs nothing per month and you can list up to 5 products from 1 store. You only pay a 2% commission when you make a sale - and even that comes out of the buyer's payment, not your wallet.",
   },
   {
     q: "What's the difference between Free and Premium?",
-    a: "Three things: (1) commission - 2% on Free vs 1.5% on Premium, (2) listing ceilings - 5 SKUs / 2 stores on Free vs unlimited on Premium, and (3) visibility - Premium sellers get sponsored search placement plus 12-hour priority support.",
+    a: "Three things: (1) commission - 2% on Free vs 1.5% on Premium, (2) listing ceilings - 5 SKUs / 1 store on Free vs unlimited on Premium, and (3) visibility - Premium sellers get sponsored search placement plus 12-hour priority support.",
   },
   {
     q: "When is Premium worth it?",
@@ -82,7 +82,7 @@ const faqs = [
   },
   {
     q: "What happens if I cancel?",
-    a: "You keep Premium until the end of the billing period, then drop to Free automatically. All your listings stay live (up to the Free tier caps); listings above the cap are paused, not deleted. Re-upgrade any time to bring them back.",
+    a: "You keep Premium until the end of the billing period, then drop to Free automatically. Your existing stores and listings stay live, but you can't add new ones above the Free tier caps (1 store, 5 listings) until you re-upgrade. We never delete anything.",
   },
   {
     q: "Do I need to be verified to subscribe?",

@@ -245,7 +245,7 @@ export default function ExporterHelpPage() {
               </p>
               <p className="mt-1 text-sm text-muted-foreground">2% commission per transaction</p>
               <ul className="mt-5 space-y-2 text-sm text-foreground/85">
-                <li>• Up to 2 stores and 5 product listings</li>
+                <li>• 1 store and up to 5 product listings</li>
                 <li>• 48-hour support response</li>
                 <li>• Standard search ranking</li>
               </ul>

@@ -18,10 +18,14 @@ import { useExporterPlans } from "@/lib/queries";
 import { formatMoney } from "@/lib/format";
 import type { ExporterPlan } from "@/lib/types";
 
-function unlimitedOr(value: number | string, suffix = "") {
+function planLimit(value: number | string, singular: string, plural: string) {
+  // Render a plan-tier limit as either "Unlimited <plural>" or "N <singular|plural>".
+  // The earlier `unlimitedOr` helper dropped the noun on the unlimited
+  // branch (so Premium showed bare "Unlimited" rows with no idea of WHAT
+  // was unlimited) and pluralized incorrectly when n === 1.
   const v = typeof value === "string" ? Number(value) : value;
-  if (v < 0) return "Unlimited";
-  return `${v}${suffix}`;
+  if (v < 0) return `Unlimited ${plural}`;
+  return `${v} ${v === 1 ? singular : plural}`;
 }
 
 export default function ServicesPage() {
@@ -140,11 +144,19 @@ function ExporterPlanCard({ plan }: { plan: ExporterPlan }) {
         <p className="text-sm leading-relaxed text-muted-foreground">{plan.description}</p>
 
         <ul className="space-y-2.5 text-sm">
-          <Feature label={`${unlimitedOr(plan.max_store, " stores")}`} />
-          <Feature label={`${unlimitedOr(plan.max_market, " market locations")}`} />
-          <Feature label={`${unlimitedOr(plan.max_product, " product listings")}`} />
+          {/* "Store" and "market location" are the same thing user-side.
+              Show only the store line - max_market remains a defensive
+              backend guard but doesn't need its own row. */}
+          <Feature label={planLimit(plan.max_store, "store", "stores")} />
+          <Feature label={planLimit(plan.max_product, "product listing", "product listings")} />
           {plan.product_promotion ? (
-            <Feature label={`Sponsored listings (up to ${unlimitedOr(plan.max_product_promotion)} promoted)`} />
+            <Feature
+              label={
+                plan.max_product_promotion < 0
+                  ? "Unlimited sponsored listings"
+                  : `Sponsored listings (up to ${plan.max_product_promotion} promoted)`
+              }
+            />
           ) : null}
           <Feature
             label={
