@@ -80,7 +80,12 @@ function importerPlanToUI(p: ImporterPlan): PlanForUI {
 }
 
 function exporterPlanToUI(p: ExporterPlan): PlanForUI {
-  const unlim = (n: number, suffix = "") => (n < 0 ? "Unlimited" : `${n}${suffix}`);
+  // Previous `unlim` helper dropped the noun on the unlimited branch (so a
+  // Premium tier rendered three bare "Unlimited" rows with no context) and
+  // pluralized incorrectly when n === 1 ("1 market locations"). Spell out
+  // both forms explicitly so each row stands on its own.
+  const limit = (n: number, singular: string, plural: string) =>
+    n < 0 ? `Unlimited ${plural}` : `${n} ${n === 1 ? singular : plural}`;
   return {
     id: p.id,
     title: p.title,
@@ -90,10 +95,16 @@ function exporterPlanToUI(p: ExporterPlan): PlanForUI {
     is_default: p.is_default,
     features: [
       `${p.commission_percent}% per-transaction commission`,
-      `${unlim(p.max_store, " stores")}`,
-      `${unlim(p.max_market, " market locations")}`,
-      `${unlim(p.max_product, " product listings")}`,
-      ...(p.product_promotion ? [`Sponsored listings (up to ${unlim(p.max_product_promotion)})`] : []),
+      limit(p.max_store, "store", "stores"),
+      limit(p.max_market, "market location", "market locations"),
+      limit(p.max_product, "product listing", "product listings"),
+      ...(p.product_promotion
+        ? [
+            p.max_product_promotion < 0
+              ? "Unlimited sponsored listings"
+              : `Sponsored listings (up to ${p.max_product_promotion})`,
+          ]
+        : []),
     ],
   };
 }
