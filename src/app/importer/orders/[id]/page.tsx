@@ -93,7 +93,9 @@ function OrderDetail({ id }: { id: string }) {
         title={`Order ${shortId(data.order_id ?? data.id, 12)}`}
         description={`Placed ${formatDate(data.time_created)}`}
         actions={
-          <div className="flex items-center gap-2">
+          // Fragment so PageHeader's outer flex-wrap can wrap the badge +
+          // button onto separate lines on phones.
+          <>
             <OrderStatusBadge
               status={data.status}
               confirmedReceived={Boolean(data.confirmed_received_at)}
@@ -109,7 +111,7 @@ function OrderDetail({ id }: { id: string }) {
             ) : data.status === "delivered" || data.status === "shipped" ? (
               <RaiseDisputeDialog orderId={data.id} />
             ) : null}
-          </div>
+          </>
         }
       />
 

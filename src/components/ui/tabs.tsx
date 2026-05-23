@@ -10,10 +10,14 @@ const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
 >(({ className, ...props }, ref) => (
+  // `max-w-full overflow-x-auto` lets long tab groups (e.g. "Public profile /
+  // Contact info / Verification") scroll horizontally on phones instead of
+  // overflowing the viewport. `scrollbar-none` hides the scrollbar - tabs
+  // are clearly horizontally arranged so the indicator isn't needed.
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      "inline-flex h-10 max-w-full items-center justify-center overflow-x-auto rounded-md bg-muted p-1 text-muted-foreground [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
       className,
     )}
     {...props}
