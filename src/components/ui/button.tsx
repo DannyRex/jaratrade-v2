@@ -27,6 +27,10 @@ const buttonVariants = cva(
         xl: "h-14 rounded-lg px-10 text-base",
         icon: "h-10 w-10",
         "icon-sm": "h-8 w-8 [&_svg]:size-3.5",
+        // Matches `lg` button height so a square icon button can sit next to a
+        // primary CTA without misaligning vertically (e.g. Save-to-favourites
+        // beside Add-to-cart on the product page).
+        "icon-lg": "h-12 w-12",
       },
     },
     defaultVariants: { variant: "default", size: "default" },
