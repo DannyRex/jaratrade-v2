@@ -37,36 +37,6 @@ import { importerApi } from "@/lib/api";
 import { formatMoney } from "@/lib/format";
 import type { Order } from "@/lib/types";
 
-// FLW Inline checkout loader. The script defines window.FlutterwaveCheckout
-// (the function we call to open the modal). Lazy-loaded only when the
-// Inline flow is selected via NEXT_PUBLIC_USE_INLINE_CHECKOUT.
-declare global {
-  interface Window {
-    FlutterwaveCheckout?: (config: Record<string, unknown>) => void;
-  }
-}
-
-const FLW_INLINE_SCRIPT = "https://checkout.flutterwave.com/v3.js";
-
-function loadFlutterwaveInline(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") return reject(new Error("not in browser"));
-    if (window.FlutterwaveCheckout) return resolve();
-    const existing = document.querySelector(`script[src="${FLW_INLINE_SCRIPT}"]`);
-    if (existing) {
-      existing.addEventListener("load", () => resolve());
-      existing.addEventListener("error", () => reject(new Error("script failed to load")));
-      return;
-    }
-    const s = document.createElement("script");
-    s.src = FLW_INLINE_SCRIPT;
-    s.async = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error("script failed to load"));
-    document.head.appendChild(s);
-  });
-}
-
 export default function PayPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   // useSearchParams requires a Suspense boundary (the inner content reads
@@ -156,51 +126,6 @@ function PayContent({ orderId }: { orderId: string }) {
     },
   });
 
-  // Inline checkout path. Bypasses FLW's hosted checkout entirely - useful
-  // when their hosted-checkout-v2 sandbox has bugs (e.g. the
-  // `Cannot read properties of undefined (reading 'switch')` Vue error
-  // they introduced in their checkout-v2 rewrite). Gated behind
-  // NEXT_PUBLIC_USE_INLINE_CHECKOUT so prod stays on Standard while dev
-  // can flip to Inline as a workaround.
-  const initInline = useMutation({
-    mutationFn: () => importerApi.initPayment(orderId),
-    onSuccess: async (config) => {
-      try {
-        await loadFlutterwaveInline();
-      } catch {
-        toast.error("Payment system unavailable", {
-          description: "Couldn't load Flutterwave inline. Please refresh and try again.",
-        });
-        return;
-      }
-      if (!window.FlutterwaveCheckout) {
-        toast.error("Payment system unavailable", { description: "Please refresh and try again." });
-        return;
-      }
-      window.FlutterwaveCheckout({
-        ...config,
-        callback: (resp: { status: string; tx_ref: string }) => {
-          if (resp.status === "successful") {
-            // Update the URL the way the Standard flow returns so the
-            // existing redirect-back useEffect picks it up. Easier than
-            // duplicating the verify logic.
-            const qp = new URLSearchParams({ from: "flw", tx_ref: resp.tx_ref, status: "successful" });
-            router.replace(`/importer/orders/${encodeURIComponent(orderId)}/pay?${qp.toString()}`);
-          } else {
-            toast.error("Payment was not completed");
-          }
-        },
-        onclose: () => {},
-      });
-    },
-    onError: (err: Error) => {
-      toast.error("Couldn't initialise payment", { description: err.message });
-    },
-  });
-
-  const useInline = process.env.NEXT_PUBLIC_USE_INLINE_CHECKOUT === "true";
-  const initPay = useInline ? initInline : initStandard;
-
   // While the redirect-back verify is running, show a clear state instead
   // of letting the user think the page is broken.
   const isVerifying = verify.isPending;
@@ -241,10 +166,10 @@ function PayContent({ orderId }: { orderId: string }) {
                 </Alert>
               ) : null}
 
-              {initPay.isError ? (
+              {initStandard.isError ? (
                 <Alert variant="destructive">
                   <AlertDescription>
-                    {(initPay.error as Error).message}
+                    {(initStandard.error as Error).message}
                   </AlertDescription>
                 </Alert>
               ) : null}
@@ -252,13 +177,13 @@ function PayContent({ orderId }: { orderId: string }) {
               <Button
                 size="lg"
                 className="w-full"
-                loading={initPay.isPending || isVerifying}
-                disabled={initPay.isPending || isVerifying}
-                onClick={() => initPay.mutate()}
+                loading={initStandard.isPending || isVerifying}
+                disabled={initStandard.isPending || isVerifying}
+                onClick={() => initStandard.mutate()}
               >
                 {isVerifying
                   ? "Confirming payment..."
-                  : initPay.isPending
+                  : initStandard.isPending
                   ? "Opening Flutterwave..."
                   : `Pay ${formatMoney(order.data?.total, order.data?.currency)}`}
               </Button>
@@ -267,9 +192,7 @@ function PayContent({ orderId }: { orderId: string }) {
                 Flutterwave
               </p>
               <p className="text-center text-[11px] text-muted-foreground">
-                {useInline
-                  ? "Payment runs in a secure Flutterwave modal on this page."
-                  : "You'll be redirected to Flutterwave's secure page to complete payment, and brought back here when done."}
+                You&apos;ll be redirected to Flutterwave&apos;s secure page to complete payment, and brought back here when done.
               </p>
             </CardContent>
           </Card>
