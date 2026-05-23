@@ -80,10 +80,11 @@ function importerPlanToUI(p: ImporterPlan): PlanForUI {
 }
 
 function exporterPlanToUI(p: ExporterPlan): PlanForUI {
-  // Previous `unlim` helper dropped the noun on the unlimited branch (so a
-  // Premium tier rendered three bare "Unlimited" rows with no context) and
-  // pluralized incorrectly when n === 1 ("1 market locations"). Spell out
-  // both forms explicitly so each row stands on its own.
+  // "Store" and "market location" are the same concept to a Nigerian
+  // seller - one shop in one marketplace - so we surface only the store
+  // line. max_market still exists as a defensive backend guard but
+  // listing it as a separate feature was confusing ("2 stores in 1 market
+  // location" reads like two contradictory caps).
   const limit = (n: number, singular: string, plural: string) =>
     n < 0 ? `Unlimited ${plural}` : `${n} ${n === 1 ? singular : plural}`;
   return {
@@ -96,7 +97,6 @@ function exporterPlanToUI(p: ExporterPlan): PlanForUI {
     features: [
       `${p.commission_percent}% per-transaction commission`,
       limit(p.max_store, "store", "stores"),
-      limit(p.max_market, "market location", "market locations"),
       limit(p.max_product, "product listing", "product listings"),
       ...(p.product_promotion
         ? [
