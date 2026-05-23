@@ -80,7 +80,7 @@ export default function AdminPayoutsPage() {
         }
       />
 
-      <div role="tablist" aria-label="Payouts view" className="mb-6 inline-flex h-10 items-center rounded-md bg-muted p-1">
+      <div role="tablist" aria-label="Payouts view" className="mb-6 inline-flex h-10 max-w-full items-center overflow-x-auto rounded-md bg-muted p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {(["eligible", "history"] as const).map((value) => (
           <button
             key={value}

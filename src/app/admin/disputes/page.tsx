@@ -94,7 +94,10 @@ export default function AdminDisputesPage() {
           and Radix Tabs swallows clicks when there's no matching
           TabsContent registered. A button group keeps the click->state path
           dead simple. */}
-      <div role="tablist" aria-label="Dispute status" className="mb-6 inline-flex h-10 items-center rounded-md bg-muted p-1">
+      {/* `max-w-full overflow-x-auto` lets the 4 tab pills scroll horizontally
+          on small phones instead of clipping. Scrollbar hidden because the
+          horizontal layout already telegraphs the affordance. */}
+      <div role="tablist" aria-label="Dispute status" className="mb-6 inline-flex h-10 max-w-full items-center overflow-x-auto rounded-md bg-muted p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {STATUSES.map((s) => {
           const count = data?.counts?.[s.value] ?? 0;
           return (
