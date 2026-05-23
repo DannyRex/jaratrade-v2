@@ -169,18 +169,26 @@ function ProductDetail({ id }: { id: string }) {
                 <dt className="text-muted-foreground">Max order</dt>
                 <dd className="font-medium">{maxOrder === 9999 ? "-" : `${maxOrder} units`}</dd>
               </div>
-              {Object.entries(properties).map(([k, v]) => (
-                <div key={k}>
-                  <dt className="text-muted-foreground capitalize">{k}</dt>
-                  <dd className="font-medium">{String(v)}</dd>
-                </div>
-              ))}
+              {/* Skip empty property entries - the seller can save a blank
+                  "weight" or similar and we don't want to render a label
+                  with no value underneath. */}
+              {Object.entries(properties)
+                .filter(([, v]) => v !== null && v !== undefined && String(v).trim() !== "")
+                .map(([k, v]) => (
+                  <div key={k}>
+                    <dt className="text-muted-foreground capitalize">{k}</dt>
+                    <dd className="font-medium">{String(v)}</dd>
+                  </div>
+                ))}
             </dl>
           </div>
 
-          {/* Quantity + actions */}
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <div className="inline-flex items-center rounded-md border">
+          {/* Quantity + actions
+              Mobile: stepper sits alone on its own row (self-start so it doesn't
+              stretch full-width in the flex column), then Add to cart + heart
+              share the next row. Desktop: everything inline. */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+            <div className="inline-flex w-fit items-center self-start rounded-md border sm:self-auto">
               <Button
                 variant="ghost"
                 size="icon"
@@ -199,7 +207,7 @@ function ProductDetail({ id }: { id: string }) {
                   setQuantity(Number.isFinite(v) ? Math.max(moq, Math.min(maxOrder, v)) : moq);
                 }}
                 aria-label="Quantity"
-                className="h-10 w-16 border-x bg-background text-center text-sm focus:outline-none"
+                className="h-10 w-14 border-x bg-background text-center text-sm focus:outline-none"
               />
               <Button
                 variant="ghost"
@@ -210,13 +218,27 @@ function ProductDetail({ id }: { id: string }) {
                 <Plus className="size-4" />
               </Button>
             </div>
-            <Button size="lg" onClick={handleAddToCart} className="flex-1" disabled={outOfStock}>
-              <ShoppingCart className="size-4" />
-              {outOfStock ? "Out of stock" : `Add to cart · ${formatMoney(Number(data.price) * qty, data.currency || "NGN")}`}
-            </Button>
-            <Button size="lg" variant="outline" aria-label="Save to favourites">
-              <Heart className="size-4" />
-            </Button>
+            <div className="flex items-stretch gap-2 sm:flex-1">
+              <Button
+                size="lg"
+                onClick={handleAddToCart}
+                className="flex-1"
+                disabled={outOfStock}
+              >
+                <ShoppingCart className="size-4" />
+                {outOfStock
+                  ? "Out of stock"
+                  : `Add to cart · ${formatMoney(Number(data.price) * qty, data.currency || "NGN")}`}
+              </Button>
+              <Button
+                size="icon-lg"
+                variant="outline"
+                aria-label="Save to favourites"
+                className="shrink-0"
+              >
+                <Heart className="size-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Trust signals */}
@@ -331,10 +353,12 @@ function DetailPriceBlock({ data }: { data: import("@/lib/types").ProductDetail 
   return (
     <div className="space-y-2">
       <p className="text-sm text-muted-foreground">{data.name}</p>
-      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{data.product_name}</h1>
+      {/* `text-2xl` baseline so the title doesn't dominate the viewport on
+          phones; steps up at sm + md breakpoints. */}
+      <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">{data.product_name}</h1>
       <div className="flex flex-wrap items-center gap-3 pt-1">
         <div>
-          <p className="text-3xl font-bold tracking-tight">
+          <p className="text-2xl font-bold tracking-tight sm:text-3xl">
             {formatMoney(primary.amount, primary.currency)}
           </p>
           {secondary ? (
