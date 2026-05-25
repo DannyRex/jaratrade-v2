@@ -24,6 +24,7 @@ import { formatMoney } from "@/lib/format";
 import { importerApi } from "@/lib/api";
 import type { LogisticsCompany, ShippingAddress } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { DualPrice } from "@/components/dual-price";
 
 type ShippingMode = "self" | "logistics";
 
@@ -114,6 +115,27 @@ export default function CheckoutPage() {
   const platformFee = subtotal * 0.02;
   const logisticsEstimate = mode === "logistics" ? subtotal * 0.05 : 0;
   const total = subtotal + platformFee + logisticsEstimate;
+
+  // Quantity-weighted average FX rate across the cart - mirror of the cart
+  // page's secondary-amount derivation so the buyer sees the same GBP
+  // equivalent on both screens. Null = no rate available, hide secondary.
+  const aggregateRate = (() => {
+    let rateSum = 0;
+    let weight = 0;
+    for (const i of items) {
+      if (i.secondary_rate && i.subtotal > 0) {
+        rateSum += i.secondary_rate * i.subtotal;
+        weight += i.subtotal;
+      }
+    }
+    return weight > 0 ? rateSum / weight : null;
+  })();
+  const secondaryCurrency =
+    items.find((i) => i.secondary_currency)?.secondary_currency ?? null;
+  const secondaryFor = (amount: number) =>
+    aggregateRate != null && secondaryCurrency
+      ? (amount * aggregateRate).toFixed(2)
+      : null;
 
   const placeOrder = useMutation({
     mutationFn: async () => {
@@ -236,7 +258,16 @@ export default function CheckoutPage() {
                             <p className="font-medium">{l.name}</p>
                             <p className="text-xs text-muted-foreground">{l.description}</p>
                           </div>
-                          <span className="text-sm font-semibold">{formatMoney(logisticsEstimate)}</span>
+                          <DualPrice
+                            size="sm"
+                            className="font-semibold"
+                            value={{
+                              amount: logisticsEstimate,
+                              currency: "NGN",
+                              secondary_amount: secondaryFor(logisticsEstimate),
+                              secondary_currency: secondaryCurrency,
+                            }}
+                          />
                         </label>
                       ))}
                     </RadioGroup>
@@ -380,7 +411,19 @@ export default function CheckoutPage() {
                     <span className="line-clamp-1 text-muted-foreground">
                       {item.quantity}x {item.name}
                     </span>
-                    <span className="tabular-nums">{formatMoney(item.subtotal)}</span>
+                    <DualPrice
+                      size="sm"
+                      inline
+                      value={{
+                        amount: item.subtotal,
+                        currency: item.currency ?? "NGN",
+                        secondary_amount:
+                          item.secondary_rate != null
+                            ? (item.subtotal * item.secondary_rate).toFixed(2)
+                            : null,
+                        secondary_currency: item.secondary_currency ?? null,
+                      }}
+                    />
                   </li>
                 ))}
               </ul>
@@ -388,23 +431,68 @@ export default function CheckoutPage() {
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Subtotal</dt>
-                  <dd className="tabular-nums">{formatMoney(subtotal)}</dd>
+                  <dd>
+                    <DualPrice
+                      size="sm"
+                      inline
+                      value={{
+                        amount: subtotal,
+                        currency: "NGN",
+                        secondary_amount: secondaryFor(subtotal),
+                        secondary_currency: secondaryCurrency,
+                      }}
+                    />
+                  </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Platform fee (2%)</dt>
-                  <dd className="tabular-nums">{formatMoney(platformFee)}</dd>
+                  <dd>
+                    <DualPrice
+                      size="sm"
+                      inline
+                      value={{
+                        amount: platformFee,
+                        currency: "NGN",
+                        secondary_amount: secondaryFor(platformFee),
+                        secondary_currency: secondaryCurrency,
+                      }}
+                    />
+                  </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground inline-flex items-center gap-1">
                     <Truck className="size-3" /> Logistics
                   </dt>
-                  <dd className="tabular-nums">{mode === "self" ? "-" : formatMoney(logisticsEstimate)}</dd>
+                  <dd>
+                    {mode === "self" ? (
+                      <span className="tabular-nums">-</span>
+                    ) : (
+                      <DualPrice
+                        size="sm"
+                        inline
+                        value={{
+                          amount: logisticsEstimate,
+                          currency: "NGN",
+                          secondary_amount: secondaryFor(logisticsEstimate),
+                          secondary_currency: secondaryCurrency,
+                        }}
+                      />
+                    )}
+                  </dd>
                 </div>
               </dl>
               <Separator />
               <div className="flex items-baseline justify-between">
                 <span className="text-sm text-muted-foreground">Total</span>
-                <span className="text-xl font-bold tabular-nums">{formatMoney(total)}</span>
+                <DualPrice
+                  size="lg"
+                  value={{
+                    amount: total,
+                    currency: "NGN",
+                    secondary_amount: secondaryFor(total),
+                    secondary_currency: secondaryCurrency,
+                  }}
+                />
               </div>
               <Button
                 size="lg"
@@ -418,7 +506,7 @@ export default function CheckoutPage() {
                   (mode === "logistics" && !logisticsId)
                 }
               >
-                Place order - {formatMoney(total)}
+                Place order
               </Button>
               <p className="text-center text-xs text-muted-foreground">
                 Pay securely via Flutterwave on the next step.

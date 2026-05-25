@@ -13,11 +13,12 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { OrderStatusBadge } from "@/components/order-status-badge";
 import { importerApi } from "@/lib/api";
-import { formatDate, formatMoney, shortId } from "@/lib/format";
+import { formatDate, shortId } from "@/lib/format";
 import type { Order } from "@/lib/types";
 import { ReviewPromptCard } from "@/components/review-prompt-card";
 import { RaiseDisputeDialog } from "@/components/raise-dispute-dialog";
 import { useImporterDisputes } from "@/lib/queries";
+import { DualPrice } from "@/components/dual-price";
 
 export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -155,14 +156,34 @@ function OrderDetail({ id }: { id: string }) {
               <h2 className="font-semibold">Items</h2>
               <ul className="divide-y">
                 {(data.items ?? []).map((item) => (
-                  <li key={item.id} className="flex justify-between py-3 text-sm">
-                    <div className="space-y-0.5">
+                  <li key={item.id} className="flex items-start justify-between gap-3 py-3 text-sm">
+                    <div className="min-w-0 space-y-0.5">
                       <p className="font-medium">{item.product_name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {item.quantity} × {formatMoney(item.unit_price, data.currency)}
+                        {item.quantity} ×{" "}
+                        <DualPrice
+                          inline
+                          size="sm"
+                          value={{
+                            amount: item.unit_price,
+                            currency: data.currency,
+                            secondary_amount: item.unit_price_secondary_amount ?? null,
+                            secondary_currency: item.secondary_currency ?? data.secondary_currency ?? null,
+                          }}
+                          className="font-normal"
+                        />
                       </p>
                     </div>
-                    <p className="font-medium tabular-nums">{formatMoney(item.subtotal, data.currency)}</p>
+                    <DualPrice
+                      size="sm"
+                      className="font-medium"
+                      value={{
+                        amount: item.subtotal,
+                        currency: data.currency,
+                        secondary_amount: item.subtotal_secondary_amount ?? null,
+                        secondary_currency: item.secondary_currency ?? data.secondary_currency ?? null,
+                      }}
+                    />
                   </li>
                 ))}
                 {(data.items?.length ?? 0) === 0 ? (
@@ -193,15 +214,70 @@ function OrderDetail({ id }: { id: string }) {
             <CardContent className="space-y-3 p-6">
               <h2 className="font-semibold">Summary</h2>
               <dl className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <dt className="text-muted-foreground">Subtotal</dt>
-                  <dd className="tabular-nums">{formatMoney(data.total, data.currency)}</dd>
-                </div>
+                {data.subtotal != null ? (
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Subtotal</dt>
+                    <dd>
+                      <DualPrice
+                        inline
+                        size="sm"
+                        value={{
+                          amount: data.subtotal,
+                          currency: data.currency,
+                          secondary_amount: data.subtotal_secondary_amount ?? null,
+                          secondary_currency: data.secondary_currency ?? null,
+                        }}
+                      />
+                    </dd>
+                  </div>
+                ) : null}
+                {data.platform_fee != null ? (
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Platform fee</dt>
+                    <dd>
+                      <DualPrice
+                        inline
+                        size="sm"
+                        value={{
+                          amount: data.platform_fee,
+                          currency: data.currency,
+                          secondary_amount: data.platform_fee_secondary_amount ?? null,
+                          secondary_currency: data.secondary_currency ?? null,
+                        }}
+                      />
+                    </dd>
+                  </div>
+                ) : null}
+                {data.logistics_fee != null && Number(data.logistics_fee) > 0 ? (
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Logistics</dt>
+                    <dd>
+                      <DualPrice
+                        inline
+                        size="sm"
+                        value={{
+                          amount: data.logistics_fee,
+                          currency: data.currency,
+                          secondary_amount: data.logistics_fee_secondary_amount ?? null,
+                          secondary_currency: data.secondary_currency ?? null,
+                        }}
+                      />
+                    </dd>
+                  </div>
+                ) : null}
               </dl>
               <Separator />
-              <div className="flex justify-between font-bold">
+              <div className="flex items-baseline justify-between font-bold">
                 <span>Total</span>
-                <span className="tabular-nums">{formatMoney(data.total, data.currency)}</span>
+                <DualPrice
+                  size="lg"
+                  value={{
+                    amount: data.total,
+                    currency: data.currency,
+                    secondary_amount: data.secondary_amount ?? null,
+                    secondary_currency: data.secondary_currency ?? null,
+                  }}
+                />
               </div>
               {data.status === "pending" ? (
                 <Button asChild className="w-full">
