@@ -10,8 +10,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ProfileProgress } from "@/components/profile-progress";
 import { OrderStatusBadge } from "@/components/order-status-badge";
 import { useImporterOrders } from "@/lib/queries";
-import { formatDate, formatMoney, shortId } from "@/lib/format";
+import { formatDate, shortId } from "@/lib/format";
 import type { Order } from "@/lib/types";
+import { DualPrice } from "@/components/dual-price";
 
 export default function ImporterOrdersPage() {
   const { data, isLoading, isError, refetch } = useImporterOrders();
@@ -78,9 +79,16 @@ export default function ImporterOrdersPage() {
                       status={order.status}
                       confirmedReceived={Boolean(order.confirmed_received_at)}
                     />
-                    <span className="text-base font-bold tabular-nums">
-                      {formatMoney(order.total, order.currency)}
-                    </span>
+                    <DualPrice
+                      size="md"
+                      className="font-bold"
+                      value={{
+                        amount: order.total,
+                        currency: order.currency,
+                        secondary_amount: order.secondary_amount ?? null,
+                        secondary_currency: order.secondary_currency ?? null,
+                      }}
+                    />
                   </div>
                 </Link>
               </li>
@@ -109,8 +117,17 @@ export default function ImporterOrdersPage() {
                         confirmedReceived={Boolean(order.confirmed_received_at)}
                       />
                     </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatMoney(order.total, order.currency)}
+                    <TableCell className="text-right">
+                      <DualPrice
+                        size="sm"
+                        className="font-medium"
+                        value={{
+                          amount: order.total,
+                          currency: order.currency,
+                          secondary_amount: order.secondary_amount ?? null,
+                          secondary_currency: order.secondary_currency ?? null,
+                        }}
+                      />
                     </TableCell>
                     <TableCell className="text-right">
                       <Button asChild variant="ghost" size="sm">

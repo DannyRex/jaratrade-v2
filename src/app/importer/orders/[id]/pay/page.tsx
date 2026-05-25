@@ -36,6 +36,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { importerApi } from "@/lib/api";
 import { formatMoney } from "@/lib/format";
 import type { Order } from "@/lib/types";
+import { DualPrice } from "@/components/dual-price";
+import { useCurrencyPreference, pickPriceDisplay } from "@/lib/currency-preference";
 
 export default function PayPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -52,11 +54,27 @@ function PayContent({ orderId }: { orderId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
+  const currencyPref = useCurrencyPreference((s) => s.preference);
 
   const order = useQuery({
     queryKey: ["importer", "orders", orderId],
     queryFn: () => importerApi.getOrder(orderId) as Promise<Order>,
   });
+
+  // Resolve the "Pay X" button label using the same toggle the rest of the
+  // journey honours. When the buyer has GBP selected and the order carries
+  // a secondary_amount, we surface the GBP figure on the button itself so
+  // the amount that hits the FLW page (in NGN, currently) is unambiguous.
+  const buttonLabel = (() => {
+    if (!order.data) return null;
+    const display = pickPriceDisplay(currencyPref, {
+      price: String(order.data.total ?? "0"),
+      currency: order.data.currency ?? "NGN",
+      secondary_amount: order.data.secondary_amount ?? null,
+      secondary_currency: order.data.secondary_currency ?? null,
+    });
+    return formatMoney(display.primary.amount, display.primary.currency);
+  })();
 
   // Verify mutation - used both for the redirect-back from FLW and for
   // any manual retry button we expose if verification stalls.
@@ -153,9 +171,15 @@ function PayContent({ orderId }: { orderId: string }) {
             <CardContent className="space-y-3 p-6">
               <div className="flex items-baseline justify-between">
                 <p className="text-sm text-muted-foreground">Amount due</p>
-                <p className="text-2xl font-bold tabular-nums">
-                  {formatMoney(order.data?.total, order.data?.currency)}
-                </p>
+                <DualPrice
+                  size="xl"
+                  value={{
+                    amount: order.data?.total ?? null,
+                    currency: order.data?.currency ?? "NGN",
+                    secondary_amount: order.data?.secondary_amount ?? null,
+                    secondary_currency: order.data?.secondary_currency ?? null,
+                  }}
+                />
               </div>
 
               {isCancelledReturn ? (
@@ -185,7 +209,7 @@ function PayContent({ orderId }: { orderId: string }) {
                   ? "Confirming payment..."
                   : initStandard.isPending
                   ? "Opening Flutterwave..."
-                  : `Pay ${formatMoney(order.data?.total, order.data?.currency)}`}
+                  : `Pay ${buttonLabel ?? formatMoney(order.data?.total, order.data?.currency)}`}
               </Button>
               <p className="inline-flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
                 <ShieldCheck className="size-3 text-success" /> 256-bit SSL · Funds split via
