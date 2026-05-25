@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useCart } from "@/lib/cart-store";
-import { formatMoney } from "@/lib/format";
+import { DualPrice } from "@/components/dual-price";
 
 export default function CartPage() {
   const router = useRouter();
@@ -22,6 +22,29 @@ export default function CartPage() {
   const subtotal = items.reduce((acc, i) => acc + i.subtotal, 0);
   const platformFee = subtotal * 0.02;
   const total = subtotal + platformFee;
+
+  // Derive a single FX rate for the cart-level totals. Cart items can in
+  // theory have different secondary_rates (different products quoted on
+  // different days), so we use a quantity-weighted average — heavily skewed
+  // by line value, which is what a buyer would intuitively expect. If no
+  // item has a rate we just hide the secondary line entirely.
+  const aggregateRate = (() => {
+    let rateSum = 0;
+    let weight = 0;
+    for (const i of items) {
+      if (i.secondary_rate && i.subtotal > 0) {
+        rateSum += i.secondary_rate * i.subtotal;
+        weight += i.subtotal;
+      }
+    }
+    return weight > 0 ? rateSum / weight : null;
+  })();
+  const secondaryCurrency =
+    items.find((i) => i.secondary_currency)?.secondary_currency ?? null;
+  const secondaryFor = (amount: number) =>
+    aggregateRate != null && secondaryCurrency
+      ? (amount * aggregateRate).toFixed(2)
+      : null;
 
   if (items.length === 0) {
     return (
@@ -100,7 +123,19 @@ export default function CartPage() {
                           <Plus className="size-3.5" />
                         </Button>
                       </div>
-                      <p className="text-sm font-bold tabular-nums">{formatMoney(item.subtotal)}</p>
+                      <DualPrice
+                        size="sm"
+                        className="font-bold"
+                        value={{
+                          amount: item.subtotal,
+                          currency: item.currency ?? "NGN",
+                          secondary_amount:
+                            item.secondary_rate != null
+                              ? (item.subtotal * item.secondary_rate).toFixed(2)
+                              : null,
+                          secondary_currency: item.secondary_currency ?? null,
+                        }}
+                      />
                     </div>
                   </div>
                   <Button
@@ -125,11 +160,33 @@ export default function CartPage() {
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Subtotal</dt>
-                  <dd className="tabular-nums">{formatMoney(subtotal)}</dd>
+                  <dd>
+                    <DualPrice
+                      size="sm"
+                      inline
+                      value={{
+                        amount: subtotal,
+                        currency: "NGN",
+                        secondary_amount: secondaryFor(subtotal),
+                        secondary_currency: secondaryCurrency,
+                      }}
+                    />
+                  </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Platform fee (2%)</dt>
-                  <dd className="tabular-nums">{formatMoney(platformFee)}</dd>
+                  <dd>
+                    <DualPrice
+                      size="sm"
+                      inline
+                      value={{
+                        amount: platformFee,
+                        currency: "NGN",
+                        secondary_amount: secondaryFor(platformFee),
+                        secondary_currency: secondaryCurrency,
+                      }}
+                    />
+                  </dd>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <dt>Logistics</dt>
@@ -139,7 +196,15 @@ export default function CartPage() {
               <Separator />
               <div className="flex items-baseline justify-between">
                 <span className="text-sm text-muted-foreground">Estimated total</span>
-                <span className="text-xl font-bold tabular-nums">{formatMoney(total)}</span>
+                <DualPrice
+                  size="lg"
+                  value={{
+                    amount: total,
+                    currency: "NGN",
+                    secondary_amount: secondaryFor(total),
+                    secondary_currency: secondaryCurrency,
+                  }}
+                />
               </div>
               <Button size="lg" className="w-full" onClick={() => router.push("/importer/checkout")}>
                 Proceed to checkout

@@ -7,7 +7,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/data-table";
 import { useImporterTransactions } from "@/lib/queries";
-import { formatDate, formatMoney, shortId } from "@/lib/format";
+import { formatDate, shortId } from "@/lib/format";
+import { DualPrice } from "@/components/dual-price";
 
 interface Tx {
   id: string;
@@ -17,6 +18,9 @@ interface Tx {
   currency: string;
   status: string;
   time_created: string;
+  /** Secondary-currency display (added v3.7). */
+  secondary_currency?: string | null;
+  secondary_amount?: string | null;
 }
 
 export default function TransactionsPage() {
@@ -59,9 +63,16 @@ export default function TransactionsPage() {
                   >
                     {tx.status}
                   </Badge>
-                  <span className="text-base font-bold tabular-nums">
-                    {formatMoney(tx.amount, tx.currency)}
-                  </span>
+                  <DualPrice
+                    size="md"
+                    className="font-bold"
+                    value={{
+                      amount: tx.amount,
+                      currency: tx.currency,
+                      secondary_amount: tx.secondary_amount ?? null,
+                      secondary_currency: tx.secondary_currency ?? null,
+                    }}
+                  />
                 </div>
               </li>
             ))}
@@ -89,7 +100,18 @@ export default function TransactionsPage() {
                         {tx.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right tabular-nums">{formatMoney(tx.amount, tx.currency)}</TableCell>
+                    <TableCell className="text-right">
+                      <DualPrice
+                        size="sm"
+                        className="font-medium"
+                        value={{
+                          amount: tx.amount,
+                          currency: tx.currency,
+                          secondary_amount: tx.secondary_amount ?? null,
+                          secondary_currency: tx.secondary_currency ?? null,
+                        }}
+                      />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

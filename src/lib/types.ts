@@ -309,6 +309,8 @@ export interface CartItem {
   name: string;
   category: string;
   price: number;
+  /** ISO code of `price` - defaults to NGN if not captured at add-time. */
+  currency?: string;
   quantity: number;
   /** The product's minimum order quantity - a line can't drop below this. */
   min_order_quantity?: number;
@@ -319,6 +321,13 @@ export interface CartItem {
   store_id?: string;
   image?: string;
   added_at: string;
+  /** Captured from the product at add-time so the GBP toggle on the cart /
+   *  checkout page can render an equivalent without a fresh API call.
+   *  The rate is per single unit of `price`. Subtotal-secondary derives
+   *  from `secondary_rate * subtotal`. Null when FX rates were unavailable. */
+  secondary_currency?: string | null;
+  secondary_amount?: string | null;
+  secondary_rate?: number | null;
 }
 
 export interface Order {
@@ -327,6 +336,10 @@ export interface Order {
   importer_id?: string;
   exporter_id?: string;
   total: string;
+  /** Sum of item subtotals (server-computed, NGN). */
+  subtotal?: string;
+  platform_fee?: string;
+  logistics_fee?: string;
   currency: string;
   status: string;
   shipping_method: "self" | "logistics";
@@ -338,6 +351,13 @@ export interface Order {
   /** ISO timestamp set when the buyer explicitly confirmed receipt -
    *  immediate-payout signal. Null until the buyer presses the button. */
   confirmed_received_at?: string | null;
+  /** Secondary-currency display fields (added v3.7) - server-computed so
+   *  the rate matches whatever the cron stored at the time of the order. */
+  secondary_currency?: string | null;
+  secondary_amount?: string | null;
+  platform_fee_secondary_amount?: string | null;
+  logistics_fee_secondary_amount?: string | null;
+  subtotal_secondary_amount?: string | null;
 }
 
 export interface OrderItem {
@@ -347,6 +367,10 @@ export interface OrderItem {
   quantity: number;
   unit_price: string;
   subtotal: string;
+  /** Secondary-currency display fields (added v3.7) */
+  secondary_currency?: string | null;
+  unit_price_secondary_amount?: string | null;
+  subtotal_secondary_amount?: string | null;
 }
 
 export interface ShippingAddress {

@@ -34,6 +34,7 @@ export const useCart = create<CartState>()(
         const name = "product_name" in product ? product.product_name : "Untitled";
         const category = "category" in product ? (product as ProductSummary).category : (product as ProductDetail).name;
         const price = asNumber(product.price);
+        const currency = ("currency" in product ? product.currency : undefined) ?? "NGN";
         // The product's minimum order quantity - a new cart line never starts
         // below it. ProductSummary carries no MOQ, so default to 1.
         const moq =
@@ -51,6 +52,22 @@ export const useCart = create<CartState>()(
               }
             })()
           : undefined;
+        // Capture the FX rate the buyer sees on the listing/detail page so we
+        // can render the same GBP equivalent on cart + checkout without
+        // hitting the API again. The rate is per single unit of `price`; it's
+        // null when FX rates are unavailable upstream (rare; cron repopulates).
+        const secondaryCurrency =
+          "secondary_currency" in product
+            ? ((product as ProductSummary).secondary_currency ?? null)
+            : null;
+        const secondaryRate =
+          "secondary_rate" in product
+            ? ((product as ProductSummary).secondary_rate ?? null)
+            : null;
+        const secondaryAmount =
+          "secondary_amount" in product
+            ? ((product as ProductSummary).secondary_amount ?? null)
+            : null;
 
         const existing = get().items.find((i) => i.product_id === productId);
         if (existing) {
@@ -62,6 +79,11 @@ export const useCart = create<CartState>()(
                     quantity: i.quantity + quantity,
                     subtotal: (i.quantity + quantity) * i.price,
                     min_order_quantity: i.min_order_quantity ?? moq,
+                    // Refresh FX hints in case the buyer revisited the
+                    // product page and rates changed since the first add.
+                    secondary_currency: secondaryCurrency ?? i.secondary_currency ?? null,
+                    secondary_rate: secondaryRate ?? i.secondary_rate ?? null,
+                    secondary_amount: secondaryAmount ?? i.secondary_amount ?? null,
                   }
                 : i,
             ),
@@ -77,6 +99,7 @@ export const useCart = create<CartState>()(
                 name,
                 category,
                 price,
+                currency,
                 quantity: startQty,
                 min_order_quantity: moq,
                 unit,
@@ -86,6 +109,9 @@ export const useCart = create<CartState>()(
                 store_id: storeId,
                 image,
                 added_at: new Date().toISOString(),
+                secondary_currency: secondaryCurrency,
+                secondary_rate: secondaryRate,
+                secondary_amount: secondaryAmount,
               },
             ],
           });
