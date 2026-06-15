@@ -38,6 +38,7 @@ import { formatMoney } from "@/lib/format";
 import type { Order } from "@/lib/types";
 import { DualPrice } from "@/components/dual-price";
 import { useCurrencyPreference, pickPriceDisplay } from "@/lib/currency-preference";
+import { FLW_INLINE_MODE, openFlutterwaveInline } from "@/lib/flw-inline";
 
 export default function PayPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -144,10 +145,51 @@ function PayContent({ orderId }: { orderId: string }) {
     },
   });
 
+  // Dev-only Inline flow. Activated by NEXT_PUBLIC_FLW_MODE=inline on the
+  // jaratrade-dev Vercel project. Loads FLW v3.js, opens a modal, and
+  // hands the resulting tx_ref straight to the verify mutation - no
+  // redirect-back round-trip. Prod leaves the env var unset so this
+  // branch is dead code there.
+  const initInline = useMutation({
+    mutationFn: () => importerApi.initPayment(orderId),
+    onSuccess: async (session) => {
+      try {
+        await openFlutterwaveInline({
+          session,
+          onSuccess: (txRef) => {
+            verify.mutate(txRef);
+          },
+          onCancel: () => {
+            toast.message("Payment cancelled", {
+              description: "No charge was made. Try again when you're ready.",
+            });
+          },
+        });
+      } catch (err) {
+        toast.error("Couldn't open Flutterwave", {
+          description: err instanceof Error ? err.message : "Try again.",
+        });
+      }
+    },
+    onError: (err: Error) => {
+      toast.error("Couldn't initialise payment", { description: err.message });
+    },
+  });
+
+  const startPayment = () => {
+    if (FLW_INLINE_MODE) {
+      initInline.mutate();
+    } else {
+      initStandard.mutate();
+    }
+  };
+
   // While the redirect-back verify is running, show a clear state instead
   // of letting the user think the page is broken.
   const isVerifying = verify.isPending;
+  const isInitialising = initStandard.isPending || initInline.isPending;
   const isCancelledReturn = searchParams.get("from") === "flw" && searchParams.get("status") === "cancelled";
+  const initError = initStandard.error ?? initInline.error;
 
   return (
     <>
@@ -190,10 +232,10 @@ function PayContent({ orderId }: { orderId: string }) {
                 </Alert>
               ) : null}
 
-              {initStandard.isError ? (
+              {initError ? (
                 <Alert variant="destructive">
                   <AlertDescription>
-                    {(initStandard.error as Error).message}
+                    {(initError as Error).message}
                   </AlertDescription>
                 </Alert>
               ) : null}
@@ -201,13 +243,13 @@ function PayContent({ orderId }: { orderId: string }) {
               <Button
                 size="lg"
                 className="w-full"
-                loading={initStandard.isPending || isVerifying}
-                disabled={initStandard.isPending || isVerifying}
-                onClick={() => initStandard.mutate()}
+                loading={isInitialising || isVerifying}
+                disabled={isInitialising || isVerifying}
+                onClick={startPayment}
               >
                 {isVerifying
                   ? "Confirming payment..."
-                  : initStandard.isPending
+                  : isInitialising
                   ? "Opening Flutterwave..."
                   : `Pay ${buttonLabel ?? formatMoney(order.data?.total, order.data?.currency)}`}
               </Button>
