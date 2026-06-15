@@ -133,8 +133,20 @@ function PayContent({ orderId }: { orderId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  // Translate the buyer's display toggle into the ISO code we want FLW
+  // to charge in. "secondary" → GBP (the order's secondary_currency),
+  // "local" → the order's native currency (NGN today). When undefined
+  // the backend falls back to the FLW_CHARGE_CURRENCY env default.
+  const preferCurrency = (() => {
+    if (!order.data) return undefined;
+    if (currencyPref === "secondary" && order.data.secondary_currency) {
+      return order.data.secondary_currency;
+    }
+    return order.data.currency ?? "NGN";
+  })();
+
   const initStandard = useMutation({
-    mutationFn: () => importerApi.initPaymentStandard(orderId),
+    mutationFn: () => importerApi.initPaymentStandard(orderId, preferCurrency),
     onSuccess: (data) => {
       // Same window navigation - FLW will redirect the user back here
       // (?from=flw&tx_ref=...&status=...) once payment completes.
@@ -151,7 +163,7 @@ function PayContent({ orderId }: { orderId: string }) {
   // redirect-back round-trip. Prod leaves the env var unset so this
   // branch is dead code there.
   const initInline = useMutation({
-    mutationFn: () => importerApi.initPayment(orderId),
+    mutationFn: () => importerApi.initPayment(orderId, preferCurrency),
     onSuccess: async (session) => {
       try {
         await openFlutterwaveInline({
