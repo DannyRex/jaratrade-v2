@@ -23,33 +23,7 @@ import {
 import { useExporterPlans, useImporterPlans } from "@/lib/queries";
 import { formatDate, formatMoney } from "@/lib/format";
 import type { ExporterPlan, ImporterPlan, Role } from "@/lib/types";
-
-declare global {
-  interface Window {
-    FlutterwaveCheckout?: (config: Record<string, unknown>) => void;
-  }
-}
-
-const FLW_INLINE_SCRIPT = "https://checkout.flutterwave.com/v3.js";
-
-function loadFlutterwave(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") return reject(new Error("not in browser"));
-    if (window.FlutterwaveCheckout) return resolve();
-    const existing = document.querySelector(`script[src="${FLW_INLINE_SCRIPT}"]`);
-    if (existing) {
-      existing.addEventListener("load", () => resolve());
-      existing.addEventListener("error", () => reject(new Error("script failed to load")));
-      return;
-    }
-    const s = document.createElement("script");
-    s.src = FLW_INLINE_SCRIPT;
-    s.async = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error("script failed to load"));
-    document.head.appendChild(s);
-  });
-}
+import { openFlutterwaveInline, prewarmFlutterwave } from "@/lib/flw-inline";
 
 interface PlanForUI {
   id: string;
@@ -127,7 +101,7 @@ export function SubscriptionPage({ role }: { role: Role }) {
   // Pre-warm the Flutterwave script on mount so clicks land on a ready
   // checkout. The upgrade handler also awaits this if it raced ahead.
   useEffect(() => {
-    loadFlutterwave().catch(() => {
+    prewarmFlutterwave().catch(() => {
       /* failure surfaces lazily in the click handler */
     });
   }, []);
@@ -162,41 +136,31 @@ export function SubscriptionPage({ role }: { role: Role }) {
         toast.success(`Switched to ${(data as { plan_title: string }).plan_title}`);
         return;
       }
-      // If the user clicked Upgrade before the Flutterwave script finished
-      // loading, await the loader here instead of bailing out. (QA observed
-      // first-click failures when the upgrade request beat the script.)
-      if (!window.FlutterwaveCheckout) {
-        try {
-          await loadFlutterwave();
-        } catch {
-          toast.error("Payment system unavailable", {
-            description: "Couldn't load Flutterwave - please refresh and try again.",
-          });
-          return;
-        }
+      try {
+        await openFlutterwaveInline({
+          session: {
+            public_key: data.public_key,
+            tx_ref: data.tx_ref,
+            amount: data.amount,
+            currency: data.currency,
+            payment_options: data.payment_options,
+            customer: data.customer,
+            customizations: data.customizations,
+            split: data.split,
+            meta: data.meta,
+          },
+          onSuccess: (txRef) => verify.mutate(txRef),
+          onCancel: () => {
+            // No charge made; subscription endpoint already handles the
+            // pending Payment row, which the cron sweeps. No toast - the
+            // user dismissed the modal intentionally.
+          },
+        });
+      } catch (err) {
+        toast.error("Payment system unavailable", {
+          description: err instanceof Error ? err.message : "Please refresh and try again.",
+        });
       }
-      if (!window.FlutterwaveCheckout) {
-        toast.error("Payment system unavailable", { description: "Please refresh and try again." });
-        return;
-      }
-      window.FlutterwaveCheckout({
-        public_key: data.public_key,
-        tx_ref: data.tx_ref,
-        amount: data.amount,
-        currency: data.currency,
-        payment_options: data.payment_options,
-        customer: data.customer,
-        customizations: data.customizations,
-        meta: data.meta,
-        callback: (resp: { status: string; tx_ref: string }) => {
-          if (resp.status === "successful") {
-            verify.mutate(resp.tx_ref);
-          } else {
-            toast.error("Payment was not completed");
-          }
-        },
-        onclose: () => {},
-      });
     },
   });
 
