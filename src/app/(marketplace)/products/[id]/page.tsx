@@ -29,6 +29,7 @@ function ProductDetail({ id }: { id: string }) {
   const router = useRouter();
   const { data, isLoading, isError, refetch } = useProduct(id);
   const addToCart = useCart((s) => s.add);
+  const currencyPref = useCurrencyPreference((s) => s.preference);
   const [quantity, setQuantity] = useState<number | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -228,7 +229,19 @@ function ProductDetail({ id }: { id: string }) {
                 <ShoppingCart className="size-4" />
                 {outOfStock
                   ? "Out of stock"
-                  : `Add to cart · ${formatMoney(Number(data.price) * qty, data.currency || "NGN")}`}
+                  : `Add to cart · ${(() => {
+                      // Honour the buyer's currency toggle on the add-to-cart
+                      // label. `pickPriceDisplay` returns primary in whichever
+                      // ccy matches the current preference; we then scale by qty.
+                      const display = pickPriceDisplay(currencyPref, {
+                        price: data.price,
+                        currency: data.currency,
+                        secondary_amount: data.secondary_amount ?? null,
+                        secondary_currency: data.secondary_currency ?? null,
+                      });
+                      const primaryUnit = Number(display.primary.amount) || 0;
+                      return formatMoney(primaryUnit * qty, display.primary.currency);
+                    })()}`}
               </Button>
               <Button
                 size="icon-lg"
