@@ -335,16 +335,28 @@ export const importerApi = {
     ),
 
   // Payments
-  initPayment: (orderId: string) =>
-    request<FlutterwavePaymentSession>("/imp/payment/init", { method: "POST", body: multipart({ order_id: orderId }) }),
+  /** `preferCurrency` (optional ISO code) lets the buyer's display
+   *  toggle drive the FLW charge currency. Backend falls back to the
+   *  FLW_CHARGE_CURRENCY env default when omitted. */
+  initPayment: (orderId: string, preferCurrency?: string) =>
+    request<FlutterwavePaymentSession>("/imp/payment/init", {
+      method: "POST",
+      body: multipart({
+        order_id: orderId,
+        ...(preferCurrency ? { prefer_currency: preferCurrency } : {}),
+      }),
+    }),
   verifyPayment: (txRef: string) => request("/imp/payment/verify", { query: { tx_ref: txRef } }),
   /** Flutterwave Standard (hosted) checkout - server creates a session,
    *  returns a URL the browser redirects to. Used when the inline
    *  modal can't load reliably (CDN flakes, browser extensions, etc). */
-  initPaymentStandard: (orderId: string) =>
+  initPaymentStandard: (orderId: string, preferCurrency?: string) =>
     request<{ link: string; tx_ref: string }>("/imp/payment/init_standard", {
       method: "POST",
-      body: multipart({ order_id: orderId }),
+      body: multipart({
+        order_id: orderId,
+        ...(preferCurrency ? { prefer_currency: preferCurrency } : {}),
+      }),
     }),
   transactionHistory: () => request<PagedData<unknown>>("/imp/payment"),
 
